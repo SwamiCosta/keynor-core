@@ -37,4 +37,14 @@ public class DomainConfiguration {
     public LoreService loreService(LoreRepository loreRepository) {
         return new LoreService(loreRepository);
     }
+
+    @Bean
+    public EraService eraService(EraRepository eraRepository) {
+        return new EraService(eraRepository);
+    }
+
+    @Bean
+    public MapService mapService(MapRepository mapRepository) {
+        return new MapService(mapRepository);
+    }
 }
