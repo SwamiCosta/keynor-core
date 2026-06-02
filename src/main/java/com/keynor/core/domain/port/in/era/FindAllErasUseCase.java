@@ -1,0 +1,9 @@
+package com.keynor.core.domain.port.in.era;
+
+import com.keynor.core.domain.model.era.Era;
+
+import java.util.List;
+
+public interface FindAllErasUseCase {
+    List<Era> findAll();
+}
