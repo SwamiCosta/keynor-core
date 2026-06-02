@@ -1,0 +1,36 @@
+package com.keynor.core.application.dto.event;
+
+import com.keynor.core.domain.model.event.Event;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
+public record EventResponse(
+        UUID id,
+        String name,
+        String summary,
+        String body,
+        List<String> tags,
+        List<String> categories,
+        String status,
+        String timelineFoundedEra,
+        String timelineDestroyedEra,
+        Instant createdAt,
+        Instant updatedAt) {
+
+    public static EventResponse from(Event event) {
+        return new EventResponse(
+                event.getId(),
+                event.getName(),
+                event.getSummary(),
+                event.getBody(),
+                event.getTags(),
+                event.getCategories().stream().map(Enum::name).toList(),
+                event.getStatus().name(),
+                event.getTimeline() != null ? event.getTimeline().founded() : null,
+                event.getTimeline() != null ? event.getTimeline().destroyed() : null,
+                event.getCreatedAt(),
+                event.getUpdatedAt());
+    }
+}

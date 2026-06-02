@@ -1,0 +1,259 @@
+# keynor-core — Agent Context
+
+> Project-level context for AI agents operating in keynor-core.
+> Read this file and `../ARCHITECTURE.md` before executing any task.
+
+---
+
+## What this project is
+
+`keynor-core` is the central API of the Keynor ecosystem. It is the authoritative source of truth for all universe entities — characters, places, factions, items, events, and lore. Every other service that needs universe data communicates through keynor-core.
+
+---
+
+## Responsibilities
+
+- CRUD for all universe entities (characters, places, factions, items, events, lore)
+- Serve data to all other services (aniannoth-overview, keynor-rpg, keynor-stories, summon-server)
+- Central authentication and authorization for the ecosystem
+- Enforce entity status rules (`canon`, `draft`, `deprecated`)
+
+---
+
+## Stack
+
+| Concern | Technology |
+|---------|------------|
+| Language | Java 21 |
+| Framework | Spring Boot 3.3.4 |
+| Database | PostgreSQL (Flyway migrations) |
+| Build tool | Maven |
+| Auth | Spring Authorization Server (OAuth2) + Resource Server (JWT) |
+| API style | REST — `ProblemDetail` (RFC 7807) for error responses |
+| Testing | JUnit 5 + Mockito + Testcontainers |
+
+---
+
+## Architecture
+
+keynor-core follows **hexagonal architecture** (ports & adapters). The domain layer has zero framework dependencies.
+
+```
+keynor-core/
+├── src/
+│   ├── main/
+│   │   └── java/com/keynor/core/
+│   │       ├── domain/                  ← pure domain (entities, value objects, exceptions)
+│   │       │   ├── model/
+│   │       │   ├── port/
+│   │       │   │   ├── in/              ← input ports (use case interfaces)
+│   │       │   │   └── out/             ← output ports (repository interfaces)
+│   │       │   └── service/             ← domain services (implement input ports)
+│   │       ├── application/             ← application layer (orchestration, DTOs)
+│   │       │   ├── dto/
+│   │       │   └── usecase/
+│   │       └── infrastructure/          ← adapters (Spring, JPA, Security, etc.)
+│   │           ├── web/                 ← REST controllers (input adapters)
+│   │           ├── persistence/         ← JPA repositories (output adapters)
+│   │           └── security/            ← Spring Security configuration
+│   └── test/
+│       └── java/com/keynor/core/
+│           ├── domain/                  ← unit tests for domain services
+│           └── infrastructure/          ← integration tests for adapters
+└── pom.xml
+```
+
+### Layer rules
+
+| Layer | Depends on | Never depends on |
+|-------|-----------|-----------------|
+| `domain` | nothing | Spring, JPA, any framework |
+| `application` | `domain` | infrastructure adapters |
+| `infrastructure` | `application`, `domain` | — |
+
+---
+
+## Domain entities
+
+All universe entities extend `UniverseEntity` (abstract base class):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key, set at construction, immutable |
+| `name` | String | Display name |
+| `categories` | List\<CategoryEnum\> | One or more categories — an entity can have multiple (e.g. DEITY + HERO) |
+| `tags` | List\<String\> | Searchable free-form tags |
+| `summary` | String | Short description |
+| `body` | String | Full content in Markdown |
+| `status` | EntityStatus | `CANON`, `DRAFT`, or `DEPRECATED` |
+| `timeline` | Timeline | Value object with `founded` and `destroyed` (era strings, nullable) |
+| `createdAt` | Instant | Set at construction, immutable |
+| `updatedAt` | Instant | Updated on every mutation |
+
+Entity types and their category enums:
+
+| Entity | Category enum | Values |
+|--------|--------------|--------|
+| `Character` | `CharacterCategory` | HERO, VILLAIN, DEITY, CREATURE, NPC |
+| `Place` | `PlaceCategory` | CITY, REGION, DUNGEON, REALM, STRUCTURE |
+| `Faction` | `FactionCategory` | EMPIRE, GUILD, ORDER, TRIBE, DIVINE |
+| `Item` | `ItemCategory` | WEAPON, ARTIFACT, RELIC, TOOL, CONSUMABLE |
+| `Event` | `EventCategory` | BATTLE, POLITICAL, DIVINE, NATURAL, SOCIAL |
+| `Lore` | `LoreCategory` | HISTORY, MYTH, LAW, PROPHECY, GEOGRAPHY |
+
+`Place` additionally has `mapType: MapType` (NAVIGABLE or ABSTRACT).
+
+### Status transition rules
+
+Valid transitions enforced in `UniverseEntity.changeStatus()`:
+- DRAFT → CANON ✓
+- DRAFT → DEPRECATED ✓
+- CANON → DRAFT ✓
+- CANON → DEPRECATED ✓
+- DEPRECATED → DRAFT ✓
+- DEPRECATED → CANON ✗ (forbidden — throws `InvalidStatusTransitionException`)
+
+### Deletion policy
+
+Universe entities (lore/story data) support **hard delete**. User data (`users` table) must never be permanently deleted.
+
+---
+
+## Security model
+
+keynor-core is both **Authorization Server** and **Resource Server**.
+
+### Roles
+
+| Role | Grantee | Grant type |
+|------|---------|------------|
+| `ADMIN` | Human users (admin panel / RPG integration) | `authorization_code` + PKCE, form login |
+| `SYSTEM` | Service-to-service calls (keynor-rpg, aniannoth, etc.) | `client_credentials` |
+
+Both roles have full access to all endpoints in the current phase. No hierarchy between them.
+
+### Token flow
+
+- Authorization Server exposes `/oauth2/token`, `/oauth2/authorize`, OIDC discovery
+- All `/api/**` endpoints are protected and require a valid Bearer JWT
+- JWT is validated by the Resource Server filter chain
+- RSA key pair (2048-bit) is generated at startup — **ephemeral for dev**. Must be externalized for production.
+- OAuth2 clients and authorizations are persisted via `JdbcRegisteredClientRepository` / `JdbcOAuth2AuthorizationService`
+
+### First bootstrap
+
+No default users or clients exist in the schema. Before using the API you must:
+1. Insert a BCrypt-hashed ADMIN user in the `users` table
+2. Insert a SYSTEM client in the `oauth2_registered_client` table
+
+---
+
+## Database migrations (Flyway)
+
+| Version | Description |
+|---------|-------------|
+| V1 | `users` table |
+| V2 | 6 entity tables + 12 join tables (categories, tags) |
+| V3 | Spring Authorization Server OAuth2 tables |
+
+New migrations must be proposed via PR and require user authorization before being applied.
+
+---
+
+## Domain wiring
+
+Domain services have zero Spring annotations. They are wired as Spring beans in `DomainConfiguration` (infrastructure/config), which is the only class that knows both the domain services and the output port adapters.
+
+Pattern:
+```java
+@Bean
+public CharacterService characterService(CharacterRepository characterRepository) {
+    return new CharacterService(characterRepository);
+}
+```
+
+Controllers depend only on the use case interfaces (`CreateCharacterUseCase`, etc.), never on concrete service classes.
+
+---
+
+## Coding conventions
+
+Follows workspace-wide Clean Code rules plus Java-specific:
+
+- Classes: `PascalCase`
+- Methods and variables: `camelCase`
+- Constants: `UPPER_SNAKE_CASE`
+- Packages: `com.keynor.core.<layer>.<module>`
+- No abbreviations — full descriptive names
+- One class per file
+- Use records for DTOs and value objects where immutability fits
+- Prefer constructor injection over field injection
+
+### Naming patterns
+
+| Artifact | Suffix | Example |
+|----------|--------|---------|
+| Input port | `UseCase` | `CreateCharacterUseCase` |
+| Output port | `Repository` | `CharacterRepository` |
+| Domain service | `Service` | `CharacterService` |
+| REST controller | `Controller` | `CharacterController` |
+| JPA entity | `Entity` | `CharacterEntity` |
+| JPA adapter | `JpaAdapter` | `CharacterJpaAdapter` |
+| DTO (request) | `Request` | `CreateCharacterRequest` |
+| DTO (response) | `Response` | `CharacterResponse` |
+
+---
+
+## Testing rules
+
+- All new code must have tests
+- **Unit tests**: domain services — no Spring context, no database
+- **Integration tests**: adapters — use Testcontainers for real PostgreSQL
+- Test class naming: `*Test.java`
+- Integration test class naming: `*IntegrationTest.java`
+- Tests must not share mutable state between test methods
+
+---
+
+## Agent structure
+
+```
+keynor-core/
+└── .claude/
+    ├── CLAUDE.md              ← this file
+    └── agents/
+        ├── imaws.md           ← Level 3 — project architect
+        └── <specialist>.md    ← Level 1 or 2 (created as needed)
+```
+
+---
+
+## FAQ for agents
+
+**Can I add a Spring annotation to a domain entity?**
+No. The domain layer has zero framework dependencies. Use a separate JPA entity in the infrastructure layer and map between them.
+
+**Can I add a new Maven dependency?**
+No. Adding dependencies is a protected action — propose it to the user and wait for authorization.
+
+**Can I create a new database migration?**
+Writing the SQL file is allowed; actually running it requires user authorization. Always propose the migration file via PR so the user reviews before applying.
+
+**Can I edit this file (CLAUDE.md)?**
+No. Only Imaws (Level 3) may propose changes to this file, and only via pull request.
+
+**Can a domain service use `@Service`?**
+No. Domain services are annotation-free. Register them as `@Bean` in `DomainConfiguration` in the infrastructure/config package.
+
+**How do I handle the PageRequest naming conflict?**
+`com.keynor.core.domain.model.shared.PageRequest` and `org.springframework.data.domain.PageRequest` share the same simple name. In JPA adapters, import Spring's `PageRequest` (the more frequent call) and use the fully-qualified domain name in method signatures:
+```java
+public PageResult<Character> findAll(EntityFilter filter, com.keynor.core.domain.model.shared.PageRequest pageRequest)
+```
+
+**What is the base package?**
+`com.keynor.core`
+
+---
+
+*Last updated: 2026-06-01*
