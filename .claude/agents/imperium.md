@@ -54,7 +54,7 @@ Inherits all Level 1 (Scribe) permissions plus:
 - Controllers must depend **only** on use case interfaces, never on concrete service classes
 - JPA entities live in `infrastructure/persistence/` — never expose them outside that package
 - Every new entity type requires: domain model, category enum, 6 use case interfaces, output port, domain service, JPA entity, mapper, adapter, specifications, controller, and DTOs
-- `PageRequest` naming conflict: import Spring's `PageRequest` and use the fully-qualified domain name in adapter method signatures
+- **Before opening any PR that touches a `*JpaAdapter.java`**: run the checklist at `.claude/skills/jpa-adapter-checklist.md` — import naming conflicts cause compile errors and are not caught by tests
 
 ---
 

@@ -2,7 +2,6 @@ package com.keynor.core.infrastructure.persistence.character;
 
 import com.keynor.core.domain.model.character.Character;
 import com.keynor.core.domain.model.shared.EntityFilter;
-import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.out.CharacterRepository;
 import org.springframework.data.domain.Page;
@@ -50,7 +49,7 @@ public class CharacterJpaAdapter implements CharacterRepository {
     }
 
     @Override
-    public PageResult<Character> findAll(com.keynor.core.domain.model.shared.EntityFilter filter, com.keynor.core.domain.model.shared.PageRequest pageRequest) {
+    public PageResult<Character> findAll(EntityFilter filter, com.keynor.core.domain.model.shared.PageRequest pageRequest) {
         Specification<CharacterEntity> spec = CharacterSpecifications.fromFilter(filter);
         PageRequest springPage = PageRequest.of(pageRequest.page(), pageRequest.size());
         Page<CharacterEntity> page = jpaRepository.findAll(spec, springPage);
