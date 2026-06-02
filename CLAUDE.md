@@ -223,8 +223,17 @@ keynor-core/
     ├── CLAUDE.md              ← this file
     └── agents/
         ├── imaws.md           ← Level 3 — project architect
-        └── <specialist>.md    ← Level 1 or 2 (created as needed)
+        ├── imperium.md        ← Level 2 — Java code developer
+        ├── siegmund.md        ← Level 2 — database data and seed scripts
+        └── judis.md           ← Level 2 — unit and integration tests
 ```
+
+| Agent | Level | Scope |
+|-------|-------|-------|
+| Imaws | 3 — Architect | Architecture, cross-cutting concerns, proposals for protected changes |
+| Imperium | 2 — Developer | Java source code: domain, application, infrastructure layers |
+| Siegmund | 2 — Developer | SQL seed and maintenance scripts; read-only DB queries |
+| Judis | 2 — Developer | Unit tests (Mockito) and integration tests (Testcontainers) |
 
 ---
 
