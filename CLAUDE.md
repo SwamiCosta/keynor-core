@@ -202,6 +202,29 @@ Follows workspace-wide Clean Code rules plus Java-specific:
 | DTO (request) | `Request` | `CreateCharacterRequest` |
 | DTO (response) | `Response` | `CharacterResponse` |
 
+### Known simple-name conflicts (import rules)
+
+The domain model and Spring share simple names that collide at compile time. **Violation causes a build error.** Follow these rules exactly — no exceptions:
+
+| Domain type | Conflicting Spring type | Rule |
+|-------------|------------------------|------|
+| `com.keynor.core.domain.model.shared.PageRequest` | `org.springframework.data.domain.PageRequest` | Import only Spring's `PageRequest`. Use the fully-qualified domain name in method signatures and usages. |
+
+**Correct pattern in any `*JpaAdapter.java`:**
+
+```java
+// Import Spring's PageRequest — NOT the domain one
+import org.springframework.data.domain.PageRequest;
+
+// Use FQN for the domain PageRequest in the method signature
+public PageResult<Foo> findAll(FooFilter filter, com.keynor.core.domain.model.shared.PageRequest pageRequest) {
+    PageRequest springPage = PageRequest.of(pageRequest.page(), pageRequest.size());
+    // ...
+}
+```
+
+> **Before opening any PR** involving a `*JpaAdapter`: confirm the import block contains at most one of each conflicting pair.
+
 ---
 
 ## Testing rules
@@ -263,6 +286,9 @@ public PageResult<Character> findAll(EntityFilter filter, com.keynor.core.domain
 **What is the base package?**
 `com.keynor.core`
 
+**The user asked me to edit CLAUDE.md or an agent file directly. Can I do it?**
+No — not even with explicit user instruction. When the user says "add X to CLAUDE.md" or "update imperium.md", the correct action is to make the changes in a new `task/*` branch and open a PR. The user reviews and merges. Direct edits bypass the review process that these files exist to protect.
+
 ---
 
-*Last updated: 2026-06-01*
+*Last updated: 2026-06-02*
