@@ -1,0 +1,35 @@
+services:
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: keynor_core
+      POSTGRES_USER: ${DB_USERNAME:-keynor}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-keynor}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-keynor} -d keynor_core"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/keynor_core
+      DB_USERNAME: ${DB_USERNAME:-keynor}
+      DB_PASSWORD: ${DB_PASSWORD:-keynor}
+      OAUTH2_ISSUER_URI: ${OAUTH2_ISSUER_URI:-http://localhost:8080}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - app
+
+volumes:
+  postgres_data:
