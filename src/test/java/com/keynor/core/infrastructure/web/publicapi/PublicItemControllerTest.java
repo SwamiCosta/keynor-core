@@ -73,7 +73,7 @@ class PublicItemControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Item item = new Item(id, "Sword of Dawn", "A legendary blade", "Body", List.of("sword"),
-                List.of(ItemCategory.WEAPON), EntityStatus.CANON, null, now, now);
+                List.of(), List.of(ItemCategory.WEAPON), EntityStatus.CANON, null, now, now);
         when(findAllItemsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(item), 0, 20, 1));
 
@@ -93,7 +93,7 @@ class PublicItemControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Item item = new Item(id, "Sword of Dawn", "A legendary blade", "Body", List.of(),
-                List.of(ItemCategory.ARTIFACT), EntityStatus.CANON, null, now, now);
+                List.of(), List.of(ItemCategory.ARTIFACT), EntityStatus.CANON, null, now, now);
         when(findItemByIdUseCase.findById(id)).thenReturn(item);
 
         var response = controller.findById(id);

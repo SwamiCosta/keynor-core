@@ -21,6 +21,7 @@ public class FactionMapper {
                 entity.getSummary(),
                 entity.getBody(),
                 entity.getTags() != null ? new ArrayList<>(entity.getTags()) : new ArrayList<>(),
+                entity.getImages() != null ? new ArrayList<>(entity.getImages()) : new ArrayList<>(),
                 entity.getCategories() != null ? new ArrayList<>(entity.getCategories()) : new ArrayList<>(),
                 entity.getStatus(),
                 timeline,
@@ -35,6 +36,7 @@ public class FactionMapper {
         entity.setSummary(faction.getSummary());
         entity.setBody(faction.getBody());
         entity.setTags(new ArrayList<>(faction.getTags()));
+        entity.setImages(new ArrayList<>(faction.getImages()));
         entity.setCategories(new ArrayList<>(faction.getCategories()));
         entity.setStatus(faction.getStatus());
         entity.setTimeline(toEmbeddable(faction));

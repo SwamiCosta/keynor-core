@@ -21,6 +21,7 @@ public class ItemMapper {
                 entity.getSummary(),
                 entity.getBody(),
                 entity.getTags() != null ? new ArrayList<>(entity.getTags()) : new ArrayList<>(),
+                entity.getImages() != null ? new ArrayList<>(entity.getImages()) : new ArrayList<>(),
                 entity.getCategories() != null ? new ArrayList<>(entity.getCategories()) : new ArrayList<>(),
                 entity.getStatus(),
                 timeline,
@@ -35,6 +36,7 @@ public class ItemMapper {
         entity.setSummary(item.getSummary());
         entity.setBody(item.getBody());
         entity.setTags(new ArrayList<>(item.getTags()));
+        entity.setImages(new ArrayList<>(item.getImages()));
         entity.setCategories(new ArrayList<>(item.getCategories()));
         entity.setStatus(item.getStatus());
         entity.setTimeline(toEmbeddable(item));

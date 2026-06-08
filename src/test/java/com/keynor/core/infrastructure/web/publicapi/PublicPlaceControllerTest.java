@@ -73,7 +73,7 @@ class PublicPlaceControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Place place = new Place(id, "Erevan", "A city", "Body", List.of("city"),
-                List.of(PlaceCategory.CITY), null, EntityStatus.CANON, null, now, now);
+                List.of(), List.of(PlaceCategory.CITY), null, EntityStatus.CANON, null, now, now);
         when(findAllPlacesUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(place), 0, 20, 1));
 
@@ -93,7 +93,7 @@ class PublicPlaceControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Place place = new Place(id, "Erevan", "A city", "Body", List.of(),
-                List.of(PlaceCategory.REGION), null, EntityStatus.CANON, null, now, now);
+                List.of(), List.of(PlaceCategory.REGION), null, EntityStatus.CANON, null, now, now);
         when(findPlaceByIdUseCase.findById(id)).thenReturn(place);
 
         var response = controller.findById(id);

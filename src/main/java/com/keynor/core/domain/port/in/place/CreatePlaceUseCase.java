@@ -14,6 +14,7 @@ public interface CreatePlaceUseCase {
             String summary,
             String body,
             List<String> tags,
+            List<String> images,
             List<PlaceCategory> categories,
             MapType mapType,
             Timeline timeline) {}

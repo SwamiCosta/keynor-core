@@ -21,6 +21,7 @@ public class LoreMapper {
                 entity.getSummary(),
                 entity.getBody(),
                 entity.getTags() != null ? new ArrayList<>(entity.getTags()) : new ArrayList<>(),
+                entity.getImages() != null ? new ArrayList<>(entity.getImages()) : new ArrayList<>(),
                 entity.getCategories() != null ? new ArrayList<>(entity.getCategories()) : new ArrayList<>(),
                 entity.getStatus(),
                 timeline,
@@ -35,6 +36,7 @@ public class LoreMapper {
         entity.setSummary(lore.getSummary());
         entity.setBody(lore.getBody());
         entity.setTags(new ArrayList<>(lore.getTags()));
+        entity.setImages(new ArrayList<>(lore.getImages()));
         entity.setCategories(new ArrayList<>(lore.getCategories()));
         entity.setStatus(lore.getStatus());
         entity.setTimeline(toEmbeddable(lore));

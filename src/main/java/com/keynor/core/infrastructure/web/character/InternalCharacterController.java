@@ -69,6 +69,7 @@ public class InternalCharacterController {
                 request.summary(),
                 request.body(),
                 request.tags() != null ? request.tags() : List.of(),
+                request.images() != null ? request.images() : List.of(),
                 parseCategories(request.categories()),
                 buildTimeline(request.timelineFoundedEra(), request.timelineDestroyedEra()));
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -82,6 +83,7 @@ public class InternalCharacterController {
                 request.summary(),
                 request.body(),
                 request.tags() != null ? request.tags() : List.of(),
+                request.images() != null ? request.images() : List.of(),
                 parseCategories(request.categories()),
                 buildTimeline(request.timelineFoundedEra(), request.timelineDestroyedEra()));
         return ResponseEntity.ok(CharacterResponse.from(updateCharacterUseCase.update(id, command)));

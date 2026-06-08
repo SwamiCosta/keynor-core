@@ -14,6 +14,7 @@ public interface UpdateCharacterUseCase {
             String summary,
             String body,
             List<String> tags,
+            List<String> images,
             List<CharacterCategory> categories,
             Timeline timeline) {}
 

@@ -72,7 +72,9 @@ public class InternalEventController {
                 ? new Timeline(request.timelineFoundedEra(), request.timelineDestroyedEra()) : null;
         var command = new CreateEventUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(), categories, timeline);
+                request.tags() != null ? request.tags() : List.of(),
+                request.images() != null ? request.images() : List.of(),
+                categories, timeline);
         return ResponseEntity.status(HttpStatus.CREATED).body(EventResponse.from(createEventUseCase.create(command)));
     }
 
@@ -84,7 +86,9 @@ public class InternalEventController {
                 ? new Timeline(request.timelineFoundedEra(), request.timelineDestroyedEra()) : null;
         var command = new UpdateEventUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(), categories, timeline);
+                request.tags() != null ? request.tags() : List.of(),
+                request.images() != null ? request.images() : List.of(),
+                categories, timeline);
         return ResponseEntity.ok(EventResponse.from(updateEventUseCase.update(id, command)));
     }
 

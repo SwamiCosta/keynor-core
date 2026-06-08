@@ -72,7 +72,9 @@ public class InternalLoreController {
                 ? new Timeline(request.timelineFoundedEra(), request.timelineDestroyedEra()) : null;
         var command = new CreateLoreUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(), categories, timeline);
+                request.tags() != null ? request.tags() : List.of(),
+                request.images() != null ? request.images() : List.of(),
+                categories, timeline);
         return ResponseEntity.status(HttpStatus.CREATED).body(LoreResponse.from(createLoreUseCase.create(command)));
     }
 
@@ -84,7 +86,9 @@ public class InternalLoreController {
                 ? new Timeline(request.timelineFoundedEra(), request.timelineDestroyedEra()) : null;
         var command = new UpdateLoreUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(), categories, timeline);
+                request.tags() != null ? request.tags() : List.of(),
+                request.images() != null ? request.images() : List.of(),
+                categories, timeline);
         return ResponseEntity.ok(LoreResponse.from(updateLoreUseCase.update(id, command)));
     }
 

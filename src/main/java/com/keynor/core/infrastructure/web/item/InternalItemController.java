@@ -72,7 +72,9 @@ public class InternalItemController {
                 ? new Timeline(request.timelineFoundedEra(), request.timelineDestroyedEra()) : null;
         var command = new CreateItemUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(), categories, timeline);
+                request.tags() != null ? request.tags() : List.of(),
+                request.images() != null ? request.images() : List.of(),
+                categories, timeline);
         return ResponseEntity.status(HttpStatus.CREATED).body(ItemResponse.from(createItemUseCase.create(command)));
     }
 
@@ -84,7 +86,9 @@ public class InternalItemController {
                 ? new Timeline(request.timelineFoundedEra(), request.timelineDestroyedEra()) : null;
         var command = new UpdateItemUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(), categories, timeline);
+                request.tags() != null ? request.tags() : List.of(),
+                request.images() != null ? request.images() : List.of(),
+                categories, timeline);
         return ResponseEntity.ok(ItemResponse.from(updateItemUseCase.update(id, command)));
     }
 

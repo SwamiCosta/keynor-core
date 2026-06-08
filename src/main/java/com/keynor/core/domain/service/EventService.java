@@ -39,6 +39,7 @@ public class EventService implements
                 command.summary(),
                 command.body(),
                 command.tags(),
+                command.images(),
                 command.categories(),
                 EntityStatus.DRAFT,
                 command.timeline(),
@@ -51,7 +52,7 @@ public class EventService implements
     public Event update(UUID id, UpdateEventUseCase.Command command) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Event", id));
-        event.update(command.name(), command.summary(), command.body(), command.tags(), command.categories(), command.timeline());
+        event.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
         return eventRepository.save(event);
     }
 

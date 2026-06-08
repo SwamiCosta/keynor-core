@@ -14,6 +14,7 @@ public abstract class UniverseEntity {
     private String summary;
     private String body;
     private List<String> tags;
+    private List<String> images;
     private EntityStatus status;
     private Timeline timeline;
     private final Instant createdAt;
@@ -25,6 +26,7 @@ public abstract class UniverseEntity {
             String summary,
             String body,
             List<String> tags,
+            List<String> images,
             EntityStatus status,
             Timeline timeline,
             Instant createdAt,
@@ -34,6 +36,7 @@ public abstract class UniverseEntity {
         this.summary = summary;
         this.body = body;
         this.tags = new ArrayList<>(tags);
+        this.images = new ArrayList<>(images);
         this.status = status;
         this.timeline = timeline;
         this.createdAt = createdAt;
@@ -48,11 +51,12 @@ public abstract class UniverseEntity {
         this.updatedAt = Instant.now();
     }
 
-    protected void updateBaseFields(String name, String summary, String body, List<String> tags, Timeline timeline) {
+    protected void updateBaseFields(String name, String summary, String body, List<String> tags, List<String> images, Timeline timeline) {
         this.name = name;
         this.summary = summary;
         this.body = body;
         this.tags = new ArrayList<>(tags);
+        this.images = new ArrayList<>(images);
         this.timeline = timeline;
         this.updatedAt = Instant.now();
     }
@@ -70,6 +74,7 @@ public abstract class UniverseEntity {
     public String getSummary() { return summary; }
     public String getBody() { return body; }
     public List<String> getTags() { return List.copyOf(tags); }
+    public List<String> getImages() { return List.copyOf(images); }
     public EntityStatus getStatus() { return status; }
     public Timeline getTimeline() { return timeline; }
     public Instant getCreatedAt() { return createdAt; }

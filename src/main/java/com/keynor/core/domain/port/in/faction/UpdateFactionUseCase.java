@@ -14,6 +14,7 @@ public interface UpdateFactionUseCase {
             String summary,
             String body,
             List<String> tags,
+            List<String> images,
             List<FactionCategory> categories,
             Timeline timeline) {}
 

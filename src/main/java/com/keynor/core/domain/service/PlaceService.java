@@ -39,6 +39,7 @@ public class PlaceService implements
                 command.summary(),
                 command.body(),
                 command.tags(),
+                command.images(),
                 command.categories(),
                 command.mapType(),
                 EntityStatus.DRAFT,
@@ -52,7 +53,7 @@ public class PlaceService implements
     public Place update(UUID id, UpdatePlaceUseCase.Command command) {
         Place place = placeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Place", id));
-        place.update(command.name(), command.summary(), command.body(), command.tags(), command.categories(), command.mapType(), command.timeline());
+        place.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.mapType(), command.timeline());
         return placeRepository.save(place);
     }
 

@@ -20,19 +20,20 @@ public class Place extends UniverseEntity {
             String summary,
             String body,
             List<String> tags,
+            List<String> images,
             List<PlaceCategory> categories,
             MapType mapType,
             EntityStatus status,
             Timeline timeline,
             Instant createdAt,
             Instant updatedAt) {
-        super(id, name, summary, body, tags, status, timeline, createdAt, updatedAt);
+        super(id, name, summary, body, tags, images, status, timeline, createdAt, updatedAt);
         this.categories = new ArrayList<>(categories);
         this.mapType = mapType;
     }
 
-    public void update(String name, String summary, String body, List<String> tags, List<PlaceCategory> categories, MapType mapType, Timeline timeline) {
-        updateBaseFields(name, summary, body, tags, timeline);
+    public void update(String name, String summary, String body, List<String> tags, List<String> images, List<PlaceCategory> categories, MapType mapType, Timeline timeline) {
+        updateBaseFields(name, summary, body, tags, images, timeline);
         this.categories = new ArrayList<>(categories);
         this.mapType = mapType;
     }
