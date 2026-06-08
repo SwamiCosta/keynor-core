@@ -63,9 +63,6 @@ VALUES (
 )
 ON CONFLICT (id) DO NOTHING;
 
-UPDATE characters SET timeline_founded = 'primordial'
-WHERE id = 'b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d' AND timeline_founded IS NULL;
-
 INSERT INTO character_categories (character_id, category)
 VALUES ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'DEITY')
 ON CONFLICT (character_id, category) DO NOTHING;
@@ -97,9 +94,6 @@ VALUES (
     NOW()
 )
 ON CONFLICT (id) DO NOTHING;
-
-UPDATE lore SET timeline_founded = 'primordial'
-WHERE id = 'a1b2c3d4-e5f6-4789-8abc-def012345678' AND timeline_founded IS NULL;
 
 INSERT INTO lore_categories (lore_id, category)
 VALUES ('a1b2c3d4-e5f6-4789-8abc-def012345678', 'MYTH')

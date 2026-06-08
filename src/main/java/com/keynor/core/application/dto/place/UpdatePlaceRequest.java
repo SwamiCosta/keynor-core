@@ -12,6 +12,6 @@ public record UpdatePlaceRequest(
         List<String> tags,
         @NotNull List<String> categories,
         String mapType,
-        String timelineFoundedEra,
+        @NotBlank String timelineFoundedEra,
         String timelineDestroyedEra) {
 }
