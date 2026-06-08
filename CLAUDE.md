@@ -140,6 +140,18 @@ Both roles have full access to all endpoints in the current phase. No hierarchy 
 - RSA key pair (2048-bit) is generated at startup — **ephemeral for dev**. Must be externalized for production.
 - OAuth2 clients and authorizations are persisted via `JdbcRegisteredClientRepository` / `JdbcOAuth2AuthorizationService`
 
+### Security filter chains
+
+Spring Security evaluates filter chains in `@Order` sequence — the first chain whose `securityMatcher` matches the request wins.
+
+| Order | Chain | Matcher | Purpose |
+|-------|-------|---------|---------|
+| 1 | `authorizationServerSecurityFilterChain` | OAuth2/OIDC endpoints | Issues and manages tokens; handles OIDC discovery |
+| 2 | `resourceServerSecurityFilterChain` | `/api/**` | Enforces JWT on internal endpoints; `permitAll` on `/api/public/**` |
+| 3 | `defaultSecurityFilterChain` | everything else (catch-all) | Serves the `/login` form; supports the `authorization_code` human login flow |
+
+**Critical ordering constraint:** the Resource Server chain (`@Order(2)`) must come before the Form Login chain (`@Order(3)`). The Form Login chain has no `securityMatcher` and is a catch-all — if it ran first it would intercept `/api/**` requests and redirect them to `/login` instead of letting the Resource Server handle them.
+
 ### CORS
 
 Allowed origins (configured in `ResourceServerConfig`):
@@ -374,4 +386,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-06-08 — added Public API section, CORS origins, V4 migration entry, unit-testing-controllers skill*
+*Last updated: 2026-06-08 — added Public API section, CORS origins, V4 migration entry, unit-testing-controllers skill, security filter chain order documentation*

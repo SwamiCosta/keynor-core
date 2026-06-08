@@ -18,7 +18,7 @@ import java.util.List;
 public class ResourceServerConfig {
 
     @Bean
-    @Order(3)
+    @Order(2)
     public SecurityFilterChain resourceServerSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/**")
