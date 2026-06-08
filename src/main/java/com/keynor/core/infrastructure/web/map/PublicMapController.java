@@ -1,4 +1,4 @@
-package com.keynor.core.infrastructure.web.publicapi;
+package com.keynor.core.infrastructure.web.map;
 
 import com.keynor.core.application.dto.map.MapResponse;
 import com.keynor.core.domain.port.in.map.FindAllMapsUseCase;

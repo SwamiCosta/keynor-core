@@ -1,4 +1,4 @@
-package com.keynor.core.infrastructure.web.publicapi;
+package com.keynor.core.infrastructure.web.character;
 
 import com.keynor.core.application.dto.character.CharacterResponse;
 import com.keynor.core.application.dto.shared.PagedResponse;

@@ -1,4 +1,4 @@
-package com.keynor.core.infrastructure.web.publicapi;
+package com.keynor.core.infrastructure.web.era;
 
 import com.keynor.core.application.dto.era.EraResponse;
 import com.keynor.core.domain.port.in.era.FindAllErasUseCase;

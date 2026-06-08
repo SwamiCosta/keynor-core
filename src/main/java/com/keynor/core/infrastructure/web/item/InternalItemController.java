@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/items")
-public class ItemController {
+public class InternalItemController {
 
     private final CreateItemUseCase createItemUseCase;
     private final UpdateItemUseCase updateItemUseCase;
@@ -30,7 +30,7 @@ public class ItemController {
     private final FindItemByIdUseCase findItemByIdUseCase;
     private final FindAllItemsUseCase findAllItemsUseCase;
 
-    public ItemController(
+    public InternalItemController(
             CreateItemUseCase createItemUseCase,
             UpdateItemUseCase updateItemUseCase,
             ChangeItemStatusUseCase changeItemStatusUseCase,

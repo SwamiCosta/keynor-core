@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/factions")
-public class FactionController {
+public class InternalFactionController {
 
     private final CreateFactionUseCase createFactionUseCase;
     private final UpdateFactionUseCase updateFactionUseCase;
@@ -30,7 +30,7 @@ public class FactionController {
     private final FindFactionByIdUseCase findFactionByIdUseCase;
     private final FindAllFactionsUseCase findAllFactionsUseCase;
 
-    public FactionController(
+    public InternalFactionController(
             CreateFactionUseCase createFactionUseCase,
             UpdateFactionUseCase updateFactionUseCase,
             ChangeFactionStatusUseCase changeFactionStatusUseCase,

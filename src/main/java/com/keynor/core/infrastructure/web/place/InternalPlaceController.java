@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/places")
-public class PlaceController {
+public class InternalPlaceController {
 
     private final CreatePlaceUseCase createPlaceUseCase;
     private final UpdatePlaceUseCase updatePlaceUseCase;
@@ -31,7 +31,7 @@ public class PlaceController {
     private final FindPlaceByIdUseCase findPlaceByIdUseCase;
     private final FindAllPlacesUseCase findAllPlacesUseCase;
 
-    public PlaceController(
+    public InternalPlaceController(
             CreatePlaceUseCase createPlaceUseCase,
             UpdatePlaceUseCase updatePlaceUseCase,
             ChangePlaceStatusUseCase changePlaceStatusUseCase,
