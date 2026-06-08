@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/lore")
-public class LoreController {
+public class InternalLoreController {
 
     private final CreateLoreUseCase createLoreUseCase;
     private final UpdateLoreUseCase updateLoreUseCase;
@@ -30,7 +30,7 @@ public class LoreController {
     private final FindLoreByIdUseCase findLoreByIdUseCase;
     private final FindAllLoreUseCase findAllLoreUseCase;
 
-    public LoreController(
+    public InternalLoreController(
             CreateLoreUseCase createLoreUseCase,
             UpdateLoreUseCase updateLoreUseCase,
             ChangeLoreStatusUseCase changeLoreStatusUseCase,

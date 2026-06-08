@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/events")
-public class EventController {
+public class InternalEventController {
 
     private final CreateEventUseCase createEventUseCase;
     private final UpdateEventUseCase updateEventUseCase;
@@ -30,7 +30,7 @@ public class EventController {
     private final FindEventByIdUseCase findEventByIdUseCase;
     private final FindAllEventsUseCase findAllEventsUseCase;
 
-    public EventController(
+    public InternalEventController(
             CreateEventUseCase createEventUseCase,
             UpdateEventUseCase updateEventUseCase,
             ChangeEventStatusUseCase changeEventStatusUseCase,

@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/characters")
-public class CharacterController {
+public class InternalCharacterController {
 
     private final CreateCharacterUseCase createCharacterUseCase;
     private final UpdateCharacterUseCase updateCharacterUseCase;
@@ -30,7 +30,7 @@ public class CharacterController {
     private final FindCharacterByIdUseCase findCharacterByIdUseCase;
     private final FindAllCharactersUseCase findAllCharactersUseCase;
 
-    public CharacterController(
+    public InternalCharacterController(
             CreateCharacterUseCase createCharacterUseCase,
             UpdateCharacterUseCase updateCharacterUseCase,
             ChangeCharacterStatusUseCase changeCharacterStatusUseCase,

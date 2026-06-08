@@ -188,12 +188,12 @@ Endpoints under `/api/public/v1/` require no authentication and are consumed by 
 
 ### Adding a new public controller
 
-Follow the pattern of `PublicCharacterController`:
-1. Inject `FindAll*UseCase` and `FindById*UseCase` only
-2. Fix the `EntityFilter` to `List.of(EntityStatus.CANON)` — never expose other statuses
-3. Map with `PagedResponse.from(result, *Response::from)`
-4. No new DTOs needed if the existing `*Response` already covers the required fields
-5. Ask Judis to add unit tests (see `.claude/skills/unit-testing-controllers.md`)
+1. Create `Public*Controller` in `infrastructure/web/<domain>/` (same package as `Internal*Controller`)
+2. Inject `FindAll*UseCase` and `FindById*UseCase` only
+3. Fix the `EntityFilter` to `List.of(EntityStatus.CANON)` — never expose other statuses
+4. Map with `PagedResponse.from(result, *Response::from)`
+5. No new DTOs needed if the existing `*Response` already covers the required fields
+6. Ask Judis to add unit tests (see `.claude/skills/unit-testing-controllers.md`)
 
 ---
 
@@ -241,16 +241,41 @@ Follows workspace-wide Clean Code rules plus Java-specific:
 
 ### Naming patterns
 
-| Artifact | Suffix | Example |
-|----------|--------|---------|
+| Artifact | Pattern | Example |
+|----------|---------|---------|
 | Input port | `UseCase` | `CreateCharacterUseCase` |
 | Output port | `Repository` | `CharacterRepository` |
 | Domain service | `Service` | `CharacterService` |
-| REST controller | `Controller` | `CharacterController` |
+| Internal REST controller | `Internal*Controller` | `InternalCharacterController` |
+| Public REST controller | `Public*Controller` | `PublicCharacterController` |
 | JPA entity | `Entity` | `CharacterEntity` |
 | JPA adapter | `JpaAdapter` | `CharacterJpaAdapter` |
 | DTO (request) | `Request` | `CreateCharacterRequest` |
 | DTO (response) | `Response` | `CharacterResponse` |
+
+### Controller structure
+
+Controllers live under `infrastructure/web/<domain>/` — one directory per domain model:
+
+```
+infrastructure/web/
+├── character/
+│   ├── InternalCharacterController.java   ← authenticated, full CRUD
+│   └── PublicCharacterController.java     ← unauthenticated, read-only CANON
+├── place/
+│   ├── InternalPlaceController.java
+│   └── PublicPlaceController.java
+├── era/
+│   └── PublicEraController.java           ← no internal controller yet
+├── map/
+│   └── PublicMapController.java
+└── handler/
+    └── GlobalExceptionHandler.java
+```
+
+- `Internal*Controller` → mapped to `/api/v1/<domain>`, requires JWT
+- `Public*Controller` → mapped to `/api/public/v1/<domain>`, `permitAll`
+- Both controllers for the same domain share the same package (`web.<domain>`)
 
 ### Known simple-name conflicts (import rules)
 

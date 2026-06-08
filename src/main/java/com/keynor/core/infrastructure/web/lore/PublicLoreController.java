@@ -1,4 +1,4 @@
-package com.keynor.core.infrastructure.web.publicapi;
+package com.keynor.core.infrastructure.web.lore;
 
 import com.keynor.core.application.dto.lore.LoreResponse;
 import com.keynor.core.application.dto.shared.PagedResponse;
