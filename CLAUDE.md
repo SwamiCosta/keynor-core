@@ -135,16 +135,65 @@ Both roles have full access to all endpoints in the current phase. No hierarchy 
 ### Token flow
 
 - Authorization Server exposes `/oauth2/token`, `/oauth2/authorize`, OIDC discovery
-- All `/api/**` endpoints are protected and require a valid Bearer JWT
+- All `/api/**` endpoints are protected and require a valid Bearer JWT — **except** `/api/public/**`, which is `permitAll`
 - JWT is validated by the Resource Server filter chain
 - RSA key pair (2048-bit) is generated at startup — **ephemeral for dev**. Must be externalized for production.
 - OAuth2 clients and authorizations are persisted via `JdbcRegisteredClientRepository` / `JdbcOAuth2AuthorizationService`
+
+### CORS
+
+Allowed origins (configured in `ResourceServerConfig`):
+- `http://localhost:5173` (aniannoth-overview dev server)
+- `http://localhost:4173` (aniannoth-overview preview)
 
 ### First bootstrap
 
 No default users or clients exist in the schema. Before using the API you must:
 1. Insert a BCrypt-hashed ADMIN user in the `users` table
 2. Insert a SYSTEM client in the `oauth2_registered_client` table
+
+---
+
+## Public API
+
+Endpoints under `/api/public/v1/` require no authentication and are consumed by aniannoth-overview.
+
+### Invariants
+
+- All public endpoints return **only `CANON` entities** — DRAFT and DEPRECATED are never exposed
+- Responses always follow the `PagedResponse<T>` shape: `content`, `page`, `size`, `totalElements`
+- `findById` endpoints are included on all public controllers
+
+### Available endpoints
+
+| Controller | Endpoints |
+|------------|-----------|
+| `PublicCharacterController` | `GET /api/public/v1/characters`, `GET /api/public/v1/characters/{id}` |
+| `PublicPlaceController` | `GET /api/public/v1/places`, `GET /api/public/v1/places/{id}` |
+| `PublicFactionController` | `GET /api/public/v1/factions`, `GET /api/public/v1/factions/{id}` |
+| `PublicItemController` | `GET /api/public/v1/items`, `GET /api/public/v1/items/{id}` |
+| `PublicEventController` | `GET /api/public/v1/events`, `GET /api/public/v1/events/{id}` |
+| `PublicLoreController` | `GET /api/public/v1/lore`, `GET /api/public/v1/lore/{id}` |
+| `PublicEraController` | `GET /api/public/v1/eras`, `GET /api/public/v1/eras/{id}` |
+| `PublicMapController` | `GET /api/public/v1/maps`, `GET /api/public/v1/maps/{id}` |
+
+### Query parameters (list endpoints)
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `categories` | `List<String>` | — | Filter by one or more category values |
+| `tags` | `List<String>` | — | Filter by one or more tags |
+| `page` | `int` | `0` | Zero-based page number |
+| `size` | `int` | `20` | Page size |
+
+### Adding a new public controller
+
+Follow the pattern of `PublicCharacterController`:
+1. Inject `FindAll*UseCase` and `FindById*UseCase` only
+2. Fix the `EntityFilter` to `List.of(EntityStatus.CANON)` — never expose other statuses
+3. Map with `PagedResponse.from(result, *Response::from)`
+4. No new DTOs needed if the existing `*Response` already covers the required fields
+5. Ask Judis to add unit tests (see `.claude/skills/unit-testing-controllers.md`)
 
 ---
 
@@ -155,6 +204,7 @@ No default users or clients exist in the schema. Before using the API you must:
 | V1 | `users` table |
 | V2 | 6 entity tables + 12 join tables (categories, tags) |
 | V3 | Spring Authorization Server OAuth2 tables |
+| V4 | `eras` and `maps` tables |
 
 For the full procedure, see the workspace `SKILLS.md` — Skill 02.
 
@@ -299,4 +349,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-06-08*
+*Last updated: 2026-06-08 — added Public API section, CORS origins, V4 migration entry, unit-testing-controllers skill*
