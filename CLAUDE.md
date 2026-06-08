@@ -260,6 +260,17 @@ keynor-core/
 
 ---
 
+## Agent operational rules
+
+Before analyzing or reporting on the current state of this project, every agent must:
+
+1. Switch to `main`: `git checkout main`
+2. Pull the latest changes: `git pull`
+
+Analysis performed on stale or feature branches may produce incorrect assessments, duplicate work already merged, or miss critical recent changes.
+
+---
+
 ## FAQ for agents
 
 **Can I add a Spring annotation to a domain entity?**
