@@ -11,6 +11,6 @@ public record UpdateItemRequest(
         String body,
         List<String> tags,
         @NotNull List<String> categories,
-        String timelineFoundedEra,
+        @NotBlank String timelineFoundedEra,
         String timelineDestroyedEra) {
 }

@@ -12,6 +12,6 @@ public record CreatePlaceRequest(
         List<String> tags,
         @NotNull List<String> categories,
         String mapType,
-        String timelineFoundedEra,
+        @NotBlank String timelineFoundedEra,
         String timelineDestroyedEra) {
 }
