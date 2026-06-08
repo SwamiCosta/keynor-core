@@ -282,9 +282,6 @@ No. Adding dependencies is a protected action — propose it to the user and wai
 **Can I create a new database migration?**
 Writing the SQL file is allowed; actually running it requires user authorization. Always propose the migration file via PR so the user reviews before applying.
 
-**Can I edit this file (CLAUDE.md)?**
-No. Only Imaws (Level 3) may propose changes to this file, and only via pull request.
-
 **Can a domain service use `@Service`?**
 No. Domain services are annotation-free. Register them as `@Bean` in `DomainConfiguration` in the infrastructure/config package.
 
@@ -297,9 +294,9 @@ public PageResult<Character> findAll(EntityFilter filter, com.keynor.core.domain
 **What is the base package?**
 `com.keynor.core`
 
-**The user asked me to edit CLAUDE.md or an agent file directly. Can I do it?**
-No — not even with explicit user instruction. When the user says "add X to CLAUDE.md" or "update imperium.md", the correct action is to make the changes in a new `task/*` branch and open a PR. The user reviews and merges. Direct edits bypass the review process that these files exist to protect.
+**How do I edit a CLAUDE.md, agent file, or SKILLS.md?**
+Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-06-02*
+*Last updated: 2026-06-08*
