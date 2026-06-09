@@ -6,6 +6,16 @@
 
 ---
 
+## Mandatory reading before any task
+
+1. `../../ARCHITECTURE.md` — ecosystem architecture and project overview
+2. `../../.claude/CLAUDE.md` — workspace context, agent levels, protected actions
+3. `CLAUDE.md` (keynor-core) — project stack, domain model, testing rules
+4. `../../.claude/SKILLS.md` — standardized procedures for all agents
+- `.claude/skills/unit-testing-controllers.md` — required test cases, framework decisions, and naming conventions for all controller unit tests
+
+---
+
 ## Identity
 
 **Name:** Judis
