@@ -1,0 +1,170 @@
+package com.keynor.core.infrastructure.web.lore;
+
+import com.keynor.core.application.dto.lore.CreateLoreRequest;
+import com.keynor.core.application.dto.lore.LoreResponse;
+import com.keynor.core.application.dto.lore.UpdateLoreRequest;
+import com.keynor.core.application.dto.shared.ChangeStatusRequest;
+import com.keynor.core.application.dto.shared.PagedResponse;
+import com.keynor.core.domain.model.lore.Lore;
+import com.keynor.core.domain.model.lore.LoreCategory;
+import com.keynor.core.domain.model.shared.EntityFilter;
+import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.PageRequest;
+import com.keynor.core.domain.model.shared.PageResult;
+import com.keynor.core.domain.port.in.lore.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class InternalLoreControllerTest {
+
+    @Mock private CreateLoreUseCase createLoreUseCase;
+    @Mock private UpdateLoreUseCase updateLoreUseCase;
+    @Mock private ChangeLoreStatusUseCase changeLoreStatusUseCase;
+    @Mock private DeleteLoreUseCase deleteLoreUseCase;
+    @Mock private FindLoreByIdUseCase findLoreByIdUseCase;
+    @Mock private FindAllLoreUseCase findAllLoreUseCase;
+
+    private InternalLoreController controller;
+
+    private Lore buildLore(UUID id) {
+        Instant now = Instant.now();
+        return new Lore(id, "The Age of Silence", "A period of stillness", "Body",
+                List.of("history"), List.of(), List.of(LoreCategory.HISTORY),
+                EntityStatus.DRAFT, null, now, now);
+    }
+
+    @BeforeEach
+    void setUp() {
+        controller = new InternalLoreController(
+                createLoreUseCase, updateLoreUseCase, changeLoreStatusUseCase,
+                deleteLoreUseCase, findLoreByIdUseCase, findAllLoreUseCase);
+    }
+
+    @Test
+    void create_shouldReturn201AndResponseBody_whenCommandIsValid() {
+        UUID id = UUID.randomUUID();
+        when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
+
+        var request = new CreateLoreRequest("The Age of Silence", "A period of stillness", "Body",
+                List.of("history"), List.of(), List.of("HISTORY"), "era-1", null);
+
+        var response = controller.create(request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().name()).isEqualTo("The Age of Silence");
+        verify(createLoreUseCase).create(any());
+    }
+
+    @Test
+    void create_shouldPassCorrectCommandToUseCase() {
+        UUID id = UUID.randomUUID();
+        when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
+
+        var request = new CreateLoreRequest("The Age of Silence", null, null,
+                List.of(), List.of(), List.of("HISTORY"), "era-1", null);
+
+        controller.create(request);
+
+        ArgumentCaptor<CreateLoreUseCase.Command> captor =
+                ArgumentCaptor.forClass(CreateLoreUseCase.Command.class);
+        verify(createLoreUseCase).create(captor.capture());
+        assertThat(captor.getValue().name()).isEqualTo("The Age of Silence");
+        assertThat(captor.getValue().categories()).containsExactly(LoreCategory.HISTORY);
+    }
+
+    @Test
+    void update_shouldReturn200AndResponseBody_whenCommandIsValid() {
+        UUID id = UUID.randomUUID();
+        when(updateLoreUseCase.update(eq(id), any())).thenReturn(buildLore(id));
+
+        var request = new UpdateLoreRequest("Updated Lore", null, null,
+                List.of(), List.of(), List.of("HISTORY"), "era-1", null);
+
+        var response = controller.update(id, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        verify(updateLoreUseCase).update(eq(id), any());
+    }
+
+    @Test
+    void changeStatus_shouldReturn200AndCallUseCase() {
+        UUID id = UUID.randomUUID();
+        when(changeLoreStatusUseCase.changeStatus(id, EntityStatus.CANON)).thenReturn(buildLore(id));
+
+        var response = controller.changeStatus(id, new ChangeStatusRequest("CANON"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(changeLoreStatusUseCase).changeStatus(id, EntityStatus.CANON);
+    }
+
+    @Test
+    void delete_shouldReturn204AndCallUseCase() {
+        UUID id = UUID.randomUUID();
+
+        var response = controller.delete(id);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        verify(deleteLoreUseCase).delete(id);
+    }
+
+    @Test
+    void findAll_shouldPassPaginationAndReturnMappedResponse() {
+        UUID id = UUID.randomUUID();
+        when(findAllLoreUseCase.findAll(any(), any()))
+                .thenReturn(new PageResult<>(List.of(buildLore(id)), 0, 20, 1));
+
+        var response = controller.findAll(null, null, null, 0, 20);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        PagedResponse<LoreResponse> body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.totalElements()).isEqualTo(1);
+        ArgumentCaptor<PageRequest> pageCaptor = ArgumentCaptor.forClass(PageRequest.class);
+        verify(findAllLoreUseCase).findAll(any(), pageCaptor.capture());
+        assertThat(pageCaptor.getValue().page()).isEqualTo(0);
+        assertThat(pageCaptor.getValue().size()).isEqualTo(20);
+    }
+
+    @Test
+    void findAll_shouldNotApplyCanonFilter_whenNoStatusProvided() {
+        when(findAllLoreUseCase.findAll(any(), any()))
+                .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
+
+        controller.findAll(null, null, null, 0, 20);
+
+        ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
+        verify(findAllLoreUseCase).findAll(filterCaptor.capture(), any());
+        assertThat(filterCaptor.getValue().statuses()).isEmpty();
+    }
+
+    @Test
+    void findById_shouldDelegateAndMapResult() {
+        UUID id = UUID.randomUUID();
+        when(findLoreByIdUseCase.findById(id)).thenReturn(buildLore(id));
+
+        var response = controller.findById(id);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().id()).isEqualTo(id);
+        verify(findLoreByIdUseCase).findById(id);
+    }
+}
