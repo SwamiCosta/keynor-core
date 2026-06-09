@@ -12,6 +12,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.validation.BindingResult;
@@ -188,8 +189,8 @@ class GlobalExceptionHandlerTest {
         BindingResult bindingResult = mock(BindingResult.class);
         FieldError fieldError = new FieldError("object", field, message);
         when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError));
-        MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
-        when(ex.getBindingResult()).thenReturn(bindingResult);
-        return ex;
+        MethodParameter methodParameter = new MethodParameter(
+                GlobalExceptionHandlerTest.class.getDeclaredMethods()[0], -1);
+        return new MethodArgumentNotValidException(methodParameter, bindingResult);
     }
 }
