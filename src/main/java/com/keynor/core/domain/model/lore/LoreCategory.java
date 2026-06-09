@@ -5,5 +5,6 @@ public enum LoreCategory {
     MYTH,
     LAW,
     PROPHECY,
-    GEOGRAPHY
+    GEOGRAPHY,
+    PHILOSOPHY
 }

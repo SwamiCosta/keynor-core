@@ -13,5 +13,6 @@ public record CreateLoreRequest(
         List<String> images,
         @NotNull List<String> categories,
         @NotBlank String timelineFoundedEra,
-        String timelineDestroyedEra) {
+        String timelineDestroyedEra,
+        String status) {
 }

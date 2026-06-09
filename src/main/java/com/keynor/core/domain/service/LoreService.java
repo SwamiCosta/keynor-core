@@ -33,6 +33,7 @@ public class LoreService implements
             throw new DuplicateEntityNameException("Lore", command.name());
         }
         Instant now = Instant.now();
+        EntityStatus initialStatus = command.status() != null ? command.status() : EntityStatus.DRAFT;
         Lore lore = new Lore(
                 UUID.randomUUID(),
                 command.name(),
@@ -41,7 +42,7 @@ public class LoreService implements
                 command.tags(),
                 command.images(),
                 command.categories(),
-                EntityStatus.DRAFT,
+                initialStatus,
                 command.timeline(),
                 now,
                 now);
