@@ -55,6 +55,7 @@ Inherits all Level 1 (Scribe) permissions plus:
 - JPA entities live in `infrastructure/persistence/` — never expose them outside that package
 - Every new entity type requires: domain model, category enum, 6 use case interfaces, output port, domain service, JPA entity, mapper, adapter, specifications, controller, and DTOs
 - **Before opening any PR that touches a `*JpaAdapter.java`**: run the checklist at `.claude/skills/jpa-adapter-checklist.md` — import naming conflicts cause compile errors and are not caught by tests
+- **Whenever adding or modifying logging**: follow `.claude/skills/logging-conventions.md` — class names, MDC usage, log levels, and placement decisions for keynor-core
 
 ---
 
