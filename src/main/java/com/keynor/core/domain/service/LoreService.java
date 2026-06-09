@@ -39,6 +39,7 @@ public class LoreService implements
                 command.summary(),
                 command.body(),
                 command.tags(),
+                command.images(),
                 command.categories(),
                 EntityStatus.DRAFT,
                 command.timeline(),
@@ -51,7 +52,7 @@ public class LoreService implements
     public Lore update(UUID id, UpdateLoreUseCase.Command command) {
         Lore lore = loreRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Lore", id));
-        lore.update(command.name(), command.summary(), command.body(), command.tags(), command.categories(), command.timeline());
+        lore.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
         return loreRepository.save(lore);
     }
 

@@ -39,6 +39,7 @@ public class ItemService implements
                 command.summary(),
                 command.body(),
                 command.tags(),
+                command.images(),
                 command.categories(),
                 EntityStatus.DRAFT,
                 command.timeline(),
@@ -51,7 +52,7 @@ public class ItemService implements
     public Item update(UUID id, UpdateItemUseCase.Command command) {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Item", id));
-        item.update(command.name(), command.summary(), command.body(), command.tags(), command.categories(), command.timeline());
+        item.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
         return itemRepository.save(item);
     }
 

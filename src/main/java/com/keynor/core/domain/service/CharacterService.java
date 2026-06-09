@@ -39,6 +39,7 @@ public class CharacterService implements
                 command.summary(),
                 command.body(),
                 command.tags(),
+                command.images(),
                 command.categories(),
                 EntityStatus.DRAFT,
                 command.timeline(),
@@ -51,7 +52,7 @@ public class CharacterService implements
     public Character update(UUID id, UpdateCharacterUseCase.Command command) {
         Character character = characterRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Character", id));
-        character.update(command.name(), command.summary(), command.body(), command.tags(), command.categories(), command.timeline());
+        character.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
         return characterRepository.save(character);
     }
 

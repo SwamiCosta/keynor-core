@@ -19,17 +19,18 @@ public class Lore extends UniverseEntity {
             String summary,
             String body,
             List<String> tags,
+            List<String> images,
             List<LoreCategory> categories,
             EntityStatus status,
             Timeline timeline,
             Instant createdAt,
             Instant updatedAt) {
-        super(id, name, summary, body, tags, status, timeline, createdAt, updatedAt);
+        super(id, name, summary, body, tags, images, status, timeline, createdAt, updatedAt);
         this.categories = new ArrayList<>(categories);
     }
 
-    public void update(String name, String summary, String body, List<String> tags, List<LoreCategory> categories, Timeline timeline) {
-        updateBaseFields(name, summary, body, tags, timeline);
+    public void update(String name, String summary, String body, List<String> tags, List<String> images, List<LoreCategory> categories, Timeline timeline) {
+        updateBaseFields(name, summary, body, tags, images, timeline);
         this.categories = new ArrayList<>(categories);
     }
 

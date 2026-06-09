@@ -32,6 +32,12 @@ public class LoreEntity {
     private List<String> tags = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "universe_entity_images", joinColumns = @JoinColumn(name = "entity_id"))
+    @Column(name = "image_url")
+    @OrderColumn(name = "display_order")
+    private List<String> images = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "lore_categories", joinColumns = @JoinColumn(name = "lore_id"))
     @Column(name = "category")
@@ -60,6 +66,8 @@ public class LoreEntity {
     public void setBody(String body) { this.body = body; }
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
+    public List<String> getImages() { return images; }
+    public void setImages(List<String> images) { this.images = images; }
     public List<LoreCategory> getCategories() { return categories; }
     public void setCategories(List<LoreCategory> categories) { this.categories = categories; }
     public EntityStatus getStatus() { return status; }

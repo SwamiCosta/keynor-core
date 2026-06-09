@@ -76,6 +76,7 @@ public class InternalPlaceController {
         var command = new CreatePlaceUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.tags() != null ? request.tags() : List.of(),
+                request.images() != null ? request.images() : List.of(),
                 categories, mapType, timeline);
         return ResponseEntity.status(HttpStatus.CREATED).body(PlaceResponse.from(createPlaceUseCase.create(command)));
     }
@@ -90,6 +91,7 @@ public class InternalPlaceController {
         var command = new UpdatePlaceUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.tags() != null ? request.tags() : List.of(),
+                request.images() != null ? request.images() : List.of(),
                 categories, mapType, timeline);
         return ResponseEntity.ok(PlaceResponse.from(updatePlaceUseCase.update(id, command)));
     }

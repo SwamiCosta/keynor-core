@@ -45,6 +45,7 @@ class CharacterServiceTest {
         var command = new CreateCharacterUseCase.Command(
                 "Araveth", "A wandering hero", "Long description...",
                 List.of("hero", "warrior"),
+                List.of(),
                 List.of(CharacterCategory.HERO),
                 null);
         when(characterRepository.existsByName("Araveth")).thenReturn(false);
@@ -61,7 +62,7 @@ class CharacterServiceTest {
     @Test
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateCharacterUseCase.Command(
-                "Araveth", null, null, List.of(), List.of(CharacterCategory.NPC), null);
+                "Araveth", null, null, List.of(), List.of(), List.of(CharacterCategory.NPC), null);
         when(characterRepository.existsByName("Araveth")).thenReturn(true);
 
         assertThatThrownBy(() -> characterService.create(command))
@@ -84,7 +85,7 @@ class CharacterServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Character character = new Character(
-                id, "Araveth", null, null, List.of(),
+                id, "Araveth", null, null, List.of(), List.of(),
                 List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now);
         when(characterRepository.findById(id)).thenReturn(Optional.of(character));
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -99,7 +100,7 @@ class CharacterServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Character character = new Character(
-                id, "Araveth", null, null, List.of(),
+                id, "Araveth", null, null, List.of(), List.of(),
                 List.of(CharacterCategory.HERO), EntityStatus.DEPRECATED, null, now, now);
         when(characterRepository.findById(id)).thenReturn(Optional.of(character));
 
@@ -122,14 +123,14 @@ class CharacterServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Character character = new Character(
-                id, "Old Name", null, null, List.of(),
+                id, "Old Name", null, null, List.of(), List.of(),
                 List.of(CharacterCategory.NPC), EntityStatus.DRAFT, null, now, now);
         when(characterRepository.findById(id)).thenReturn(Optional.of(character));
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         var command = new UpdateCharacterUseCase.Command(
                 "New Name", "New summary", "New body",
-                List.of("tag1"), List.of(CharacterCategory.HERO, CharacterCategory.DEITY), null);
+                List.of("tag1"), List.of(), List.of(CharacterCategory.HERO, CharacterCategory.DEITY), null);
 
         Character result = characterService.update(id, command);
 
@@ -148,5 +149,56 @@ class CharacterServiceTest {
 
         assertThat(result.content()).isEmpty();
         assertThat(result.totalElements()).isZero();
+    }
+
+    @Test
+    void create_shouldReturnCharacterWithImages_whenImagesProvided() {
+        var command = new CreateCharacterUseCase.Command(
+                "Araveth", null, null, List.of(),
+                List.of("https://example.com/araveth.png", "https://example.com/araveth2.png"),
+                List.of(CharacterCategory.HERO), null);
+        when(characterRepository.existsByName("Araveth")).thenReturn(false);
+        when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Character result = characterService.create(command);
+
+        assertThat(result.getImages()).containsExactly(
+                "https://example.com/araveth.png",
+                "https://example.com/araveth2.png");
+    }
+
+    @Test
+    void create_shouldReturnCharacterWithEmptyImages_whenNoImagesProvided() {
+        var command = new CreateCharacterUseCase.Command(
+                "Araveth", null, null, List.of(), List.of(), List.of(CharacterCategory.HERO), null);
+        when(characterRepository.existsByName("Araveth")).thenReturn(false);
+        when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Character result = characterService.create(command);
+
+        assertThat(result.getImages()).isEmpty();
+    }
+
+    @Test
+    void update_shouldReplaceImagesWithNewList() {
+        UUID id = UUID.randomUUID();
+        Instant now = Instant.now();
+        Character character = new Character(
+                id, "Araveth", null, null, List.of(),
+                List.of("https://example.com/old.png"),
+                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now);
+        when(characterRepository.findById(id)).thenReturn(Optional.of(character));
+        when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        var command = new UpdateCharacterUseCase.Command(
+                "Araveth", null, null, List.of(),
+                List.of("https://example.com/new1.png", "https://example.com/new2.png"),
+                List.of(CharacterCategory.HERO), null);
+
+        Character result = characterService.update(id, command);
+
+        assertThat(result.getImages()).containsExactly(
+                "https://example.com/new1.png",
+                "https://example.com/new2.png");
     }
 }

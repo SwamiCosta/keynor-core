@@ -21,6 +21,7 @@ public class CharacterMapper {
                 entity.getSummary(),
                 entity.getBody(),
                 entity.getTags() != null ? new ArrayList<>(entity.getTags()) : new ArrayList<>(),
+                entity.getImages() != null ? new ArrayList<>(entity.getImages()) : new ArrayList<>(),
                 entity.getCategories() != null ? new ArrayList<>(entity.getCategories()) : new ArrayList<>(),
                 entity.getStatus(),
                 timeline,
@@ -35,6 +36,7 @@ public class CharacterMapper {
         entity.setSummary(character.getSummary());
         entity.setBody(character.getBody());
         entity.setTags(new ArrayList<>(character.getTags()));
+        entity.setImages(new ArrayList<>(character.getImages()));
         entity.setCategories(new ArrayList<>(character.getCategories()));
         entity.setStatus(character.getStatus());
         entity.setTimeline(toEmbeddable(character));

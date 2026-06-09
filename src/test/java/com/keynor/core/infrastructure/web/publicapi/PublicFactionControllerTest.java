@@ -73,7 +73,7 @@ class PublicFactionControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Faction faction = new Faction(id, "The Iron Order", "A guild", "Body", List.of("guild"),
-                List.of(FactionCategory.ORDER), EntityStatus.CANON, null, now, now);
+                List.of(), List.of(FactionCategory.ORDER), EntityStatus.CANON, null, now, now);
         when(findAllFactionsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(faction), 0, 20, 1));
 
@@ -93,7 +93,7 @@ class PublicFactionControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Faction faction = new Faction(id, "The Iron Order", "A guild", "Body", List.of(),
-                List.of(FactionCategory.GUILD), EntityStatus.CANON, null, now, now);
+                List.of(), List.of(FactionCategory.GUILD), EntityStatus.CANON, null, now, now);
         when(findFactionByIdUseCase.findById(id)).thenReturn(faction);
 
         var response = controller.findById(id);

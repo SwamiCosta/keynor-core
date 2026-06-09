@@ -10,6 +10,7 @@ public record UpdatePlaceRequest(
         String summary,
         String body,
         List<String> tags,
+        List<String> images,
         @NotNull List<String> categories,
         String mapType,
         @NotBlank String timelineFoundedEra,

@@ -14,6 +14,7 @@ public interface UpdateItemUseCase {
             String summary,
             String body,
             List<String> tags,
+            List<String> images,
             List<ItemCategory> categories,
             Timeline timeline) {}
 

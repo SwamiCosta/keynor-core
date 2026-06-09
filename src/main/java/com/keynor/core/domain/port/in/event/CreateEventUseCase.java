@@ -13,6 +13,7 @@ public interface CreateEventUseCase {
             String summary,
             String body,
             List<String> tags,
+            List<String> images,
             List<EventCategory> categories,
             Timeline timeline) {}
 

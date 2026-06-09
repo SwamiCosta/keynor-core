@@ -39,6 +39,7 @@ public class FactionService implements
                 command.summary(),
                 command.body(),
                 command.tags(),
+                command.images(),
                 command.categories(),
                 EntityStatus.DRAFT,
                 command.timeline(),
@@ -51,7 +52,7 @@ public class FactionService implements
     public Faction update(UUID id, UpdateFactionUseCase.Command command) {
         Faction faction = factionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Faction", id));
-        faction.update(command.name(), command.summary(), command.body(), command.tags(), command.categories(), command.timeline());
+        faction.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
         return factionRepository.save(faction);
     }
 
