@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -62,7 +63,7 @@ class InternalLoreControllerTest {
         when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
 
         var request = new CreateLoreRequest("The Age of Silence", "A period of stillness", "Body",
-                List.of("history"), List.of(), List.of("HISTORY"), "era-1", null);
+                List.of("history"), List.of(), List.of("HISTORY"), "era-1", null, null);
 
         var response = controller.create(request);
 
@@ -78,7 +79,7 @@ class InternalLoreControllerTest {
         when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
 
         var request = new CreateLoreRequest("The Age of Silence", null, null,
-                List.of(), List.of(), List.of("HISTORY"), "era-1", null);
+                List.of(), List.of(), List.of("HISTORY"), "era-1", null, null);
 
         controller.create(request);
 
@@ -87,6 +88,51 @@ class InternalLoreControllerTest {
         verify(createLoreUseCase).create(captor.capture());
         assertThat(captor.getValue().name()).isEqualTo("The Age of Silence");
         assertThat(captor.getValue().categories()).containsExactly(LoreCategory.HISTORY);
+    }
+
+    @Test
+    void create_shouldDefaultToDraftStatus_whenStatusIsNull() {
+        UUID id = UUID.randomUUID();
+        when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
+
+        var request = new CreateLoreRequest("The Age of Silence", null, null,
+                List.of(), List.of(), List.of("HISTORY"), "era-1", null, null);
+
+        controller.create(request);
+
+        ArgumentCaptor<CreateLoreUseCase.Command> captor =
+                ArgumentCaptor.forClass(CreateLoreUseCase.Command.class);
+        verify(createLoreUseCase).create(captor.capture());
+        assertThat(captor.getValue().status()).isEqualTo(EntityStatus.DRAFT);
+    }
+
+    @Test
+    void create_shouldPassCanonStatus_whenStatusIsCanon() {
+        UUID id = UUID.randomUUID();
+        Instant now = Instant.now();
+        Lore canonLore = new Lore(id, "The Age of Silence", null, null, List.of(), List.of(),
+                List.of(LoreCategory.HISTORY), EntityStatus.CANON, null, now, now);
+        when(createLoreUseCase.create(any())).thenReturn(canonLore);
+
+        var request = new CreateLoreRequest("The Age of Silence", null, null,
+                List.of(), List.of(), List.of("HISTORY"), "era-1", null, "CANON");
+
+        controller.create(request);
+
+        ArgumentCaptor<CreateLoreUseCase.Command> captor =
+                ArgumentCaptor.forClass(CreateLoreUseCase.Command.class);
+        verify(createLoreUseCase).create(captor.capture());
+        assertThat(captor.getValue().status()).isEqualTo(EntityStatus.CANON);
+    }
+
+    @Test
+    void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
+        var request = new CreateLoreRequest("The Age of Silence", null, null,
+                List.of(), List.of(), List.of("HISTORY"), "era-1", null, "DEPRECATED");
+
+        assertThatThrownBy(() -> controller.create(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("DEPRECATED");
     }
 
     @Test

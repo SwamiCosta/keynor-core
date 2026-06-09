@@ -41,13 +41,13 @@ class LoreServiceTest {
     }
 
     @Test
-    void create_shouldReturnSavedLore_whenNameIsUnique() {
+    void create_shouldReturnSavedLoreWithDraftStatus_whenStatusIsNull() {
         var command = new CreateLoreUseCase.Command(
                 "The Age of Silence", "A period of stillness", "Long description...",
                 List.of("history", "silence"),
                 List.of(),
                 List.of(LoreCategory.HISTORY),
-                null);
+                null, null);
         when(loreRepository.existsByName("The Age of Silence")).thenReturn(false);
         when(loreRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -60,10 +60,27 @@ class LoreServiceTest {
     }
 
     @Test
+    void create_shouldReturnSavedLoreWithCanonStatus_whenStatusIsCanon() {
+        var command = new CreateLoreUseCase.Command(
+                "The Age of Silence", "A period of stillness", "Long description...",
+                List.of("history", "silence"),
+                List.of(),
+                List.of(LoreCategory.HISTORY),
+                null, EntityStatus.CANON);
+        when(loreRepository.existsByName("The Age of Silence")).thenReturn(false);
+        when(loreRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Lore result = loreService.create(command);
+
+        assertThat(result.getStatus()).isEqualTo(EntityStatus.CANON);
+        verify(loreRepository).save(any());
+    }
+
+    @Test
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateLoreUseCase.Command(
                 "The Age of Silence", null, null, List.of(), List.of(),
-                List.of(LoreCategory.MYTH), null);
+                List.of(LoreCategory.MYTH), null, null);
         when(loreRepository.existsByName("The Age of Silence")).thenReturn(true);
 
         assertThatThrownBy(() -> loreService.create(command))

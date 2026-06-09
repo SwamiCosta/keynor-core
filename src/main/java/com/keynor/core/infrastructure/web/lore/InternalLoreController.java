@@ -70,12 +70,24 @@ public class InternalLoreController {
                 .map(c -> LoreCategory.valueOf(c.toUpperCase())).toList();
         Timeline timeline = (request.timelineFoundedEra() != null || request.timelineDestroyedEra() != null)
                 ? new Timeline(request.timelineFoundedEra(), request.timelineDestroyedEra()) : null;
+        EntityStatus initialStatus = parseCreationStatus(request.status());
         var command = new CreateLoreUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
-                categories, timeline);
+                categories, timeline, initialStatus);
         return ResponseEntity.status(HttpStatus.CREATED).body(LoreResponse.from(createLoreUseCase.create(command)));
+    }
+
+    private EntityStatus parseCreationStatus(String rawStatus) {
+        if (rawStatus == null) {
+            return EntityStatus.DRAFT;
+        }
+        EntityStatus status = EntityStatus.valueOf(rawStatus.toUpperCase());
+        if (status == EntityStatus.DEPRECATED) {
+            throw new IllegalArgumentException("Status DEPRECATED is not allowed on creation. Allowed values: DRAFT, CANON");
+        }
+        return status;
     }
 
     @PutMapping("/{id}")

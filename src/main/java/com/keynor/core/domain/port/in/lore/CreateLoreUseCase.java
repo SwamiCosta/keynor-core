@@ -2,6 +2,7 @@ package com.keynor.core.domain.port.in.lore;
 
 import com.keynor.core.domain.model.lore.Lore;
 import com.keynor.core.domain.model.lore.LoreCategory;
+import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.Timeline;
 
 import java.util.List;
@@ -15,7 +16,8 @@ public interface CreateLoreUseCase {
             List<String> tags,
             List<String> images,
             List<LoreCategory> categories,
-            Timeline timeline) {}
+            Timeline timeline,
+            EntityStatus status) {}
 
     Lore create(Command command);
 }
