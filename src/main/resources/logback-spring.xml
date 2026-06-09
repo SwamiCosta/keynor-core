@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- ===================================================================
+         Dev profile: DEBUG level, human-readable format with traceId
+         =================================================================== -->
+    <springProfile name="dev">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] [traceId=%X{traceId}] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- ===================================================================
+         Default profile (non-dev): INFO level, structured key=value format
+         ready for log aggregation
+         =================================================================== -->
+    <springProfile name="!dev">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>time=%d{ISO8601} thread=%thread traceId=%X{traceId} level=%-5level logger=%logger{36} msg="%msg"%n</pattern>
+            </encoder>
+        </appender>
+
+        <!-- Suppress noisy Spring internals in production -->
+        <logger name="org.springframework" level="WARN"/>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+</configuration>
