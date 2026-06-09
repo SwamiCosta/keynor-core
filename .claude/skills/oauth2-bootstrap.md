@@ -1,0 +1,128 @@
+# Skill — OAuth2 Bootstrap and Token Acquisition
+
+**Scope:** keynor-core. Applies whenever a developer, agent, or operator needs to bootstrap the OAuth2 layer or obtain a token for API access.
+
+---
+
+## Context
+
+keynor-core acts as both Authorization Server and Resource Server. No users or OAuth2 clients exist after a fresh Flyway migration — they must be inserted manually before any authenticated API call can succeed.
+
+The `PasswordEncoder` bean is a plain **`BCryptPasswordEncoder`** — not a `DelegatingPasswordEncoder`. This has one critical consequence:
+
+> **Stored password hashes must NOT include the `{bcrypt}` prefix.**
+> Store only the raw BCrypt hash: `$2a$10$...`
+> The `{bcrypt}` prefix is specific to `DelegatingPasswordEncoder` and will cause `"Encoded password does not look like BCrypt"` and `invalid_client` errors.
+
+---
+
+## Step 1 — Generate a BCrypt hash
+
+Use `jshell` with the Spring Security Crypto jar from the local Maven repository:
+
+```bash
+jshell --class-path "C:/Users/<user>/.m2/repository/org/springframework/security/spring-security-crypto/6.3.3/spring-security-crypto-6.3.3.jar;C:/Users/<user>/.m2/repository/commons-logging/commons-logging/1.2/commons-logging-1.2.jar"
+```
+
+Inside jshell:
+
+```java
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+System.out.println(new BCryptPasswordEncoder().encode("your-password-here"));
+```
+
+The output is the raw hash to store — for example:
+```
+$2a$10$ncuvtKlGkqK/UGdm8ebus.aWGXCjF8D9STYDp7P8RpoVeTmkCK6GC
+```
+
+Do NOT add any prefix. Store this value exactly as printed.
+
+---
+
+## Step 2 — Insert the ADMIN user
+
+```sql
+INSERT INTO users (id, email, password, role, active)
+VALUES (
+    gen_random_uuid(),
+    'admin@yourdomain.com',
+    '$2a$10$<hash-generated-above>',
+    'ADMIN',
+    true
+);
+```
+
+---
+
+## Step 3 — Insert the SYSTEM client
+
+```sql
+INSERT INTO oauth2_registered_client (
+    id, client_id, client_id_issued_at, client_secret, client_name,
+    client_authentication_methods, authorization_grant_types,
+    redirect_uris, post_logout_redirect_uris, scopes, client_settings, token_settings
+)
+VALUES (
+    gen_random_uuid()::text,
+    'system-client',
+    NOW(),
+    '$2a$10$<hash-generated-above>',
+    'System Client',
+    'client_secret_basic',
+    'client_credentials',
+    '',
+    '',
+    'openid',
+    '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":false,"settings.client.require-authorization-consent":false}',
+    '{"@class":"java.util.Collections$UnmodifiableMap","settings.token.reuse-refresh-tokens":true,"settings.token.id-token-signature-algorithm":["org.springframework.security.oauth2.jose.jws.SignatureAlgorithm","RS256"],"settings.token.access-token-time-to-live":["java.time.Duration",3600.000000000],"settings.token.access-token-format":{"@class":"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat","value":"self-contained"},"settings.token.refresh-token-time-to-live":["java.time.Duration",86400.000000000],"settings.token.authorization-code-time-to-live":["java.time.Duration",300.000000000],"settings.token.device-code-time-to-live":["java.time.Duration",300.000000000]}'
+);
+```
+
+Keep the plaintext secret in a local `.env.local` file (gitignored) — it cannot be recovered from the database after hashing.
+
+---
+
+## Step 4 — Obtain a token (client_credentials)
+
+Used by agents and services (Aroneus, keynor-rpg, etc.) for service-to-service calls.
+
+**Postman:**
+- Method: `POST`
+- URL: `http://localhost:8080/oauth2/token`
+- Tab Authorization → Type: `Basic Auth` → Username: `system-client` → Password: `<plaintext secret>`
+- Tab Body → `x-www-form-urlencoded` → `grant_type: client_credentials`
+
+**curl:**
+```bash
+curl -X POST http://localhost:8080/oauth2/token \
+  -u "system-client:<plaintext-secret>" \
+  -d "grant_type=client_credentials"
+```
+
+The response includes an `access_token` (Bearer JWT). Use it in subsequent API calls:
+```
+Authorization: Bearer <access_token>
+```
+
+---
+
+## Step 5 — Obtain a token (authorization_code — ADMIN human flow)
+
+Used for the admin panel. Open a browser and navigate to:
+```
+http://localhost:8080/oauth2/authorize?response_type=code&client_id=<admin-client-id>&redirect_uri=<redirect>&code_challenge=<pkce-challenge>&code_challenge_method=S256
+```
+
+The Authorization Server redirects to `/login`. Submit ADMIN credentials. After login, the code is returned to the redirect URI and exchanged for a token via `POST /oauth2/token`.
+
+---
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `"Encoded password does not look like BCrypt"` | Hash stored with `{bcrypt}` prefix | Remove the prefix — store only `$2a$10$...` |
+| `invalid_client` | Wrong `client_id`, wrong secret, or hash mismatch | Verify with SELECT; regenerate hash if needed |
+| `invalid_grant` | Grant type not registered for this client | Check `authorization_grant_types` column |
+| Token invalid after app restart | RSA key is ephemeral in dev | Obtain a new token — existing tokens are invalidated on restart |

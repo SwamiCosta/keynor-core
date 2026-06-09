@@ -165,6 +165,10 @@ No default users or clients exist in the schema. Before using the API you must:
 1. Insert a BCrypt-hashed ADMIN user in the `users` table
 2. Insert a SYSTEM client in the `oauth2_registered_client` table
 
+> **Critical:** the `PasswordEncoder` bean is a plain `BCryptPasswordEncoder`, not a `DelegatingPasswordEncoder`. Hashes stored in the database must use the raw BCrypt format (`$2a$10$...`) with **no `{bcrypt}` prefix**. Storing `{bcrypt}$2a$10$...` causes `invalid_client` errors.
+
+For the full bootstrap procedure, hash generation steps, token acquisition examples, and common errors, see `.claude/skills/oauth2-bootstrap.md`.
+
 ---
 
 ## Public API
@@ -400,4 +404,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-06-09 — added Logging section, SLF4J+Logback row in stack table, reference to logging-conventions.md skill*
+*Last updated: 2026-06-09 — added oauth2-bootstrap skill, BCryptPasswordEncoder prefix warning in First bootstrap section*
