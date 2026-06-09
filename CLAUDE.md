@@ -31,6 +31,7 @@
 | Auth | Spring Authorization Server (OAuth2) + Resource Server (JWT) |
 | API style | REST — `ProblemDetail` (RFC 7807) for error responses |
 | Testing | JUnit 5 + Mockito + Testcontainers |
+| Logging | SLF4J + Logback (via Spring Boot) — see `.claude/skills/logging-conventions.md` |
 
 ---
 
@@ -314,6 +315,19 @@ public PageResult<Foo> findAll(FooFilter filter, com.keynor.core.domain.model.sh
 
 ---
 
+## Logging
+
+All logging in keynor-core follows workspace Skill 08. The project-level implementation details are in `.claude/skills/logging-conventions.md`.
+
+Key points:
+- Logger declaration: `private static final Logger log = LoggerFactory.getLogger(YourClass.class);` (no Lombok)
+- Every HTTP request gets a UUID `traceId` injected into MDC by `RequestLoggingFilter`
+- Exception levels: WARN for expected client errors (4xx), ERROR with stack trace for unexpected failures (5xx)
+- Status transitions are logged at INFO in `UniverseEntity.changeStatus()` — single authoritative point
+- Two log profiles: `dev` (DEBUG, human-readable) and default/prod (INFO, structured key=value)
+
+---
+
 ## Testing rules
 
 - All new code must have tests
@@ -386,4 +400,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-06-08 — added Public API section, CORS origins, V4 migration entry, unit-testing-controllers skill, security filter chain order documentation*
+*Last updated: 2026-06-09 — added Logging section, SLF4J+Logback row in stack table, reference to logging-conventions.md skill*
