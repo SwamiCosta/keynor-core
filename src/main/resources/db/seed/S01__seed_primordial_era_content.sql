@@ -2,9 +2,10 @@
 -- Purpose: Seeds all universe data from aniannoth-overview/content/ into keynor-core.
 --          Covers eras, maps, one character (Omnia) and one lore entry (The Last Prayer).
 -- Target:  maps, eras, map_eras, characters, character_categories, character_tags,
---          lore, lore_categories, lore_tags
--- Effect:  4 new rows across parent tables, plus categories and tags join rows.
---          All entities set to status CANON. Idempotent via ON CONFLICT DO NOTHING.
+--          universe_entity_images, lore, lore_categories, lore_tags
+-- Effect:  4 new rows across parent tables, plus categories, tags, and image join rows.
+--          All entities set to status CANON. Idempotent via ON CONFLICT DO NOTHING,
+--          except the IMAGES section which is NOT idempotent (no unique constraint).
 -- Author:  Siegmund (Level 2 — keynor-core)
 -- Date:    2026-06-02
 --
@@ -76,6 +77,24 @@ VALUES
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'infinite'),
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'primordial')
 ON CONFLICT (character_id, tag) DO NOTHING;
+
+-- ============================================================
+-- IMAGES
+-- ============================================================
+
+-- NOTE: universe_entity_images has no unique constraint.
+-- This INSERT is NOT idempotent — run it only once against each target database.
+
+INSERT INTO universe_entity_images (entity_id, image_url, display_order)
+VALUES
+    ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-1.png', 0),
+    ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-2.png', 1),
+    ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-3.png', 2),
+    ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-4.png', 3),
+    ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-5.png', 4),
+    ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-6.png', 5),
+    ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-7.png', 6),
+    ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-8.png', 7);
 
 -- ============================================================
 -- LORE
