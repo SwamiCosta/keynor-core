@@ -100,7 +100,7 @@ Entity types and their category enums:
 | `Faction` | `FactionCategory` | EMPIRE, GUILD, ORDER, TRIBE, DIVINE |
 | `Item` | `ItemCategory` | WEAPON, ARTIFACT, RELIC, TOOL, CONSUMABLE |
 | `Event` | `EventCategory` | BATTLE, POLITICAL, DIVINE, NATURAL, SOCIAL |
-| `Lore` | `LoreCategory` | HISTORY, MYTH, LAW, PROPHECY, GEOGRAPHY |
+| `Lore` | `LoreCategory` | HISTORY, MYTH, LAW, PROPHECY, GEOGRAPHY, PHILOSOPHY |
 
 `Place` additionally has `mapType: MapType` (NAVIGABLE or ABSTRACT).
 
@@ -404,4 +404,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-06-15 — require repository sync before any action (Skill 09)*
+*Last updated: 2026-06-15*
