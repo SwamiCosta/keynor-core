@@ -222,8 +222,22 @@ Endpoints under `/api/public/v1/` require no authentication and are consumed by 
 | V2 | 6 entity tables + 12 join tables (categories, tags) |
 | V3 | Spring Authorization Server OAuth2 tables |
 | V4 | `eras` and `maps` tables |
+| V5 | `timeline_founded NOT NULL` on all 6 entity tables |
+| V6 | `universe_entity_images` table |
 
 For the full procedure, see the workspace `SKILLS.md` — Skill 02.
+
+---
+
+## Universe content seed
+
+`db/seed/universe-content.sql` is the single source of truth for all universe content data. It uses TRUNCATE + INSERT and represents the complete current state of all universe tables.
+
+- **Updated on demand** — Siegmund regenerates it when the user requests after a data change
+- **Applied manually by the user** — agents never execute it against any database
+- **Divergence diagnosis** — Siegmund can inspect the current DB state via SELECT queries and compare against the file to detect what is missing or outdated
+
+For the full procedure, see `.claude/skills/universe-content-dump.md`.
 
 ---
 
