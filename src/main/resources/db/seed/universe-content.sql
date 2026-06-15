@@ -126,6 +126,28 @@ INSERT INTO lore_tags (lore_id, tag) VALUES
     ('a1b2c3d4-e5f6-4789-8abc-def012345678', 'prayer'),
     ('a1b2c3d4-e5f6-4789-8abc-def012345678', 'primordial');
 
+INSERT INTO lore (id, name, summary, body, status, timeline_founded, timeline_destroyed, created_at, updated_at) VALUES
+    (
+        'c4ba4207-7857-49ab-8e22-5acc57ea2cd5',
+        'On the Word God',
+        'A philosophical inquiry into the concept of divinity — arguing that the word god is a valkani invention: a name large enough to hold all that exceeds mortal grasp, but never theirs to give.',
+        E'There is no god.\n\nOr rather: the very notion of a god is something the valkani made.\n\nConsider the ant. Should it ever possess reason, an elephant would be divine to it — vast, inexplicable, moving on a scale the ant could never cross. But the elephant holds no such category for itself. It does not name what it is. It does not measure itself against the creature beneath its foot. It is simply what it is.\n\nThe valkani look up at the firmament and find forces and forms that surpass them — powers that predate language, that move without need, that exist without explanation. And the valkani, who cannot abide what cannot be named, invented a word. A word large enough to hold all that exceeds their grasp. They called it god.\n\nBut that word was never theirs to give.\n\nThe beings who received it did not ask for it. From their own vantage, there may be no shared name at all — no brotherhood of divinity, no common throne. A pear does not compare itself to an apple unless someone has already taught them both to answer to the word fruit. These beings, great as they are, may regard one another across the same vast distance with which they regard everything else: not as peers, but as things simply different in kind.\n\nThis was perhaps most true in the Primordial Era, before form, before matter — when most of what the valkani would later call gods existed as singular presences, each complete within its own context, each without need of a category. They were not a pantheon. They were not deities. They were powers, each alien to the next, as varied and as indifferent as the void that held them. To gather them beneath a single word was an act of valkani imagination — not a truth, but a convenience.\n\nPowerful, yes. Beyond mortal reckoning, yes. But gods? That was the valkani''s doing.\n\nAnd yet — valkani will be valkani. The word endures. It will be used for creatures, for concepts, for the silent things at the far edge of faith that no one has ever seen and no one can truly name. The word god will outlast every attempt to correct it.\n\nPerhaps that is the most divine thing about it.',
+        'CANON',
+        'primordial',
+        NULL,
+        NOW(),
+        NOW()
+    );
+
+INSERT INTO lore_categories (lore_id, category) VALUES
+    ('c4ba4207-7857-49ab-8e22-5acc57ea2cd5', 'PHILOSOPHY');
+
+INSERT INTO lore_tags (lore_id, tag) VALUES
+    ('c4ba4207-7857-49ab-8e22-5acc57ea2cd5', 'divinity'),
+    ('c4ba4207-7857-49ab-8e22-5acc57ea2cd5', 'primordial-era'),
+    ('c4ba4207-7857-49ab-8e22-5acc57ea2cd5', 'theology'),
+    ('c4ba4207-7857-49ab-8e22-5acc57ea2cd5', 'valkani');
+
 -- ============================================================
 -- IMAGES
 -- ============================================================
