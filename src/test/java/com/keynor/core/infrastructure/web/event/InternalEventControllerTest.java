@@ -12,6 +12,7 @@ import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.event.*;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +40,7 @@ class InternalEventControllerTest {
     @Mock private DeleteEventUseCase deleteEventUseCase;
     @Mock private FindEventByIdUseCase findEventByIdUseCase;
     @Mock private FindAllEventsUseCase findAllEventsUseCase;
+    @Mock private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     private InternalEventController controller;
 
@@ -53,16 +55,18 @@ class InternalEventControllerTest {
     void setUp() {
         controller = new InternalEventController(
                 createEventUseCase, updateEventUseCase, changeEventStatusUseCase,
-                deleteEventUseCase, findEventByIdUseCase, findAllEventsUseCase);
+                deleteEventUseCase, findEventByIdUseCase, findAllEventsUseCase,
+                findLinkedEntitiesUseCase);
     }
 
     @Test
     void create_shouldReturn201AndResponseBody_whenCommandIsValid() {
         UUID id = UUID.randomUUID();
         when(createEventUseCase.create(any())).thenReturn(buildEvent(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateEventRequest("The Battle of Kor", "A decisive battle", "Body",
-                List.of("battle"), List.of(), List.of("BATTLE"), "era-1", null);
+                List.of("battle"), List.of(), List.of("BATTLE"), "era-1", null, null);
 
         var response = controller.create(request);
 
@@ -76,9 +80,10 @@ class InternalEventControllerTest {
     void create_shouldPassCorrectCommandToUseCase() {
         UUID id = UUID.randomUUID();
         when(createEventUseCase.create(any())).thenReturn(buildEvent(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateEventRequest("The Battle of Kor", null, null,
-                List.of(), List.of(), List.of("BATTLE"), "era-1", null);
+                List.of(), List.of(), List.of("BATTLE"), "era-1", null, null);
 
         controller.create(request);
 
@@ -93,9 +98,10 @@ class InternalEventControllerTest {
     void update_shouldReturn200AndResponseBody_whenCommandIsValid() {
         UUID id = UUID.randomUUID();
         when(updateEventUseCase.update(eq(id), any())).thenReturn(buildEvent(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdateEventRequest("Battle Updated", null, null,
-                List.of(), List.of(), List.of("BATTLE"), "era-1", null);
+                List.of(), List.of(), List.of("BATTLE"), "era-1", null, null);
 
         var response = controller.update(id, request);
 
@@ -108,6 +114,7 @@ class InternalEventControllerTest {
     void changeStatus_shouldReturn200AndCallUseCase() {
         UUID id = UUID.randomUUID();
         when(changeEventStatusUseCase.changeStatus(id, EntityStatus.CANON)).thenReturn(buildEvent(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.changeStatus(id, new ChangeStatusRequest("CANON"));
 
@@ -130,6 +137,7 @@ class InternalEventControllerTest {
         UUID id = UUID.randomUUID();
         when(findAllEventsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(buildEvent(id)), 0, 20, 1));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findAll(null, null, null, 0, 20);
 
@@ -159,6 +167,7 @@ class InternalEventControllerTest {
     void findById_shouldDelegateAndMapResult() {
         UUID id = UUID.randomUUID();
         when(findEventByIdUseCase.findById(id)).thenReturn(buildEvent(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findById(id);
 

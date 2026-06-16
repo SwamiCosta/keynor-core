@@ -4,9 +4,11 @@ import com.keynor.core.application.dto.place.PlaceResponse;
 import com.keynor.core.application.dto.shared.PagedResponse;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.port.in.place.FindAllPlacesUseCase;
 import com.keynor.core.domain.port.in.place.FindPlaceByIdUseCase;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,12 +21,15 @@ public class PublicPlaceController {
 
     private final FindAllPlacesUseCase findAllPlacesUseCase;
     private final FindPlaceByIdUseCase findPlaceByIdUseCase;
+    private final FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     public PublicPlaceController(
             FindAllPlacesUseCase findAllPlacesUseCase,
-            FindPlaceByIdUseCase findPlaceByIdUseCase) {
+            FindPlaceByIdUseCase findPlaceByIdUseCase,
+            FindLinkedEntitiesUseCase findLinkedEntitiesUseCase) {
         this.findAllPlacesUseCase = findAllPlacesUseCase;
         this.findPlaceByIdUseCase = findPlaceByIdUseCase;
+        this.findLinkedEntitiesUseCase = findLinkedEntitiesUseCase;
     }
 
     @GetMapping
@@ -38,11 +43,13 @@ public class PublicPlaceController {
                 categories != null ? categories : List.of(),
                 tags != null ? tags : List.of());
         var result = findAllPlacesUseCase.findAll(filter, new PageRequest(page, size));
-        return ResponseEntity.ok(PagedResponse.from(result, PlaceResponse::from));
+        return ResponseEntity.ok(PagedResponse.from(result,
+                place -> PlaceResponse.from(place, findLinkedEntitiesUseCase.findLinks(EntityType.PLACE, place.getId()))));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PlaceResponse> findById(@PathVariable UUID id) {
-        return ResponseEntity.ok(PlaceResponse.from(findPlaceByIdUseCase.findById(id)));
+        var place = findPlaceByIdUseCase.findById(id);
+        return ResponseEntity.ok(PlaceResponse.from(place, findLinkedEntitiesUseCase.findLinks(EntityType.PLACE, place.getId())));
     }
 }

@@ -5,12 +5,15 @@ import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.faction.Faction;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.faction.*;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.FactionRepository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public class FactionService implements
@@ -22,9 +25,11 @@ public class FactionService implements
         FindAllFactionsUseCase {
 
     private final FactionRepository factionRepository;
+    private final EntityLinkRepository entityLinkRepository;
 
-    public FactionService(FactionRepository factionRepository) {
+    public FactionService(FactionRepository factionRepository, EntityLinkRepository entityLinkRepository) {
         this.factionRepository = factionRepository;
+        this.entityLinkRepository = entityLinkRepository;
     }
 
     @Override
@@ -45,7 +50,9 @@ public class FactionService implements
                 command.timeline(),
                 now,
                 now);
-        return factionRepository.save(faction);
+        Faction saved = factionRepository.save(faction);
+        entityLinkRepository.replaceLinks(EntityType.FACTION, saved.getId(), command.links() != null ? command.links() : List.of());
+        return saved;
     }
 
     @Override
@@ -53,7 +60,9 @@ public class FactionService implements
         Faction faction = factionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Faction", id));
         faction.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
-        return factionRepository.save(faction);
+        Faction saved = factionRepository.save(faction);
+        entityLinkRepository.replaceLinks(EntityType.FACTION, saved.getId(), command.links() != null ? command.links() : List.of());
+        return saved;
     }
 
     @Override
@@ -70,6 +79,7 @@ public class FactionService implements
             throw new EntityNotFoundException("Faction", id);
         }
         factionRepository.deleteById(id);
+        entityLinkRepository.deleteAllForEntity(EntityType.FACTION, id);
     }
 
     @Override

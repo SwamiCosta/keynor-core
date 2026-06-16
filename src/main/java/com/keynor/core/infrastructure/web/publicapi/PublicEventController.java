@@ -4,9 +4,11 @@ import com.keynor.core.application.dto.event.EventResponse;
 import com.keynor.core.application.dto.shared.PagedResponse;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.port.in.event.FindAllEventsUseCase;
 import com.keynor.core.domain.port.in.event.FindEventByIdUseCase;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,12 +21,15 @@ public class PublicEventController {
 
     private final FindAllEventsUseCase findAllEventsUseCase;
     private final FindEventByIdUseCase findEventByIdUseCase;
+    private final FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     public PublicEventController(
             FindAllEventsUseCase findAllEventsUseCase,
-            FindEventByIdUseCase findEventByIdUseCase) {
+            FindEventByIdUseCase findEventByIdUseCase,
+            FindLinkedEntitiesUseCase findLinkedEntitiesUseCase) {
         this.findAllEventsUseCase = findAllEventsUseCase;
         this.findEventByIdUseCase = findEventByIdUseCase;
+        this.findLinkedEntitiesUseCase = findLinkedEntitiesUseCase;
     }
 
     @GetMapping
@@ -38,11 +43,13 @@ public class PublicEventController {
                 categories != null ? categories : List.of(),
                 tags != null ? tags : List.of());
         var result = findAllEventsUseCase.findAll(filter, new PageRequest(page, size));
-        return ResponseEntity.ok(PagedResponse.from(result, EventResponse::from));
+        return ResponseEntity.ok(PagedResponse.from(result,
+                event -> EventResponse.from(event, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, event.getId()))));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EventResponse> findById(@PathVariable UUID id) {
-        return ResponseEntity.ok(EventResponse.from(findEventByIdUseCase.findById(id)));
+        var event = findEventByIdUseCase.findById(id);
+        return ResponseEntity.ok(EventResponse.from(event, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, event.getId())));
     }
 }

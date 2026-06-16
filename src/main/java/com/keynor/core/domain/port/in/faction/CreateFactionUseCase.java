@@ -2,6 +2,7 @@ package com.keynor.core.domain.port.in.faction;
 
 import com.keynor.core.domain.model.faction.Faction;
 import com.keynor.core.domain.model.faction.FactionCategory;
+import com.keynor.core.domain.model.shared.EntityLinkRef;
 import com.keynor.core.domain.model.shared.Timeline;
 
 import java.util.List;
@@ -15,7 +16,8 @@ public interface CreateFactionUseCase {
             List<String> tags,
             List<String> images,
             List<FactionCategory> categories,
-            Timeline timeline) {}
+            Timeline timeline,
+            List<EntityLinkRef> links) {}
 
     Faction create(Command command);
 }

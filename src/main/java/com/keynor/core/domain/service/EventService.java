@@ -5,12 +5,15 @@ import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.event.Event;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.event.*;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.EventRepository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public class EventService implements
@@ -22,9 +25,11 @@ public class EventService implements
         FindAllEventsUseCase {
 
     private final EventRepository eventRepository;
+    private final EntityLinkRepository entityLinkRepository;
 
-    public EventService(EventRepository eventRepository) {
+    public EventService(EventRepository eventRepository, EntityLinkRepository entityLinkRepository) {
         this.eventRepository = eventRepository;
+        this.entityLinkRepository = entityLinkRepository;
     }
 
     @Override
@@ -45,7 +50,9 @@ public class EventService implements
                 command.timeline(),
                 now,
                 now);
-        return eventRepository.save(event);
+        Event saved = eventRepository.save(event);
+        entityLinkRepository.replaceLinks(EntityType.EVENT, saved.getId(), command.links() != null ? command.links() : List.of());
+        return saved;
     }
 
     @Override
@@ -53,7 +60,9 @@ public class EventService implements
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Event", id));
         event.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
-        return eventRepository.save(event);
+        Event saved = eventRepository.save(event);
+        entityLinkRepository.replaceLinks(EntityType.EVENT, saved.getId(), command.links() != null ? command.links() : List.of());
+        return saved;
     }
 
     @Override
@@ -70,6 +79,7 @@ public class EventService implements
             throw new EntityNotFoundException("Event", id);
         }
         eventRepository.deleteById(id);
+        entityLinkRepository.deleteAllForEntity(EntityType.EVENT, id);
     }
 
     @Override

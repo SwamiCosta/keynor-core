@@ -12,6 +12,7 @@ import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.character.*;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +40,7 @@ class InternalCharacterControllerTest {
     @Mock private DeleteCharacterUseCase deleteCharacterUseCase;
     @Mock private FindCharacterByIdUseCase findCharacterByIdUseCase;
     @Mock private FindAllCharactersUseCase findAllCharactersUseCase;
+    @Mock private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     private InternalCharacterController controller;
 
@@ -52,7 +54,8 @@ class InternalCharacterControllerTest {
     void setUp() {
         controller = new InternalCharacterController(
                 createCharacterUseCase, updateCharacterUseCase, changeCharacterStatusUseCase,
-                deleteCharacterUseCase, findCharacterByIdUseCase, findAllCharactersUseCase);
+                deleteCharacterUseCase, findCharacterByIdUseCase, findAllCharactersUseCase,
+                findLinkedEntitiesUseCase);
     }
 
     @Test
@@ -60,9 +63,10 @@ class InternalCharacterControllerTest {
         UUID id = UUID.randomUUID();
         Character character = buildCharacter(id);
         when(createCharacterUseCase.create(any())).thenReturn(character);
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of("warrior"), List.of(), List.of("HERO"), "era-1", null);
+                List.of("warrior"), List.of(), List.of("HERO"), "era-1", null, null);
 
         var response = controller.create(request);
 
@@ -76,9 +80,10 @@ class InternalCharacterControllerTest {
     void create_shouldPassCorrectCommandToUseCase() {
         UUID id = UUID.randomUUID();
         when(createCharacterUseCase.create(any())).thenReturn(buildCharacter(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of("warrior"), List.of("img.png"), List.of("HERO"), "era-1", null);
+                List.of("warrior"), List.of("img.png"), List.of("HERO"), "era-1", null, null);
 
         controller.create(request);
 
@@ -94,9 +99,10 @@ class InternalCharacterControllerTest {
         UUID id = UUID.randomUUID();
         Character updated = buildCharacter(id);
         when(updateCharacterUseCase.update(eq(id), any())).thenReturn(updated);
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdateCharacterRequest("Araveth Updated", "New summary", "New body",
-                List.of(), List.of(), List.of("HERO"), "era-1", null);
+                List.of(), List.of(), List.of("HERO"), "era-1", null, null);
 
         var response = controller.update(id, request);
 
@@ -110,6 +116,7 @@ class InternalCharacterControllerTest {
         UUID id = UUID.randomUUID();
         Character character = buildCharacter(id);
         when(changeCharacterStatusUseCase.changeStatus(id, EntityStatus.CANON)).thenReturn(character);
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.changeStatus(id, new ChangeStatusRequest("CANON"));
 
@@ -133,6 +140,7 @@ class InternalCharacterControllerTest {
         Character character = buildCharacter(id);
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(character), 1, 10, 1));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findAll(null, null, null, 1, 10);
 
@@ -163,6 +171,7 @@ class InternalCharacterControllerTest {
         UUID id = UUID.randomUUID();
         Character character = buildCharacter(id);
         when(findCharacterByIdUseCase.findById(id)).thenReturn(character);
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findById(id);
 

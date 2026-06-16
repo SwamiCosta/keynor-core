@@ -12,6 +12,7 @@ import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.faction.*;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +40,7 @@ class InternalFactionControllerTest {
     @Mock private DeleteFactionUseCase deleteFactionUseCase;
     @Mock private FindFactionByIdUseCase findFactionByIdUseCase;
     @Mock private FindAllFactionsUseCase findAllFactionsUseCase;
+    @Mock private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     private InternalFactionController controller;
 
@@ -52,16 +54,18 @@ class InternalFactionControllerTest {
     void setUp() {
         controller = new InternalFactionController(
                 createFactionUseCase, updateFactionUseCase, changeFactionStatusUseCase,
-                deleteFactionUseCase, findFactionByIdUseCase, findAllFactionsUseCase);
+                deleteFactionUseCase, findFactionByIdUseCase, findAllFactionsUseCase,
+                findLinkedEntitiesUseCase);
     }
 
     @Test
     void create_shouldReturn201AndResponseBody_whenCommandIsValid() {
         UUID id = UUID.randomUUID();
         when(createFactionUseCase.create(any())).thenReturn(buildFaction(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateFactionRequest("The Silver Order", "A guild", "Body",
-                List.of("mages"), List.of(), List.of("ORDER"), "era-1", null);
+                List.of("mages"), List.of(), List.of("ORDER"), "era-1", null, null);
 
         var response = controller.create(request);
 
@@ -75,9 +79,10 @@ class InternalFactionControllerTest {
     void create_shouldPassCorrectCommandToUseCase() {
         UUID id = UUID.randomUUID();
         when(createFactionUseCase.create(any())).thenReturn(buildFaction(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateFactionRequest("The Silver Order", null, null,
-                List.of(), List.of(), List.of("ORDER"), "era-1", null);
+                List.of(), List.of(), List.of("ORDER"), "era-1", null, null);
 
         controller.create(request);
 
@@ -92,9 +97,10 @@ class InternalFactionControllerTest {
     void update_shouldReturn200AndResponseBody_whenCommandIsValid() {
         UUID id = UUID.randomUUID();
         when(updateFactionUseCase.update(eq(id), any())).thenReturn(buildFaction(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdateFactionRequest("Updated Name", null, null,
-                List.of(), List.of(), List.of("ORDER"), "era-1", null);
+                List.of(), List.of(), List.of("ORDER"), "era-1", null, null);
 
         var response = controller.update(id, request);
 
@@ -107,6 +113,7 @@ class InternalFactionControllerTest {
     void changeStatus_shouldReturn200AndCallUseCase() {
         UUID id = UUID.randomUUID();
         when(changeFactionStatusUseCase.changeStatus(id, EntityStatus.CANON)).thenReturn(buildFaction(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.changeStatus(id, new ChangeStatusRequest("CANON"));
 
@@ -129,6 +136,7 @@ class InternalFactionControllerTest {
         UUID id = UUID.randomUUID();
         when(findAllFactionsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(buildFaction(id)), 0, 20, 1));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findAll(null, null, null, 0, 20);
 
@@ -158,6 +166,7 @@ class InternalFactionControllerTest {
     void findById_shouldDelegateAndMapResult() {
         UUID id = UUID.randomUUID();
         when(findFactionByIdUseCase.findById(id)).thenReturn(buildFaction(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findById(id);
 

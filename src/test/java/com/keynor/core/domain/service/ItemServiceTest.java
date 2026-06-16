@@ -11,6 +11,7 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.item.CreateItemUseCase;
 import com.keynor.core.domain.port.in.item.UpdateItemUseCase;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.ItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,11 +34,14 @@ class ItemServiceTest {
     @Mock
     private ItemRepository itemRepository;
 
+    @Mock
+    private EntityLinkRepository entityLinkRepository;
+
     private ItemService itemService;
 
     @BeforeEach
     void setUp() {
-        itemService = new ItemService(itemRepository);
+        itemService = new ItemService(itemRepository, entityLinkRepository);
     }
 
     @Test
@@ -47,6 +51,7 @@ class ItemServiceTest {
                 List.of("sword", "cursed"),
                 List.of(),
                 List.of(ItemCategory.WEAPON),
+                null,
                 null);
         when(itemRepository.existsByName("Shadowblade")).thenReturn(false);
         when(itemRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -63,7 +68,7 @@ class ItemServiceTest {
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateItemUseCase.Command(
                 "Shadowblade", null, null, List.of(), List.of(),
-                List.of(ItemCategory.ARTIFACT), null);
+                List.of(ItemCategory.ARTIFACT), null, null);
         when(itemRepository.existsByName("Shadowblade")).thenReturn(true);
 
         assertThatThrownBy(() -> itemService.create(command))
@@ -164,7 +169,7 @@ class ItemServiceTest {
         var command = new UpdateItemUseCase.Command(
                 "New Name", "New summary", "New body",
                 List.of("tag1"), List.of(),
-                List.of(ItemCategory.WEAPON, ItemCategory.ARTIFACT), null);
+                List.of(ItemCategory.WEAPON, ItemCategory.ARTIFACT), null, null);
 
         Item result = itemService.update(id, command);
 

@@ -12,6 +12,7 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.place.CreatePlaceUseCase;
 import com.keynor.core.domain.port.in.place.UpdatePlaceUseCase;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.PlaceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,11 +35,14 @@ class PlaceServiceTest {
     @Mock
     private PlaceRepository placeRepository;
 
+    @Mock
+    private EntityLinkRepository entityLinkRepository;
+
     private PlaceService placeService;
 
     @BeforeEach
     void setUp() {
-        placeService = new PlaceService(placeRepository);
+        placeService = new PlaceService(placeRepository, entityLinkRepository);
     }
 
     @Test
@@ -49,6 +53,7 @@ class PlaceServiceTest {
                 List.of(),
                 List.of(PlaceCategory.CITY),
                 MapType.NAVIGABLE,
+                null,
                 null);
         when(placeRepository.existsByName("Thornvale")).thenReturn(false);
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -66,7 +71,7 @@ class PlaceServiceTest {
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreatePlaceUseCase.Command(
                 "Thornvale", null, null, List.of(), List.of(),
-                List.of(PlaceCategory.REGION), MapType.ABSTRACT, null);
+                List.of(PlaceCategory.REGION), MapType.ABSTRACT, null, null);
         when(placeRepository.existsByName("Thornvale")).thenReturn(true);
 
         assertThatThrownBy(() -> placeService.create(command))
@@ -181,7 +186,7 @@ class PlaceServiceTest {
 
         var command = new UpdatePlaceUseCase.Command(
                 "New Name", "New summary", "New body",
-                List.of("tag1"), List.of(), List.of(PlaceCategory.REALM), MapType.ABSTRACT, null);
+                List.of("tag1"), List.of(), List.of(PlaceCategory.REALM), MapType.ABSTRACT, null, null);
 
         Place result = placeService.update(id, command);
 

@@ -12,6 +12,7 @@ import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.character.CreateCharacterUseCase;
 import com.keynor.core.domain.port.in.character.UpdateCharacterUseCase;
 import com.keynor.core.domain.port.out.CharacterRepository;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,11 +34,14 @@ class CharacterServiceTest {
     @Mock
     private CharacterRepository characterRepository;
 
+    @Mock
+    private EntityLinkRepository entityLinkRepository;
+
     private CharacterService characterService;
 
     @BeforeEach
     void setUp() {
-        characterService = new CharacterService(characterRepository);
+        characterService = new CharacterService(characterRepository, entityLinkRepository);
     }
 
     @Test
@@ -47,6 +51,7 @@ class CharacterServiceTest {
                 List.of("hero", "warrior"),
                 List.of(),
                 List.of(CharacterCategory.HERO),
+                null,
                 null);
         when(characterRepository.existsByName("Araveth")).thenReturn(false);
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -62,7 +67,7 @@ class CharacterServiceTest {
     @Test
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateCharacterUseCase.Command(
-                "Araveth", null, null, List.of(), List.of(), List.of(CharacterCategory.NPC), null);
+                "Araveth", null, null, List.of(), List.of(), List.of(CharacterCategory.NPC), null, null);
         when(characterRepository.existsByName("Araveth")).thenReturn(true);
 
         assertThatThrownBy(() -> characterService.create(command))
@@ -130,7 +135,7 @@ class CharacterServiceTest {
 
         var command = new UpdateCharacterUseCase.Command(
                 "New Name", "New summary", "New body",
-                List.of("tag1"), List.of(), List.of(CharacterCategory.HERO, CharacterCategory.DEITY), null);
+                List.of("tag1"), List.of(), List.of(CharacterCategory.HERO, CharacterCategory.DEITY), null, null);
 
         Character result = characterService.update(id, command);
 
@@ -156,7 +161,7 @@ class CharacterServiceTest {
         var command = new CreateCharacterUseCase.Command(
                 "Araveth", null, null, List.of(),
                 List.of("https://example.com/araveth.png", "https://example.com/araveth2.png"),
-                List.of(CharacterCategory.HERO), null);
+                List.of(CharacterCategory.HERO), null, null);
         when(characterRepository.existsByName("Araveth")).thenReturn(false);
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -170,7 +175,7 @@ class CharacterServiceTest {
     @Test
     void create_shouldReturnCharacterWithEmptyImages_whenNoImagesProvided() {
         var command = new CreateCharacterUseCase.Command(
-                "Araveth", null, null, List.of(), List.of(), List.of(CharacterCategory.HERO), null);
+                "Araveth", null, null, List.of(), List.of(), List.of(CharacterCategory.HERO), null, null);
         when(characterRepository.existsByName("Araveth")).thenReturn(false);
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -193,7 +198,7 @@ class CharacterServiceTest {
         var command = new UpdateCharacterUseCase.Command(
                 "Araveth", null, null, List.of(),
                 List.of("https://example.com/new1.png", "https://example.com/new2.png"),
-                List.of(CharacterCategory.HERO), null);
+                List.of(CharacterCategory.HERO), null, null);
 
         Character result = characterService.update(id, command);
 

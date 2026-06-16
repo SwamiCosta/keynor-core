@@ -11,6 +11,7 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.faction.CreateFactionUseCase;
 import com.keynor.core.domain.port.in.faction.UpdateFactionUseCase;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.FactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,11 +34,14 @@ class FactionServiceTest {
     @Mock
     private FactionRepository factionRepository;
 
+    @Mock
+    private EntityLinkRepository entityLinkRepository;
+
     private FactionService factionService;
 
     @BeforeEach
     void setUp() {
-        factionService = new FactionService(factionRepository);
+        factionService = new FactionService(factionRepository, entityLinkRepository);
     }
 
     @Test
@@ -47,6 +51,7 @@ class FactionServiceTest {
                 List.of("mages", "arcane"),
                 List.of(),
                 List.of(FactionCategory.ORDER),
+                null,
                 null);
         when(factionRepository.existsByName("The Silver Order")).thenReturn(false);
         when(factionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -63,7 +68,7 @@ class FactionServiceTest {
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateFactionUseCase.Command(
                 "The Silver Order", null, null, List.of(), List.of(),
-                List.of(FactionCategory.GUILD), null);
+                List.of(FactionCategory.GUILD), null, null);
         when(factionRepository.existsByName("The Silver Order")).thenReturn(true);
 
         assertThatThrownBy(() -> factionService.create(command))
@@ -164,7 +169,7 @@ class FactionServiceTest {
         var command = new UpdateFactionUseCase.Command(
                 "New Name", "New summary", "New body",
                 List.of("tag1"), List.of(),
-                List.of(FactionCategory.EMPIRE, FactionCategory.ORDER), null);
+                List.of(FactionCategory.EMPIRE, FactionCategory.ORDER), null, null);
 
         Faction result = factionService.update(id, command);
 
