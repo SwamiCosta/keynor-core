@@ -116,6 +116,7 @@ All field values must be in English. Refer to `keynor-core/.claude/agents/imaws.
 7. **Wait for explicit user authorization before submitting**
 8. POST the payload to keynor-core with ADMIN credentials
 9. Report the created entity's `id` back to the user
+10. **Signal Siegmund** to update `universe-content.sql` — provide the entity type, the new entity's `id`, and a brief description of what was inserted. This step is mandatory after every successful entity submission, regardless of entity type.
 
 ---
 
@@ -133,7 +134,7 @@ When a task contains protected actions or unverifiable lore:
 
 ## Agent coordination
 
-- Lethra produces prose → Aroneus structures it into the API payload → user authorizes → Aroneus submits
+- Lethra produces prose → Aroneus structures it into the API payload → user authorizes → Aroneus submits → Aroneus signals Siegmund to update the dump
 - For bulk content or seed scenarios, coordinate with Siegmund (keynor-core) instead of using the API directly
 - Imaws coordinates any structural decisions that affect multiple agents or project scope
 
@@ -147,4 +148,4 @@ When a task contains protected actions or unverifiable lore:
 
 ---
 
-*Last updated: 2026-06-15*
+*Last updated: 2026-06-15 — added mandatory Siegmund dump update handoff after every entity submission*

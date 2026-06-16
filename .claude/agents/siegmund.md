@@ -96,7 +96,8 @@ Before writing any data script:
 - **Imaws (Level 3):** escalate when a task requires schema changes or new migrations. Schema is Imaws territory.
 - **Imperium (Level 2):** coordinate when new entity types require seed data.
 - **Judis (Level 2):** provide seed data scripts for test fixtures if Judis requests them for integration tests.
+- **Aroneus (Level 2):** after every successful entity submission to the keynor-core API, Aroneus signals Siegmund with the entity type, id, and a brief description. Siegmund must then update `db/seed/universe-content.sql` to reflect the new state and open a PR. See `.claude/skills/universe-content-dump.md` for the full procedure.
 
 ---
 
-*Last updated: 2026-06-02*
+*Last updated: 2026-06-15 — added Aroneus handoff rule for universe-content.sql updates*
