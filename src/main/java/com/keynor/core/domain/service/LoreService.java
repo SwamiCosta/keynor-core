@@ -5,12 +5,15 @@ import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.lore.Lore;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.lore.*;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.LoreRepository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public class LoreService implements
@@ -22,9 +25,11 @@ public class LoreService implements
         FindAllLoreUseCase {
 
     private final LoreRepository loreRepository;
+    private final EntityLinkRepository entityLinkRepository;
 
-    public LoreService(LoreRepository loreRepository) {
+    public LoreService(LoreRepository loreRepository, EntityLinkRepository entityLinkRepository) {
         this.loreRepository = loreRepository;
+        this.entityLinkRepository = entityLinkRepository;
     }
 
     @Override
@@ -46,7 +51,9 @@ public class LoreService implements
                 command.timeline(),
                 now,
                 now);
-        return loreRepository.save(lore);
+        Lore saved = loreRepository.save(lore);
+        entityLinkRepository.replaceLinks(EntityType.LORE, saved.getId(), command.links() != null ? command.links() : List.of());
+        return saved;
     }
 
     @Override
@@ -54,7 +61,9 @@ public class LoreService implements
         Lore lore = loreRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Lore", id));
         lore.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
-        return loreRepository.save(lore);
+        Lore saved = loreRepository.save(lore);
+        entityLinkRepository.replaceLinks(EntityType.LORE, saved.getId(), command.links() != null ? command.links() : List.of());
+        return saved;
     }
 
     @Override
@@ -71,6 +80,7 @@ public class LoreService implements
             throw new EntityNotFoundException("Lore", id);
         }
         loreRepository.deleteById(id);
+        entityLinkRepository.deleteAllForEntity(EntityType.LORE, id);
     }
 
     @Override

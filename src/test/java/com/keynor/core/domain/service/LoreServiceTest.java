@@ -11,6 +11,7 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.lore.CreateLoreUseCase;
 import com.keynor.core.domain.port.in.lore.UpdateLoreUseCase;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.LoreRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,11 +34,14 @@ class LoreServiceTest {
     @Mock
     private LoreRepository loreRepository;
 
+    @Mock
+    private EntityLinkRepository entityLinkRepository;
+
     private LoreService loreService;
 
     @BeforeEach
     void setUp() {
-        loreService = new LoreService(loreRepository);
+        loreService = new LoreService(loreRepository, entityLinkRepository);
     }
 
     @Test
@@ -47,7 +51,7 @@ class LoreServiceTest {
                 List.of("history", "silence"),
                 List.of(),
                 List.of(LoreCategory.HISTORY),
-                null, null);
+                null, null, List.of());
         when(loreRepository.existsByName("The Age of Silence")).thenReturn(false);
         when(loreRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -66,7 +70,7 @@ class LoreServiceTest {
                 List.of("history", "silence"),
                 List.of(),
                 List.of(LoreCategory.HISTORY),
-                null, EntityStatus.CANON);
+                null, EntityStatus.CANON, List.of());
         when(loreRepository.existsByName("The Age of Silence")).thenReturn(false);
         when(loreRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -80,7 +84,7 @@ class LoreServiceTest {
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateLoreUseCase.Command(
                 "The Age of Silence", null, null, List.of(), List.of(),
-                List.of(LoreCategory.MYTH), null, null);
+                List.of(LoreCategory.MYTH), null, null, List.of());
         when(loreRepository.existsByName("The Age of Silence")).thenReturn(true);
 
         assertThatThrownBy(() -> loreService.create(command))
@@ -181,7 +185,7 @@ class LoreServiceTest {
         var command = new UpdateLoreUseCase.Command(
                 "New Name", "New summary", "New body",
                 List.of("tag1"), List.of(),
-                List.of(LoreCategory.HISTORY, LoreCategory.PROPHECY), null);
+                List.of(LoreCategory.HISTORY, LoreCategory.PROPHECY), null, List.of());
 
         Lore result = loreService.update(id, command);
 

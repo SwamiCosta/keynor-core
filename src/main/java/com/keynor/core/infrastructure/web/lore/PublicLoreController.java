@@ -4,9 +4,11 @@ import com.keynor.core.application.dto.lore.LoreResponse;
 import com.keynor.core.application.dto.shared.PagedResponse;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.port.in.lore.FindAllLoreUseCase;
 import com.keynor.core.domain.port.in.lore.FindLoreByIdUseCase;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,12 +21,15 @@ public class PublicLoreController {
 
     private final FindAllLoreUseCase findAllLoreUseCase;
     private final FindLoreByIdUseCase findLoreByIdUseCase;
+    private final FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     public PublicLoreController(
             FindAllLoreUseCase findAllLoreUseCase,
-            FindLoreByIdUseCase findLoreByIdUseCase) {
+            FindLoreByIdUseCase findLoreByIdUseCase,
+            FindLinkedEntitiesUseCase findLinkedEntitiesUseCase) {
         this.findAllLoreUseCase = findAllLoreUseCase;
         this.findLoreByIdUseCase = findLoreByIdUseCase;
+        this.findLinkedEntitiesUseCase = findLinkedEntitiesUseCase;
     }
 
     @GetMapping
@@ -38,11 +43,13 @@ public class PublicLoreController {
                 categories != null ? categories : List.of(),
                 tags != null ? tags : List.of());
         var result = findAllLoreUseCase.findAll(filter, new PageRequest(page, size));
-        return ResponseEntity.ok(PagedResponse.from(result, LoreResponse::from));
+        return ResponseEntity.ok(PagedResponse.from(result,
+                lore -> LoreResponse.from(lore, findLinkedEntitiesUseCase.findLinks(EntityType.LORE, lore.getId()))));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LoreResponse> findById(@PathVariable UUID id) {
-        return ResponseEntity.ok(LoreResponse.from(findLoreByIdUseCase.findById(id)));
+        var lore = findLoreByIdUseCase.findById(id);
+        return ResponseEntity.ok(LoreResponse.from(lore, findLinkedEntitiesUseCase.findLinks(EntityType.LORE, lore.getId())));
     }
 }

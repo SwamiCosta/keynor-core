@@ -1,5 +1,6 @@
 package com.keynor.core.application.dto.lore;
 
+import com.keynor.core.application.dto.shared.EntityLinkRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -14,5 +15,6 @@ public record CreateLoreRequest(
         @NotNull List<String> categories,
         @NotBlank String timelineFoundedEra,
         String timelineDestroyedEra,
-        String status) {
+        String status,
+        List<EntityLinkRequest> links) {
 }
