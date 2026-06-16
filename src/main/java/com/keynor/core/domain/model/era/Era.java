@@ -1,36 +1,56 @@
 package com.keynor.core.domain.model.era;
 
-import com.keynor.core.domain.model.place.MapType;
+import java.time.Instant;
+import java.util.UUID;
 
 public class Era {
 
-    private final String id;
+    private final UUID id;
     private final String name;
-    private final int eraOrder;
-    private final String period;
-    private final String summary;
-    private final MapType mapType;
-    private final String defaultMap;
-    private final String color;
+    private final int orderIndex;
+    private final EraType type;
+    private final EraImportance importance;
+    private final String description;
+    private final Instant createdAt;
+    private final Instant updatedAt;
 
-    public Era(String id, String name, int eraOrder, String period, String summary,
-               MapType mapType, String defaultMap, String color) {
+    public Era(
+            UUID id,
+            String name,
+            int orderIndex,
+            EraType type,
+            EraImportance importance,
+            String description,
+            Instant createdAt,
+            Instant updatedAt) {
+        validateTypeImportanceInvariant(type, importance);
         this.id = id;
         this.name = name;
-        this.eraOrder = eraOrder;
-        this.period = period;
-        this.summary = summary;
-        this.mapType = mapType;
-        this.defaultMap = defaultMap;
-        this.color = color;
+        this.orderIndex = orderIndex;
+        this.type = type;
+        this.importance = importance;
+        this.description = description;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
-    public String getId() { return id; }
+    private static void validateTypeImportanceInvariant(EraType type, EraImportance importance) {
+        if (type == EraType.POINT && importance == null) {
+            throw new IllegalArgumentException(
+                    "Era of type POINT must have an importance value (STANDARD or MAJOR)");
+        }
+        if (type == EraType.ERA && importance != null) {
+            throw new IllegalArgumentException(
+                    "Era of type ERA must not have an importance value — only POINT entries carry importance");
+        }
+    }
+
+    public UUID getId() { return id; }
     public String getName() { return name; }
-    public int getEraOrder() { return eraOrder; }
-    public String getPeriod() { return period; }
-    public String getSummary() { return summary; }
-    public MapType getMapType() { return mapType; }
-    public String getDefaultMap() { return defaultMap; }
-    public String getColor() { return color; }
+    public int getOrderIndex() { return orderIndex; }
+    public EraType getType() { return type; }
+    public EraImportance getImportance() { return importance; }
+    public String getDescription() { return description; }
+    public Instant getCreatedAt() { return createdAt; }
+    public Instant getUpdatedAt() { return updatedAt; }
 }

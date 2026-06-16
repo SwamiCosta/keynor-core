@@ -10,11 +10,11 @@ public class EraMapper {
         return new Era(
                 entity.getId(),
                 entity.getName(),
-                entity.getEraOrder(),
-                entity.getPeriod(),
-                entity.getSummary(),
-                entity.getMapType(),
-                entity.getDefaultMap(),
-                entity.getColor());
+                entity.getOrderIndex(),
+                entity.getType(),
+                entity.getImportance(),
+                entity.getDescription(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt());
     }
 }

@@ -7,6 +7,7 @@ import com.keynor.core.domain.port.in.era.FindEraByIdUseCase;
 import com.keynor.core.domain.port.out.EraRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 public class EraService implements FindAllErasUseCase, FindEraByIdUseCase {
 
@@ -18,11 +19,11 @@ public class EraService implements FindAllErasUseCase, FindEraByIdUseCase {
 
     @Override
     public List<Era> findAll() {
-        return eraRepository.findAll();
+        return eraRepository.findAllOrderedByIndex();
     }
 
     @Override
-    public Era findById(String id) {
+    public Era findById(UUID id) {
         return eraRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Era", id));
     }

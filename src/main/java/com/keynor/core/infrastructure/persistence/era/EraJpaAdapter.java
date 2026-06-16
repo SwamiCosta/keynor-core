@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class EraJpaAdapter implements EraRepository {
@@ -19,12 +20,15 @@ public class EraJpaAdapter implements EraRepository {
     }
 
     @Override
-    public List<Era> findAll() {
-        return jpaRepository.findAll().stream().map(mapper::toDomain).toList();
+    public List<Era> findAllOrderedByIndex() {
+        return jpaRepository.findAllByOrderByOrderIndexAsc()
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 
     @Override
-    public Optional<Era> findById(String id) {
+    public Optional<Era> findById(UUID id) {
         return jpaRepository.findById(id).map(mapper::toDomain);
     }
 }
