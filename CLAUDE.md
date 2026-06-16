@@ -104,6 +104,20 @@ Entity types and their category enums:
 
 `Place` additionally has `mapType: MapType` (NAVIGABLE or ABSTRACT).
 
+### Request DTO field names
+
+The domain model uses a `Timeline` value object with `founded` and `destroyed` fields. In the JSON body of API requests, these fields are **flattened** into the DTO with the following names:
+
+| Domain field | JSON / DTO field name | Required | Notes |
+|--------------|-----------------------|----------|-------|
+| `timeline.founded` | `timelineFoundedEra` | Yes (`@NotBlank`) | Era string |
+| `timeline.destroyed` | `timelineDestroyedEra` | No | Era string, nullable |
+
+This mapping applies uniformly to all `Create*Request` and `Update*Request` DTOs:
+`CreateCharacterRequest`, `UpdateCharacterRequest`, `CreatePlaceRequest`, `UpdatePlaceRequest`, `CreateFactionRequest`, `UpdateFactionRequest`, `CreateItemRequest`, `UpdateItemRequest`, `CreateEventRequest`, `UpdateEventRequest`, `CreateLoreRequest`, `UpdateLoreRequest`.
+
+> Do **not** use `timeline.founded` or `timeline.destroyed` in the JSON body — these will produce a `400 Bad Request`.
+
 ### Status transition rules
 
 Valid transitions enforced in `UniverseEntity.changeStatus()`:
