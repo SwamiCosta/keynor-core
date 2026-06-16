@@ -4,8 +4,9 @@ import com.keynor.core.domain.model.era.Era;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface EraRepository {
-    List<Era> findAll();
-    Optional<Era> findById(String id);
+    List<Era> findAllOrderedByIndex();
+    Optional<Era> findById(UUID id);
 }

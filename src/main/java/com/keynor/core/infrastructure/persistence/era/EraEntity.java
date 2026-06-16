@@ -1,48 +1,56 @@
 package com.keynor.core.infrastructure.persistence.era;
 
-import com.keynor.core.domain.model.place.MapType;
+import com.keynor.core.domain.model.era.EraImportance;
+import com.keynor.core.domain.model.era.EraType;
 import jakarta.persistence.*;
+
+import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "eras")
 public class EraEntity {
 
     @Id
-    private String id;
+    private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = false)
-    private int eraOrder;
-
-    private String period;
-
-    @Column(columnDefinition = "TEXT")
-    private String summary;
+    private int orderIndex;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private EraType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10)
+    private EraImportance importance;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     @Column(nullable = false)
-    private MapType mapType;
+    private Instant createdAt;
 
-    private String defaultMap;
+    @Column(nullable = false)
+    private Instant updatedAt;
 
-    private String color;
-
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public int getEraOrder() { return eraOrder; }
-    public void setEraOrder(int eraOrder) { this.eraOrder = eraOrder; }
-    public String getPeriod() { return period; }
-    public void setPeriod(String period) { this.period = period; }
-    public String getSummary() { return summary; }
-    public void setSummary(String summary) { this.summary = summary; }
-    public MapType getMapType() { return mapType; }
-    public void setMapType(MapType mapType) { this.mapType = mapType; }
-    public String getDefaultMap() { return defaultMap; }
-    public void setDefaultMap(String defaultMap) { this.defaultMap = defaultMap; }
-    public String getColor() { return color; }
-    public void setColor(String color) { this.color = color; }
+    public int getOrderIndex() { return orderIndex; }
+    public void setOrderIndex(int orderIndex) { this.orderIndex = orderIndex; }
+    public EraType getType() { return type; }
+    public void setType(EraType type) { this.type = type; }
+    public EraImportance getImportance() { return importance; }
+    public void setImportance(EraImportance importance) { this.importance = importance; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public Instant getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+    public Instant getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
 }

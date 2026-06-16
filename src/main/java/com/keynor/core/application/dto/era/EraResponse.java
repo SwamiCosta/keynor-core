@@ -2,25 +2,23 @@ package com.keynor.core.application.dto.era;
 
 import com.keynor.core.domain.model.era.Era;
 
+import java.util.UUID;
+
 public record EraResponse(
-        String id,
+        UUID id,
         String name,
-        int eraOrder,
-        String period,
-        String summary,
-        String mapType,
-        String defaultMap,
-        String color) {
+        int order,
+        String type,
+        String importance,
+        String description) {
 
     public static EraResponse from(Era era) {
         return new EraResponse(
                 era.getId(),
                 era.getName(),
-                era.getEraOrder(),
-                era.getPeriod(),
-                era.getSummary(),
-                era.getMapType().name(),
-                era.getDefaultMap(),
-                era.getColor());
+                era.getOrderIndex(),
+                era.getType().name(),
+                era.getImportance() != null ? era.getImportance().name() : null,
+                era.getDescription());
     }
 }

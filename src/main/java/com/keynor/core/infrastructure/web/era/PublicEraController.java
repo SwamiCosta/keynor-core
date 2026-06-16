@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/public/v1/eras")
@@ -24,11 +25,12 @@ public class PublicEraController {
 
     @GetMapping
     public ResponseEntity<List<EraResponse>> findAll() {
-        return ResponseEntity.ok(findAllErasUseCase.findAll().stream().map(EraResponse::from).toList());
+        return ResponseEntity.ok(
+                findAllErasUseCase.findAll().stream().map(EraResponse::from).toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EraResponse> findById(@PathVariable String id) {
+    public ResponseEntity<EraResponse> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(EraResponse.from(findEraByIdUseCase.findById(id)));
     }
 }

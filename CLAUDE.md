@@ -134,6 +134,44 @@ Universe entities (lore/story data) support **hard delete**. User data (`users` 
 
 ---
 
+## Era entity
+
+`Era` is **not** a `UniverseEntity` subclass — it does not have `status`, `timeline`, `tags`, `images`, `categories`, or `body`. It is a standalone domain class that models both era intervals and single-moment temporal points on the same timeline.
+
+### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key, set at construction, immutable |
+| `name` | String | Display name, unique |
+| `orderIndex` | int | Determines position in the ordered timeline list |
+| `type` | `EraType` | `ERA` (interval) or `POINT` (single moment) |
+| `importance` | `EraImportance` | `STANDARD` or `MAJOR` — required when `type = POINT`, must be null when `type = ERA` |
+| `description` | String | Optional descriptive text |
+| `createdAt` | Instant | Set at construction, immutable |
+| `updatedAt` | Instant | Updated on every mutation |
+
+### Domain invariant
+
+The `Era` constructor enforces: `importance` is required when `type = POINT`; must be null when `type = ERA`. Violation throws `IllegalArgumentException`.
+
+### API response shape
+
+`GET /api/public/v1/eras` returns all entries (eras and points) ordered by `orderIndex`:
+
+```json
+[
+  { "id": "...", "name": "Age of Creation", "order": 1, "type": "ERA", "importance": null, "description": "..." },
+  { "id": "...", "name": "The Great Sundering", "order": 2, "type": "POINT", "importance": "MAJOR", "description": "..." }
+]
+```
+
+### Port naming
+
+`EraRepository` output port exposes `findAllOrderedByIndex()` (not the generic `findAll`) to make the ordering contract explicit at the domain boundary.
+
+---
+
 ## Security model
 
 keynor-core is both **Authorization Server** and **Resource Server**.
@@ -239,6 +277,7 @@ Endpoints under `/api/public/v1/` require no authentication and are consumed by 
 | V5 | `timeline_founded NOT NULL` on all 6 entity tables |
 | V6 | `universe_entity_images` table |
 | V7 | `entity_links` table (cross-entity references) |
+| V8 | Redesign `eras` table — UUID PK, `type` (ERA/POINT), `importance` (STANDARD/MAJOR/null), `order_index`, `description`; drops V4 schema |
 
 For the full procedure, see the workspace `SKILLS.md` — Skill 02.
 
