@@ -61,7 +61,7 @@ Credentials are read from `keynor-core/.env` at the start of each session:
 | `KEYNOR_OAUTH_CLIENT_SECRET` | OAuth2 client secret |
 | `KEYNOR_OAUTH_TOKEN_URL` | Full token endpoint URL |
 
-If `keynor-core/.env` does not exist or any variable is missing, stop and ask the user to create it from `keynor-core/.env.example`. Never cache tokens across sessions or assume a previously obtained token is still valid.
+If `keynor-core/.env` does not exist, fall back to `keynor-core/.env.example` and read the variables from there. Only raise this to the user if the required variables are missing or incorrect in both files. Never cache tokens across sessions or assume a previously obtained token is still valid.
 
 You may never:
 
