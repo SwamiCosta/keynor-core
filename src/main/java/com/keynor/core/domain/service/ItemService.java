@@ -5,12 +5,15 @@ import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.item.Item;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.item.*;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.ItemRepository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public class ItemService implements
@@ -22,9 +25,11 @@ public class ItemService implements
         FindAllItemsUseCase {
 
     private final ItemRepository itemRepository;
+    private final EntityLinkRepository entityLinkRepository;
 
-    public ItemService(ItemRepository itemRepository) {
+    public ItemService(ItemRepository itemRepository, EntityLinkRepository entityLinkRepository) {
         this.itemRepository = itemRepository;
+        this.entityLinkRepository = entityLinkRepository;
     }
 
     @Override
@@ -45,7 +50,9 @@ public class ItemService implements
                 command.timeline(),
                 now,
                 now);
-        return itemRepository.save(item);
+        Item saved = itemRepository.save(item);
+        entityLinkRepository.replaceLinks(EntityType.ITEM, saved.getId(), command.links() != null ? command.links() : List.of());
+        return saved;
     }
 
     @Override
@@ -53,7 +60,9 @@ public class ItemService implements
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Item", id));
         item.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
-        return itemRepository.save(item);
+        Item saved = itemRepository.save(item);
+        entityLinkRepository.replaceLinks(EntityType.ITEM, saved.getId(), command.links() != null ? command.links() : List.of());
+        return saved;
     }
 
     @Override
@@ -70,6 +79,7 @@ public class ItemService implements
             throw new EntityNotFoundException("Item", id);
         }
         itemRepository.deleteById(id);
+        entityLinkRepository.deleteAllForEntity(EntityType.ITEM, id);
     }
 
     @Override

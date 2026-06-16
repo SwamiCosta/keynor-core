@@ -11,6 +11,7 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.event.CreateEventUseCase;
 import com.keynor.core.domain.port.in.event.UpdateEventUseCase;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.EventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,11 +34,14 @@ class EventServiceTest {
     @Mock
     private EventRepository eventRepository;
 
+    @Mock
+    private EntityLinkRepository entityLinkRepository;
+
     private EventService eventService;
 
     @BeforeEach
     void setUp() {
-        eventService = new EventService(eventRepository);
+        eventService = new EventService(eventRepository, entityLinkRepository);
     }
 
     @Test
@@ -47,6 +51,7 @@ class EventServiceTest {
                 List.of("battle", "war"),
                 List.of(),
                 List.of(EventCategory.BATTLE),
+                null,
                 null);
         when(eventRepository.existsByName("The Battle of Kor")).thenReturn(false);
         when(eventRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -63,7 +68,7 @@ class EventServiceTest {
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateEventUseCase.Command(
                 "The Battle of Kor", null, null, List.of(), List.of(),
-                List.of(EventCategory.POLITICAL), null);
+                List.of(EventCategory.POLITICAL), null, null);
         when(eventRepository.existsByName("The Battle of Kor")).thenReturn(true);
 
         assertThatThrownBy(() -> eventService.create(command))
@@ -164,7 +169,7 @@ class EventServiceTest {
         var command = new UpdateEventUseCase.Command(
                 "New Name", "New summary", "New body",
                 List.of("tag1"), List.of(),
-                List.of(EventCategory.BATTLE, EventCategory.DIVINE), null);
+                List.of(EventCategory.BATTLE, EventCategory.DIVINE), null, null);
 
         Event result = eventService.update(id, command);
 

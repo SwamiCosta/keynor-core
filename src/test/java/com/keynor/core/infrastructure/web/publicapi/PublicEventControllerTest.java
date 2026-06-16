@@ -10,6 +10,7 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.event.FindAllEventsUseCase;
 import com.keynor.core.domain.port.in.event.FindEventByIdUseCase;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,11 +37,15 @@ class PublicEventControllerTest {
     @Mock
     private FindEventByIdUseCase findEventByIdUseCase;
 
+    @Mock
+    private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
+
     private PublicEventController controller;
 
     @BeforeEach
     void setUp() {
-        controller = new PublicEventController(findAllEventsUseCase, findEventByIdUseCase);
+        controller = new PublicEventController(
+                findAllEventsUseCase, findEventByIdUseCase, findLinkedEntitiesUseCase);
     }
 
     @Test
@@ -76,6 +81,7 @@ class PublicEventControllerTest {
                 List.of(), List.of(EventCategory.BATTLE), EntityStatus.CANON, null, now, now);
         when(findAllEventsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(event), 0, 20, 1));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findAll(null, null, 0, 20);
 
@@ -95,6 +101,7 @@ class PublicEventControllerTest {
         Event event = new Event(id, "The First Sundering", "A cataclysmic event", "Body", List.of(),
                 List.of(), List.of(EventCategory.DIVINE), EntityStatus.CANON, null, now, now);
         when(findEventByIdUseCase.findById(id)).thenReturn(event);
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findById(id);
 

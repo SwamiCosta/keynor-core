@@ -12,6 +12,7 @@ import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.item.*;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +40,7 @@ class InternalItemControllerTest {
     @Mock private DeleteItemUseCase deleteItemUseCase;
     @Mock private FindItemByIdUseCase findItemByIdUseCase;
     @Mock private FindAllItemsUseCase findAllItemsUseCase;
+    @Mock private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     private InternalItemController controller;
 
@@ -52,16 +54,18 @@ class InternalItemControllerTest {
     void setUp() {
         controller = new InternalItemController(
                 createItemUseCase, updateItemUseCase, changeItemStatusUseCase,
-                deleteItemUseCase, findItemByIdUseCase, findAllItemsUseCase);
+                deleteItemUseCase, findItemByIdUseCase, findAllItemsUseCase,
+                findLinkedEntitiesUseCase);
     }
 
     @Test
     void create_shouldReturn201AndResponseBody_whenCommandIsValid() {
         UUID id = UUID.randomUUID();
         when(createItemUseCase.create(any())).thenReturn(buildItem(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateItemRequest("Shadowblade", "A cursed sword", "Body",
-                List.of("sword"), List.of(), List.of("WEAPON"), "era-1", null);
+                List.of("sword"), List.of(), List.of("WEAPON"), "era-1", null, null);
 
         var response = controller.create(request);
 
@@ -75,9 +79,10 @@ class InternalItemControllerTest {
     void create_shouldPassCorrectCommandToUseCase() {
         UUID id = UUID.randomUUID();
         when(createItemUseCase.create(any())).thenReturn(buildItem(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateItemRequest("Shadowblade", null, null,
-                List.of(), List.of(), List.of("WEAPON"), "era-1", null);
+                List.of(), List.of(), List.of("WEAPON"), "era-1", null, null);
 
         controller.create(request);
 
@@ -92,9 +97,10 @@ class InternalItemControllerTest {
     void update_shouldReturn200AndResponseBody_whenCommandIsValid() {
         UUID id = UUID.randomUUID();
         when(updateItemUseCase.update(eq(id), any())).thenReturn(buildItem(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdateItemRequest("Shadowblade Updated", null, null,
-                List.of(), List.of(), List.of("WEAPON"), "era-1", null);
+                List.of(), List.of(), List.of("WEAPON"), "era-1", null, null);
 
         var response = controller.update(id, request);
 
@@ -107,6 +113,7 @@ class InternalItemControllerTest {
     void changeStatus_shouldReturn200AndCallUseCase() {
         UUID id = UUID.randomUUID();
         when(changeItemStatusUseCase.changeStatus(id, EntityStatus.CANON)).thenReturn(buildItem(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.changeStatus(id, new ChangeStatusRequest("CANON"));
 
@@ -129,6 +136,7 @@ class InternalItemControllerTest {
         UUID id = UUID.randomUUID();
         when(findAllItemsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(buildItem(id)), 0, 20, 1));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findAll(null, null, null, 0, 20);
 
@@ -158,6 +166,7 @@ class InternalItemControllerTest {
     void findById_shouldDelegateAndMapResult() {
         UUID id = UUID.randomUUID();
         when(findItemByIdUseCase.findById(id)).thenReturn(buildItem(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findById(id);
 

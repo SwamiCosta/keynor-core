@@ -10,6 +10,7 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.item.FindAllItemsUseCase;
 import com.keynor.core.domain.port.in.item.FindItemByIdUseCase;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,11 +37,15 @@ class PublicItemControllerTest {
     @Mock
     private FindItemByIdUseCase findItemByIdUseCase;
 
+    @Mock
+    private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
+
     private PublicItemController controller;
 
     @BeforeEach
     void setUp() {
-        controller = new PublicItemController(findAllItemsUseCase, findItemByIdUseCase);
+        controller = new PublicItemController(
+                findAllItemsUseCase, findItemByIdUseCase, findLinkedEntitiesUseCase);
     }
 
     @Test
@@ -76,6 +81,7 @@ class PublicItemControllerTest {
                 List.of(), List.of(ItemCategory.WEAPON), EntityStatus.CANON, null, now, now);
         when(findAllItemsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(item), 0, 20, 1));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findAll(null, null, 0, 20);
 
@@ -95,6 +101,7 @@ class PublicItemControllerTest {
         Item item = new Item(id, "Sword of Dawn", "A legendary blade", "Body", List.of(),
                 List.of(), List.of(ItemCategory.ARTIFACT), EntityStatus.CANON, null, now, now);
         when(findItemByIdUseCase.findById(id)).thenReturn(item);
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findById(id);
 

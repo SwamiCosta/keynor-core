@@ -7,10 +7,13 @@ import com.keynor.core.application.dto.shared.ChangeStatusRequest;
 import com.keynor.core.application.dto.shared.PagedResponse;
 import com.keynor.core.domain.model.event.EventCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
+import com.keynor.core.domain.model.shared.EntityLinkRef;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.event.*;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +32,7 @@ public class InternalEventController {
     private final DeleteEventUseCase deleteEventUseCase;
     private final FindEventByIdUseCase findEventByIdUseCase;
     private final FindAllEventsUseCase findAllEventsUseCase;
+    private final FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     public InternalEventController(
             CreateEventUseCase createEventUseCase,
@@ -36,13 +40,15 @@ public class InternalEventController {
             ChangeEventStatusUseCase changeEventStatusUseCase,
             DeleteEventUseCase deleteEventUseCase,
             FindEventByIdUseCase findEventByIdUseCase,
-            FindAllEventsUseCase findAllEventsUseCase) {
+            FindAllEventsUseCase findAllEventsUseCase,
+            FindLinkedEntitiesUseCase findLinkedEntitiesUseCase) {
         this.createEventUseCase = createEventUseCase;
         this.updateEventUseCase = updateEventUseCase;
         this.changeEventStatusUseCase = changeEventStatusUseCase;
         this.deleteEventUseCase = deleteEventUseCase;
         this.findEventByIdUseCase = findEventByIdUseCase;
         this.findAllEventsUseCase = findAllEventsUseCase;
+        this.findLinkedEntitiesUseCase = findLinkedEntitiesUseCase;
     }
 
     @GetMapping
@@ -56,12 +62,14 @@ public class InternalEventController {
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList() : List.of();
         EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of(), tags != null ? tags : List.of());
         var result = findAllEventsUseCase.findAll(filter, new PageRequest(page, size));
-        return ResponseEntity.ok(PagedResponse.from(result, EventResponse::from));
+        return ResponseEntity.ok(PagedResponse.from(result,
+                event -> EventResponse.from(event, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, event.getId()))));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EventResponse> findById(@PathVariable UUID id) {
-        return ResponseEntity.ok(EventResponse.from(findEventByIdUseCase.findById(id)));
+        var event = findEventByIdUseCase.findById(id);
+        return ResponseEntity.ok(EventResponse.from(event, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, event.getId())));
     }
 
     @PostMapping
@@ -70,12 +78,14 @@ public class InternalEventController {
                 .map(c -> EventCategory.valueOf(c.toUpperCase())).toList();
         Timeline timeline = (request.timelineFoundedEra() != null || request.timelineDestroyedEra() != null)
                 ? new Timeline(request.timelineFoundedEra(), request.timelineDestroyedEra()) : null;
+        List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new CreateEventUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
-                categories, timeline);
-        return ResponseEntity.status(HttpStatus.CREATED).body(EventResponse.from(createEventUseCase.create(command)));
+                categories, timeline, links);
+        var created = createEventUseCase.create(command);
+        return ResponseEntity.status(HttpStatus.CREATED).body(EventResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, created.getId())));
     }
 
     @PutMapping("/{id}")
@@ -84,23 +94,34 @@ public class InternalEventController {
                 .map(c -> EventCategory.valueOf(c.toUpperCase())).toList();
         Timeline timeline = (request.timelineFoundedEra() != null || request.timelineDestroyedEra() != null)
                 ? new Timeline(request.timelineFoundedEra(), request.timelineDestroyedEra()) : null;
+        List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new UpdateEventUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
-                categories, timeline);
-        return ResponseEntity.ok(EventResponse.from(updateEventUseCase.update(id, command)));
+                categories, timeline, links);
+        var updated = updateEventUseCase.update(id, command);
+        return ResponseEntity.ok(EventResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, updated.getId())));
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<EventResponse> changeStatus(@PathVariable UUID id, @Valid @RequestBody ChangeStatusRequest request) {
-        return ResponseEntity.ok(EventResponse.from(
-                changeEventStatusUseCase.changeStatus(id, EntityStatus.valueOf(request.status().toUpperCase()))));
+        var updated = changeEventStatusUseCase.changeStatus(id, EntityStatus.valueOf(request.status().toUpperCase()));
+        return ResponseEntity.ok(EventResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, updated.getId())));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         deleteEventUseCase.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private List<EntityLinkRef> toLinkRefs(List<com.keynor.core.application.dto.shared.EntityLinkRequest> links) {
+        if (links == null) {
+            return List.of();
+        }
+        return links.stream()
+                .map(link -> new EntityLinkRef(EntityType.valueOf(link.targetType().toUpperCase()), link.targetId()))
+                .toList();
     }
 }

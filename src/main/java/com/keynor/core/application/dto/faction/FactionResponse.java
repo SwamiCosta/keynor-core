@@ -1,6 +1,8 @@
 package com.keynor.core.application.dto.faction;
 
+import com.keynor.core.application.dto.shared.LinkedEntityResponse;
 import com.keynor.core.domain.model.faction.Faction;
+import com.keynor.core.domain.model.shared.EntityLinkSummary;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,9 +20,10 @@ public record FactionResponse(
         String timelineFoundedEra,
         String timelineDestroyedEra,
         Instant createdAt,
-        Instant updatedAt) {
+        Instant updatedAt,
+        List<LinkedEntityResponse> links) {
 
-    public static FactionResponse from(Faction faction) {
+    public static FactionResponse from(Faction faction, List<EntityLinkSummary> links) {
         return new FactionResponse(
                 faction.getId(),
                 faction.getName(),
@@ -33,6 +36,7 @@ public record FactionResponse(
                 faction.getTimeline() != null ? faction.getTimeline().founded() : null,
                 faction.getTimeline() != null ? faction.getTimeline().destroyed() : null,
                 faction.getCreatedAt(),
-                faction.getUpdatedAt());
+                faction.getUpdatedAt(),
+                links.stream().map(LinkedEntityResponse::from).toList());
     }
 }

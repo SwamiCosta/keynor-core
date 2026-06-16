@@ -13,6 +13,7 @@ import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.place.*;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,7 @@ class InternalPlaceControllerTest {
     @Mock private DeletePlaceUseCase deletePlaceUseCase;
     @Mock private FindPlaceByIdUseCase findPlaceByIdUseCase;
     @Mock private FindAllPlacesUseCase findAllPlacesUseCase;
+    @Mock private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     private InternalPlaceController controller;
 
@@ -54,16 +56,18 @@ class InternalPlaceControllerTest {
     void setUp() {
         controller = new InternalPlaceController(
                 createPlaceUseCase, updatePlaceUseCase, changePlaceStatusUseCase,
-                deletePlaceUseCase, findPlaceByIdUseCase, findAllPlacesUseCase);
+                deletePlaceUseCase, findPlaceByIdUseCase, findAllPlacesUseCase,
+                findLinkedEntitiesUseCase);
     }
 
     @Test
     void create_shouldReturn201AndResponseBody_whenCommandIsValid() {
         UUID id = UUID.randomUUID();
         when(createPlaceUseCase.create(any())).thenReturn(buildPlace(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreatePlaceRequest("Thornvale", "A city", "Body",
-                List.of("city"), List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null);
+                List.of("city"), List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null);
 
         var response = controller.create(request);
 
@@ -77,9 +81,10 @@ class InternalPlaceControllerTest {
     void create_shouldPassMapTypeToCommand() {
         UUID id = UUID.randomUUID();
         when(createPlaceUseCase.create(any())).thenReturn(buildPlace(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreatePlaceRequest("Thornvale", null, null,
-                List.of(), List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null);
+                List.of(), List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null);
 
         controller.create(request);
 
@@ -93,9 +98,10 @@ class InternalPlaceControllerTest {
     void update_shouldReturn200AndResponseBody_whenCommandIsValid() {
         UUID id = UUID.randomUUID();
         when(updatePlaceUseCase.update(eq(id), any())).thenReturn(buildPlace(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdatePlaceRequest("Thornvale Updated", null, null,
-                List.of(), List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null);
+                List.of(), List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null);
 
         var response = controller.update(id, request);
 
@@ -108,6 +114,7 @@ class InternalPlaceControllerTest {
     void changeStatus_shouldReturn200AndCallUseCase() {
         UUID id = UUID.randomUUID();
         when(changePlaceStatusUseCase.changeStatus(id, EntityStatus.CANON)).thenReturn(buildPlace(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.changeStatus(id, new ChangeStatusRequest("CANON"));
 
@@ -130,6 +137,7 @@ class InternalPlaceControllerTest {
         UUID id = UUID.randomUUID();
         when(findAllPlacesUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(buildPlace(id)), 0, 20, 1));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findAll(null, null, null, 0, 20);
 
@@ -159,6 +167,7 @@ class InternalPlaceControllerTest {
     void findById_shouldDelegateAndMapResult() {
         UUID id = UUID.randomUUID();
         when(findPlaceByIdUseCase.findById(id)).thenReturn(buildPlace(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findById(id);
 

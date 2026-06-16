@@ -2,6 +2,7 @@ package com.keynor.core.domain.port.in.character;
 
 import com.keynor.core.domain.model.character.Character;
 import com.keynor.core.domain.model.character.CharacterCategory;
+import com.keynor.core.domain.model.shared.EntityLinkRef;
 import com.keynor.core.domain.model.shared.Timeline;
 
 import java.util.List;
@@ -16,7 +17,8 @@ public interface UpdateCharacterUseCase {
             List<String> tags,
             List<String> images,
             List<CharacterCategory> categories,
-            Timeline timeline) {}
+            Timeline timeline,
+            List<EntityLinkRef> links) {}
 
     Character update(UUID id, Command command);
 }

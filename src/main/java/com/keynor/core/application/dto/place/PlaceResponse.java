@@ -1,6 +1,8 @@
 package com.keynor.core.application.dto.place;
 
+import com.keynor.core.application.dto.shared.LinkedEntityResponse;
 import com.keynor.core.domain.model.place.Place;
+import com.keynor.core.domain.model.shared.EntityLinkSummary;
 
 import java.time.Instant;
 import java.util.List;
@@ -19,9 +21,10 @@ public record PlaceResponse(
         String timelineFoundedEra,
         String timelineDestroyedEra,
         Instant createdAt,
-        Instant updatedAt) {
+        Instant updatedAt,
+        List<LinkedEntityResponse> links) {
 
-    public static PlaceResponse from(Place place) {
+    public static PlaceResponse from(Place place, List<EntityLinkSummary> links) {
         return new PlaceResponse(
                 place.getId(),
                 place.getName(),
@@ -35,6 +38,7 @@ public record PlaceResponse(
                 place.getTimeline() != null ? place.getTimeline().founded() : null,
                 place.getTimeline() != null ? place.getTimeline().destroyed() : null,
                 place.getCreatedAt(),
-                place.getUpdatedAt());
+                place.getUpdatedAt(),
+                links.stream().map(LinkedEntityResponse::from).toList());
     }
 }

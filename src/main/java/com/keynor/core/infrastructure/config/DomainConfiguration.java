@@ -9,28 +9,28 @@ import org.springframework.context.annotation.Configuration;
 public class DomainConfiguration {
 
     @Bean
-    public CharacterService characterService(CharacterRepository characterRepository) {
-        return new CharacterService(characterRepository);
+    public CharacterService characterService(CharacterRepository characterRepository, EntityLinkRepository entityLinkRepository) {
+        return new CharacterService(characterRepository, entityLinkRepository);
     }
 
     @Bean
-    public PlaceService placeService(PlaceRepository placeRepository) {
-        return new PlaceService(placeRepository);
+    public PlaceService placeService(PlaceRepository placeRepository, EntityLinkRepository entityLinkRepository) {
+        return new PlaceService(placeRepository, entityLinkRepository);
     }
 
     @Bean
-    public FactionService factionService(FactionRepository factionRepository) {
-        return new FactionService(factionRepository);
+    public FactionService factionService(FactionRepository factionRepository, EntityLinkRepository entityLinkRepository) {
+        return new FactionService(factionRepository, entityLinkRepository);
     }
 
     @Bean
-    public ItemService itemService(ItemRepository itemRepository) {
-        return new ItemService(itemRepository);
+    public ItemService itemService(ItemRepository itemRepository, EntityLinkRepository entityLinkRepository) {
+        return new ItemService(itemRepository, entityLinkRepository);
     }
 
     @Bean
-    public EventService eventService(EventRepository eventRepository) {
-        return new EventService(eventRepository);
+    public EventService eventService(EventRepository eventRepository, EntityLinkRepository entityLinkRepository) {
+        return new EventService(eventRepository, entityLinkRepository);
     }
 
     @Bean

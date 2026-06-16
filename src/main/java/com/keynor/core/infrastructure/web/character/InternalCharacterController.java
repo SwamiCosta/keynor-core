@@ -7,10 +7,13 @@ import com.keynor.core.application.dto.shared.ChangeStatusRequest;
 import com.keynor.core.application.dto.shared.PagedResponse;
 import com.keynor.core.domain.model.character.CharacterCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
+import com.keynor.core.domain.model.shared.EntityLinkRef;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.character.*;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +32,7 @@ public class InternalCharacterController {
     private final DeleteCharacterUseCase deleteCharacterUseCase;
     private final FindCharacterByIdUseCase findCharacterByIdUseCase;
     private final FindAllCharactersUseCase findAllCharactersUseCase;
+    private final FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     public InternalCharacterController(
             CreateCharacterUseCase createCharacterUseCase,
@@ -36,13 +40,15 @@ public class InternalCharacterController {
             ChangeCharacterStatusUseCase changeCharacterStatusUseCase,
             DeleteCharacterUseCase deleteCharacterUseCase,
             FindCharacterByIdUseCase findCharacterByIdUseCase,
-            FindAllCharactersUseCase findAllCharactersUseCase) {
+            FindAllCharactersUseCase findAllCharactersUseCase,
+            FindLinkedEntitiesUseCase findLinkedEntitiesUseCase) {
         this.createCharacterUseCase = createCharacterUseCase;
         this.updateCharacterUseCase = updateCharacterUseCase;
         this.changeCharacterStatusUseCase = changeCharacterStatusUseCase;
         this.deleteCharacterUseCase = deleteCharacterUseCase;
         this.findCharacterByIdUseCase = findCharacterByIdUseCase;
         this.findAllCharactersUseCase = findAllCharactersUseCase;
+        this.findLinkedEntitiesUseCase = findLinkedEntitiesUseCase;
     }
 
     @GetMapping
@@ -54,16 +60,19 @@ public class InternalCharacterController {
             @RequestParam(defaultValue = "20") int size) {
         EntityFilter filter = buildFilter(statuses, categories, tags);
         var result = findAllCharactersUseCase.findAll(filter, new PageRequest(page, size));
-        return ResponseEntity.ok(PagedResponse.from(result, CharacterResponse::from));
+        return ResponseEntity.ok(PagedResponse.from(result,
+                character -> CharacterResponse.from(character, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, character.getId()))));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CharacterResponse> findById(@PathVariable UUID id) {
-        return ResponseEntity.ok(CharacterResponse.from(findCharacterByIdUseCase.findById(id)));
+        var character = findCharacterByIdUseCase.findById(id);
+        return ResponseEntity.ok(CharacterResponse.from(character, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, character.getId())));
     }
 
     @PostMapping
     public ResponseEntity<CharacterResponse> create(@Valid @RequestBody CreateCharacterRequest request) {
+        List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new CreateCharacterUseCase.Command(
                 request.name(),
                 request.summary(),
@@ -71,13 +80,16 @@ public class InternalCharacterController {
                 request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 parseCategories(request.categories()),
-                buildTimeline(request.timelineFoundedEra(), request.timelineDestroyedEra()));
+                buildTimeline(request.timelineFoundedEra(), request.timelineDestroyedEra()),
+                links);
+        var created = createCharacterUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(CharacterResponse.from(createCharacterUseCase.create(command)));
+                .body(CharacterResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, created.getId())));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CharacterResponse> update(@PathVariable UUID id, @Valid @RequestBody UpdateCharacterRequest request) {
+        List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new UpdateCharacterUseCase.Command(
                 request.name(),
                 request.summary(),
@@ -85,20 +97,32 @@ public class InternalCharacterController {
                 request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 parseCategories(request.categories()),
-                buildTimeline(request.timelineFoundedEra(), request.timelineDestroyedEra()));
-        return ResponseEntity.ok(CharacterResponse.from(updateCharacterUseCase.update(id, command)));
+                buildTimeline(request.timelineFoundedEra(), request.timelineDestroyedEra()),
+                links);
+        var updated = updateCharacterUseCase.update(id, command);
+        return ResponseEntity.ok(CharacterResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, updated.getId())));
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<CharacterResponse> changeStatus(@PathVariable UUID id, @Valid @RequestBody ChangeStatusRequest request) {
         EntityStatus newStatus = EntityStatus.valueOf(request.status().toUpperCase());
-        return ResponseEntity.ok(CharacterResponse.from(changeCharacterStatusUseCase.changeStatus(id, newStatus)));
+        var updated = changeCharacterStatusUseCase.changeStatus(id, newStatus);
+        return ResponseEntity.ok(CharacterResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, updated.getId())));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         deleteCharacterUseCase.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private List<EntityLinkRef> toLinkRefs(List<com.keynor.core.application.dto.shared.EntityLinkRequest> links) {
+        if (links == null) {
+            return List.of();
+        }
+        return links.stream()
+                .map(link -> new EntityLinkRef(EntityType.valueOf(link.targetType().toUpperCase()), link.targetId()))
+                .toList();
     }
 
     private EntityFilter buildFilter(List<String> statuses, List<String> categories, List<String> tags) {

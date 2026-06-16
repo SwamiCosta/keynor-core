@@ -1,6 +1,8 @@
 package com.keynor.core.application.dto.item;
 
+import com.keynor.core.application.dto.shared.LinkedEntityResponse;
 import com.keynor.core.domain.model.item.Item;
+import com.keynor.core.domain.model.shared.EntityLinkSummary;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,9 +20,10 @@ public record ItemResponse(
         String timelineFoundedEra,
         String timelineDestroyedEra,
         Instant createdAt,
-        Instant updatedAt) {
+        Instant updatedAt,
+        List<LinkedEntityResponse> links) {
 
-    public static ItemResponse from(Item item) {
+    public static ItemResponse from(Item item, List<EntityLinkSummary> links) {
         return new ItemResponse(
                 item.getId(),
                 item.getName(),
@@ -33,6 +36,7 @@ public record ItemResponse(
                 item.getTimeline() != null ? item.getTimeline().founded() : null,
                 item.getTimeline() != null ? item.getTimeline().destroyed() : null,
                 item.getCreatedAt(),
-                item.getUpdatedAt());
+                item.getUpdatedAt(),
+                links.stream().map(LinkedEntityResponse::from).toList());
     }
 }

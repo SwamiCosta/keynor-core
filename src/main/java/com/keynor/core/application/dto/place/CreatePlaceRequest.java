@@ -1,5 +1,6 @@
 package com.keynor.core.application.dto.place;
 
+import com.keynor.core.application.dto.shared.EntityLinkRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -14,5 +15,6 @@ public record CreatePlaceRequest(
         @NotNull List<String> categories,
         String mapType,
         @NotBlank String timelineFoundedEra,
-        String timelineDestroyedEra) {
+        String timelineDestroyedEra,
+        List<EntityLinkRequest> links) {
 }

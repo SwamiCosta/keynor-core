@@ -5,12 +5,15 @@ import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.character.Character;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.character.*;
 import com.keynor.core.domain.port.out.CharacterRepository;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public class CharacterService implements
@@ -22,9 +25,11 @@ public class CharacterService implements
         FindAllCharactersUseCase {
 
     private final CharacterRepository characterRepository;
+    private final EntityLinkRepository entityLinkRepository;
 
-    public CharacterService(CharacterRepository characterRepository) {
+    public CharacterService(CharacterRepository characterRepository, EntityLinkRepository entityLinkRepository) {
         this.characterRepository = characterRepository;
+        this.entityLinkRepository = entityLinkRepository;
     }
 
     @Override
@@ -45,7 +50,9 @@ public class CharacterService implements
                 command.timeline(),
                 now,
                 now);
-        return characterRepository.save(character);
+        Character saved = characterRepository.save(character);
+        entityLinkRepository.replaceLinks(EntityType.CHARACTER, saved.getId(), command.links() != null ? command.links() : List.of());
+        return saved;
     }
 
     @Override
@@ -53,7 +60,9 @@ public class CharacterService implements
         Character character = characterRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Character", id));
         character.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
-        return characterRepository.save(character);
+        Character saved = characterRepository.save(character);
+        entityLinkRepository.replaceLinks(EntityType.CHARACTER, saved.getId(), command.links() != null ? command.links() : List.of());
+        return saved;
     }
 
     @Override
@@ -70,6 +79,7 @@ public class CharacterService implements
             throw new EntityNotFoundException("Character", id);
         }
         characterRepository.deleteById(id);
+        entityLinkRepository.deleteAllForEntity(EntityType.CHARACTER, id);
     }
 
     @Override

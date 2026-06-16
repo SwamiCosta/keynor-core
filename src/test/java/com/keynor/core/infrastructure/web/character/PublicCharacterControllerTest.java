@@ -8,6 +8,7 @@ import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.character.FindAllCharactersUseCase;
 import com.keynor.core.domain.port.in.character.FindCharacterByIdUseCase;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,11 +33,15 @@ class PublicCharacterControllerTest {
     @Mock
     private FindCharacterByIdUseCase findCharacterByIdUseCase;
 
+    @Mock
+    private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
+
     private PublicCharacterController controller;
 
     @BeforeEach
     void setUp() {
-        controller = new PublicCharacterController(findAllCharactersUseCase, findCharacterByIdUseCase);
+        controller = new PublicCharacterController(
+                findAllCharactersUseCase, findCharacterByIdUseCase, findLinkedEntitiesUseCase);
     }
 
     @Test
@@ -51,6 +56,7 @@ class PublicCharacterControllerTest {
                 EntityStatus.CANON, null, now, now);
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(character), 0, 20, 1));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findAll(null, null, 0, 20);
 
@@ -74,6 +80,7 @@ class PublicCharacterControllerTest {
                 List.of(CharacterCategory.HERO),
                 EntityStatus.CANON, null, now, now);
         when(findCharacterByIdUseCase.findById(id)).thenReturn(character);
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findById(id);
 
@@ -95,6 +102,7 @@ class PublicCharacterControllerTest {
                 EntityStatus.CANON, null, now, now);
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(character), 0, 20, 1));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findAll(null, null, 0, 20);
 

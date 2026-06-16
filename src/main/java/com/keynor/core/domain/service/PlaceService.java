@@ -5,12 +5,15 @@ import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.place.Place;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.place.*;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.PlaceRepository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public class PlaceService implements
@@ -22,9 +25,11 @@ public class PlaceService implements
         FindAllPlacesUseCase {
 
     private final PlaceRepository placeRepository;
+    private final EntityLinkRepository entityLinkRepository;
 
-    public PlaceService(PlaceRepository placeRepository) {
+    public PlaceService(PlaceRepository placeRepository, EntityLinkRepository entityLinkRepository) {
         this.placeRepository = placeRepository;
+        this.entityLinkRepository = entityLinkRepository;
     }
 
     @Override
@@ -46,7 +51,9 @@ public class PlaceService implements
                 command.timeline(),
                 now,
                 now);
-        return placeRepository.save(place);
+        Place saved = placeRepository.save(place);
+        entityLinkRepository.replaceLinks(EntityType.PLACE, saved.getId(), command.links() != null ? command.links() : List.of());
+        return saved;
     }
 
     @Override
@@ -54,7 +61,9 @@ public class PlaceService implements
         Place place = placeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Place", id));
         place.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.mapType(), command.timeline());
-        return placeRepository.save(place);
+        Place saved = placeRepository.save(place);
+        entityLinkRepository.replaceLinks(EntityType.PLACE, saved.getId(), command.links() != null ? command.links() : List.of());
+        return saved;
     }
 
     @Override
@@ -71,6 +80,7 @@ public class PlaceService implements
             throw new EntityNotFoundException("Place", id);
         }
         placeRepository.deleteById(id);
+        entityLinkRepository.deleteAllForEntity(EntityType.PLACE, id);
     }
 
     @Override

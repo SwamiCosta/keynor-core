@@ -10,6 +10,7 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.place.FindAllPlacesUseCase;
 import com.keynor.core.domain.port.in.place.FindPlaceByIdUseCase;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,11 +37,15 @@ class PublicPlaceControllerTest {
     @Mock
     private FindPlaceByIdUseCase findPlaceByIdUseCase;
 
+    @Mock
+    private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
+
     private PublicPlaceController controller;
 
     @BeforeEach
     void setUp() {
-        controller = new PublicPlaceController(findAllPlacesUseCase, findPlaceByIdUseCase);
+        controller = new PublicPlaceController(
+                findAllPlacesUseCase, findPlaceByIdUseCase, findLinkedEntitiesUseCase);
     }
 
     @Test
@@ -76,6 +81,7 @@ class PublicPlaceControllerTest {
                 List.of(), List.of(PlaceCategory.CITY), null, EntityStatus.CANON, null, now, now);
         when(findAllPlacesUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(place), 0, 20, 1));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findAll(null, null, 0, 20);
 
@@ -95,6 +101,7 @@ class PublicPlaceControllerTest {
         Place place = new Place(id, "Erevan", "A city", "Body", List.of(),
                 List.of(), List.of(PlaceCategory.REGION), null, EntityStatus.CANON, null, now, now);
         when(findPlaceByIdUseCase.findById(id)).thenReturn(place);
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findById(id);
 

@@ -1,5 +1,6 @@
 package com.keynor.core.application.dto.item;
 
+import com.keynor.core.application.dto.shared.EntityLinkRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -13,5 +14,6 @@ public record CreateItemRequest(
         List<String> images,
         @NotNull List<String> categories,
         @NotBlank String timelineFoundedEra,
-        String timelineDestroyedEra) {
+        String timelineDestroyedEra,
+        List<EntityLinkRequest> links) {
 }

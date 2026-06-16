@@ -1,6 +1,8 @@
 package com.keynor.core.application.dto.event;
 
+import com.keynor.core.application.dto.shared.LinkedEntityResponse;
 import com.keynor.core.domain.model.event.Event;
+import com.keynor.core.domain.model.shared.EntityLinkSummary;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,9 +20,10 @@ public record EventResponse(
         String timelineFoundedEra,
         String timelineDestroyedEra,
         Instant createdAt,
-        Instant updatedAt) {
+        Instant updatedAt,
+        List<LinkedEntityResponse> links) {
 
-    public static EventResponse from(Event event) {
+    public static EventResponse from(Event event, List<EntityLinkSummary> links) {
         return new EventResponse(
                 event.getId(),
                 event.getName(),
@@ -33,6 +36,7 @@ public record EventResponse(
                 event.getTimeline() != null ? event.getTimeline().founded() : null,
                 event.getTimeline() != null ? event.getTimeline().destroyed() : null,
                 event.getCreatedAt(),
-                event.getUpdatedAt());
+                event.getUpdatedAt(),
+                links.stream().map(LinkedEntityResponse::from).toList());
     }
 }

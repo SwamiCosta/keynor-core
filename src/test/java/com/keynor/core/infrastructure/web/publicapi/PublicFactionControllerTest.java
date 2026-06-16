@@ -10,6 +10,7 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.faction.FindAllFactionsUseCase;
 import com.keynor.core.domain.port.in.faction.FindFactionByIdUseCase;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,11 +37,15 @@ class PublicFactionControllerTest {
     @Mock
     private FindFactionByIdUseCase findFactionByIdUseCase;
 
+    @Mock
+    private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
+
     private PublicFactionController controller;
 
     @BeforeEach
     void setUp() {
-        controller = new PublicFactionController(findAllFactionsUseCase, findFactionByIdUseCase);
+        controller = new PublicFactionController(
+                findAllFactionsUseCase, findFactionByIdUseCase, findLinkedEntitiesUseCase);
     }
 
     @Test
@@ -76,6 +81,7 @@ class PublicFactionControllerTest {
                 List.of(), List.of(FactionCategory.ORDER), EntityStatus.CANON, null, now, now);
         when(findAllFactionsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(faction), 0, 20, 1));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findAll(null, null, 0, 20);
 
@@ -95,6 +101,7 @@ class PublicFactionControllerTest {
         Faction faction = new Faction(id, "The Iron Order", "A guild", "Body", List.of(),
                 List.of(), List.of(FactionCategory.GUILD), EntityStatus.CANON, null, now, now);
         when(findFactionByIdUseCase.findById(id)).thenReturn(faction);
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var response = controller.findById(id);
 
