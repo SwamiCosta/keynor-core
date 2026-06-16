@@ -7,10 +7,13 @@ import com.keynor.core.application.dto.shared.ChangeStatusRequest;
 import com.keynor.core.application.dto.shared.PagedResponse;
 import com.keynor.core.domain.model.lore.LoreCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
+import com.keynor.core.domain.model.shared.EntityLinkRef;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.lore.*;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +32,7 @@ public class InternalLoreController {
     private final DeleteLoreUseCase deleteLoreUseCase;
     private final FindLoreByIdUseCase findLoreByIdUseCase;
     private final FindAllLoreUseCase findAllLoreUseCase;
+    private final FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     public InternalLoreController(
             CreateLoreUseCase createLoreUseCase,
@@ -36,13 +40,15 @@ public class InternalLoreController {
             ChangeLoreStatusUseCase changeLoreStatusUseCase,
             DeleteLoreUseCase deleteLoreUseCase,
             FindLoreByIdUseCase findLoreByIdUseCase,
-            FindAllLoreUseCase findAllLoreUseCase) {
+            FindAllLoreUseCase findAllLoreUseCase,
+            FindLinkedEntitiesUseCase findLinkedEntitiesUseCase) {
         this.createLoreUseCase = createLoreUseCase;
         this.updateLoreUseCase = updateLoreUseCase;
         this.changeLoreStatusUseCase = changeLoreStatusUseCase;
         this.deleteLoreUseCase = deleteLoreUseCase;
         this.findLoreByIdUseCase = findLoreByIdUseCase;
         this.findAllLoreUseCase = findAllLoreUseCase;
+        this.findLinkedEntitiesUseCase = findLinkedEntitiesUseCase;
     }
 
     @GetMapping
@@ -56,12 +62,14 @@ public class InternalLoreController {
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList() : List.of();
         EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of(), tags != null ? tags : List.of());
         var result = findAllLoreUseCase.findAll(filter, new PageRequest(page, size));
-        return ResponseEntity.ok(PagedResponse.from(result, LoreResponse::from));
+        return ResponseEntity.ok(PagedResponse.from(result,
+                lore -> LoreResponse.from(lore, findLinkedEntitiesUseCase.findLinks(EntityType.LORE, lore.getId()))));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LoreResponse> findById(@PathVariable UUID id) {
-        return ResponseEntity.ok(LoreResponse.from(findLoreByIdUseCase.findById(id)));
+        var lore = findLoreByIdUseCase.findById(id);
+        return ResponseEntity.ok(LoreResponse.from(lore, findLinkedEntitiesUseCase.findLinks(EntityType.LORE, lore.getId())));
     }
 
     @PostMapping
@@ -71,12 +79,24 @@ public class InternalLoreController {
         Timeline timeline = (request.timelineFoundedEra() != null || request.timelineDestroyedEra() != null)
                 ? new Timeline(request.timelineFoundedEra(), request.timelineDestroyedEra()) : null;
         EntityStatus initialStatus = parseCreationStatus(request.status());
+        List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new CreateLoreUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
-                categories, timeline, initialStatus);
-        return ResponseEntity.status(HttpStatus.CREATED).body(LoreResponse.from(createLoreUseCase.create(command)));
+                categories, timeline, initialStatus, links);
+        var created = createLoreUseCase.create(command);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                LoreResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.LORE, created.getId())));
+    }
+
+    private List<EntityLinkRef> toLinkRefs(List<com.keynor.core.application.dto.shared.EntityLinkRequest> links) {
+        if (links == null) {
+            return List.of();
+        }
+        return links.stream()
+                .map(link -> new EntityLinkRef(EntityType.valueOf(link.targetType().toUpperCase()), link.targetId()))
+                .toList();
     }
 
     private EntityStatus parseCreationStatus(String rawStatus) {
@@ -96,18 +116,20 @@ public class InternalLoreController {
                 .map(c -> LoreCategory.valueOf(c.toUpperCase())).toList();
         Timeline timeline = (request.timelineFoundedEra() != null || request.timelineDestroyedEra() != null)
                 ? new Timeline(request.timelineFoundedEra(), request.timelineDestroyedEra()) : null;
+        List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new UpdateLoreUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
-                categories, timeline);
-        return ResponseEntity.ok(LoreResponse.from(updateLoreUseCase.update(id, command)));
+                categories, timeline, links);
+        var updated = updateLoreUseCase.update(id, command);
+        return ResponseEntity.ok(LoreResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.LORE, updated.getId())));
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<LoreResponse> changeStatus(@PathVariable UUID id, @Valid @RequestBody ChangeStatusRequest request) {
-        return ResponseEntity.ok(LoreResponse.from(
-                changeLoreStatusUseCase.changeStatus(id, EntityStatus.valueOf(request.status().toUpperCase()))));
+        var updated = changeLoreStatusUseCase.changeStatus(id, EntityStatus.valueOf(request.status().toUpperCase()));
+        return ResponseEntity.ok(LoreResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.LORE, updated.getId())));
     }
 
     @DeleteMapping("/{id}")

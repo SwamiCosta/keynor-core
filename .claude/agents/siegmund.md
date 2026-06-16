@@ -79,6 +79,19 @@ Siegmund will generate these seed scripts on request, with BCrypt hashes compute
 
 ---
 
+## Cross-entity links (`entity_links` table)
+
+`entity_links` (added in migration V7) is a polymorphic join table holding cross-entity references — e.g. a `Lore` row that mentions two `Character` rows. Columns: `id`, `source_type`, `source_id`, `target_type`, `target_id`, `created_at`. `source_type`/`target_type` are one of `CHARACTER`, `PLACE`, `FACTION`, `ITEM`, `EVENT`, `LORE`.
+
+Implications for Siegmund's work:
+
+- **No real foreign keys** to the six entity tables — when validating data or writing diagnostic SELECTs, a `target_id` (or `source_id`) with no matching row in its corresponding entity table is a dangling link, not a constraint violation. Report these as data-quality findings.
+- `db/seed/universe-content.sql` must include `entity_links` rows whenever seeded content references other seeded entities — when Aroneus signals an entity submission that included a `links` field, the dump update must also capture the corresponding `entity_links` rows
+- The unique constraint is `(source_type, source_id, target_type, target_id)` — a self-link (`source_type = target_type AND source_id = target_id`) is rejected by a CHECK constraint, never seed one
+- This table is not yet populated by API submissions for entities other than `Lore` — see `CLAUDE.md` for the current rollout status
+
+---
+
 ## Planning protocol
 
 Before writing any data script:
@@ -100,4 +113,4 @@ Before writing any data script:
 
 ---
 
-*Last updated: 2026-06-15 — added Aroneus handoff rule for universe-content.sql updates*
+*Last updated: 2026-06-15 — documented the `entity_links` table for seed/dump and validation queries*

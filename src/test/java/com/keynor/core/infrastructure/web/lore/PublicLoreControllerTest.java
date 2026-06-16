@@ -10,6 +10,7 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.lore.FindAllLoreUseCase;
 import com.keynor.core.domain.port.in.lore.FindLoreByIdUseCase;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,11 +37,15 @@ class PublicLoreControllerTest {
     @Mock
     private FindLoreByIdUseCase findLoreByIdUseCase;
 
+    @Mock
+    private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
+
     private PublicLoreController controller;
 
     @BeforeEach
     void setUp() {
-        controller = new PublicLoreController(findAllLoreUseCase, findLoreByIdUseCase);
+        controller = new PublicLoreController(findAllLoreUseCase, findLoreByIdUseCase, findLinkedEntitiesUseCase);
+        org.mockito.Mockito.lenient().when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
     }
 
     @Test

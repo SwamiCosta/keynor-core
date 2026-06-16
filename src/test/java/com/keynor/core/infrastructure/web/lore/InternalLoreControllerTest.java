@@ -12,6 +12,7 @@ import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.lore.*;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,7 @@ class InternalLoreControllerTest {
     @Mock private DeleteLoreUseCase deleteLoreUseCase;
     @Mock private FindLoreByIdUseCase findLoreByIdUseCase;
     @Mock private FindAllLoreUseCase findAllLoreUseCase;
+    @Mock private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     private InternalLoreController controller;
 
@@ -54,7 +56,8 @@ class InternalLoreControllerTest {
     void setUp() {
         controller = new InternalLoreController(
                 createLoreUseCase, updateLoreUseCase, changeLoreStatusUseCase,
-                deleteLoreUseCase, findLoreByIdUseCase, findAllLoreUseCase);
+                deleteLoreUseCase, findLoreByIdUseCase, findAllLoreUseCase, findLinkedEntitiesUseCase);
+        org.mockito.Mockito.lenient().when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
     }
 
     @Test
@@ -63,7 +66,7 @@ class InternalLoreControllerTest {
         when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
 
         var request = new CreateLoreRequest("The Age of Silence", "A period of stillness", "Body",
-                List.of("history"), List.of(), List.of("HISTORY"), "era-1", null, null);
+                List.of("history"), List.of(), List.of("HISTORY"), "era-1", null, null, null);
 
         var response = controller.create(request);
 
@@ -79,7 +82,7 @@ class InternalLoreControllerTest {
         when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
 
         var request = new CreateLoreRequest("The Age of Silence", null, null,
-                List.of(), List.of(), List.of("HISTORY"), "era-1", null, null);
+                List.of(), List.of(), List.of("HISTORY"), "era-1", null, null, null);
 
         controller.create(request);
 
@@ -96,7 +99,7 @@ class InternalLoreControllerTest {
         when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
 
         var request = new CreateLoreRequest("The Age of Silence", null, null,
-                List.of(), List.of(), List.of("HISTORY"), "era-1", null, null);
+                List.of(), List.of(), List.of("HISTORY"), "era-1", null, null, null);
 
         controller.create(request);
 
@@ -115,7 +118,7 @@ class InternalLoreControllerTest {
         when(createLoreUseCase.create(any())).thenReturn(canonLore);
 
         var request = new CreateLoreRequest("The Age of Silence", null, null,
-                List.of(), List.of(), List.of("HISTORY"), "era-1", null, "CANON");
+                List.of(), List.of(), List.of("HISTORY"), "era-1", null, "CANON", null);
 
         controller.create(request);
 
@@ -128,7 +131,7 @@ class InternalLoreControllerTest {
     @Test
     void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
         var request = new CreateLoreRequest("The Age of Silence", null, null,
-                List.of(), List.of(), List.of("HISTORY"), "era-1", null, "DEPRECATED");
+                List.of(), List.of(), List.of("HISTORY"), "era-1", null, "DEPRECATED", null);
 
         assertThatThrownBy(() -> controller.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -141,7 +144,7 @@ class InternalLoreControllerTest {
         when(updateLoreUseCase.update(eq(id), any())).thenReturn(buildLore(id));
 
         var request = new UpdateLoreRequest("Updated Lore", null, null,
-                List.of(), List.of(), List.of("HISTORY"), "era-1", null);
+                List.of(), List.of(), List.of("HISTORY"), "era-1", null, null);
 
         var response = controller.update(id, request);
 

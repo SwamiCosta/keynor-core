@@ -34,8 +34,15 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public LoreService loreService(LoreRepository loreRepository) {
-        return new LoreService(loreRepository);
+    public LoreService loreService(LoreRepository loreRepository, EntityLinkRepository entityLinkRepository) {
+        return new LoreService(loreRepository, entityLinkRepository);
+    }
+
+    @Bean
+    public EntityLinkService entityLinkService(
+            EntityLinkRepository entityLinkRepository,
+            UniverseEntityLookupRepository universeEntityLookupRepository) {
+        return new EntityLinkService(entityLinkRepository, universeEntityLookupRepository);
     }
 
     @Bean

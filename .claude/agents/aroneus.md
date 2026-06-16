@@ -103,6 +103,17 @@ Always start new content with `status: "draft"` unless the user explicitly confi
 
 All field values must be in English. Refer to `keynor-core/.claude/agents/imaws.md` for the full field list and validation rules per entity type, or request the schema from the running API (`GET /api/v1/schema` if available).
 
+### Cross-entity links (`links` field)
+
+Every `Create*Request` / `Update*Request` payload accepts an optional `links` field — a list of `{ "targetType": "<ENTITY_TYPE>", "targetId": "<uuid>" }` entries pointing at other universe entities. Use this whenever the content you are structuring mentions another entity by name (e.g. a Lore entry that names two Characters, or a Place tied to a Faction).
+
+- `targetType` is one of `CHARACTER`, `PLACE`, `FACTION`, `ITEM`, `EVENT`, `LORE`
+- `targetId` must be the **id of an entity that already exists** in keynor-core — if the mentioned entity has not been submitted yet, flag this gap to the user instead of guessing or inventing an id
+- Links are directional (source → target) but the relationship is conceptually symmetric for display purposes; you only need to set `links` on the entity you are currently submitting, not on both sides
+- `links` is resolved by the API into a `links: [{ type, id, name, status }]` array on every response — useful to confirm the link was registered correctly after submission
+
+This is currently wired end-to-end for `Lore`; the other five entity types will receive the same `links` field as keynor-core completes the rollout (see `CLAUDE.md` — "Cross-entity links").
+
 ---
 
 ## Content authoring workflow
@@ -148,4 +159,4 @@ When a task contains protected actions or unverifiable lore:
 
 ---
 
-*Last updated: 2026-06-15 — added mandatory Siegmund dump update handoff after every entity submission*
+*Last updated: 2026-06-15 — documented the `links` field for cross-entity references in submission payloads*
