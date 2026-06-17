@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface EraRepository {
     List<Era> findAllOrderedByIndex();
     Optional<Era> findById(UUID id);
+    Era save(Era era);
 }

@@ -17,4 +17,17 @@ public class EraMapper {
                 entity.getCreatedAt(),
                 entity.getUpdatedAt());
     }
+
+    public EraEntity toEntity(Era era) {
+        EraEntity entity = new EraEntity();
+        entity.setId(era.getId());
+        entity.setName(era.getName());
+        entity.setOrderIndex(era.getOrderIndex());
+        entity.setType(era.getType());
+        entity.setImportance(era.getImportance());
+        entity.setDescription(era.getDescription());
+        entity.setCreatedAt(era.getCreatedAt());
+        entity.setUpdatedAt(era.getUpdatedAt());
+        return entity;
+    }
 }
