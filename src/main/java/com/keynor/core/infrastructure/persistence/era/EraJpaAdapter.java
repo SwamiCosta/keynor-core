@@ -31,4 +31,9 @@ public class EraJpaAdapter implements EraRepository {
     public Optional<Era> findById(UUID id) {
         return jpaRepository.findById(id).map(mapper::toDomain);
     }
+
+    @Override
+    public Era save(Era era) {
+        return mapper.toDomain(jpaRepository.save(mapper.toEntity(era)));
+    }
 }
