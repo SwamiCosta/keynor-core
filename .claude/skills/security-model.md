@@ -1,10 +1,55 @@
-# Skill — OAuth2 Bootstrap and Token Acquisition
+# Skill: Security Model and OAuth2 Bootstrap
 
-**Scope:** keynor-core. Applies whenever a developer, agent, or operator needs to bootstrap the OAuth2 layer or obtain a token for API access.
+> Covers keynor-core's Authorization Server / Resource Server model — roles, token flow, filter chain ordering, CORS — and the bootstrap procedure for obtaining the first token. Read before modifying anything under `infrastructure/security/` or before any developer/agent needs API access for the first time.
 
 ---
 
-## Context
+## Roles
+
+| Role | Grantee | Grant type |
+|------|---------|------------|
+| `ADMIN` | Human users (admin panel / RPG integration) | `authorization_code` + PKCE, form login |
+| `SYSTEM` | Service-to-service calls (keynor-rpg, aniannoth, etc.) | `client_credentials` |
+
+Both roles have full access to all endpoints in the current phase. No hierarchy between them.
+
+---
+
+## Token flow
+
+- Authorization Server exposes `/oauth2/token`, `/oauth2/authorize`, OIDC discovery
+- All `/api/**` endpoints are protected and require a valid Bearer JWT — **except** `/api/public/**`, which is `permitAll`
+- JWT is validated by the Resource Server filter chain
+- RSA key pair (2048-bit) is generated at startup — **ephemeral for dev**. Must be externalized for production.
+- OAuth2 clients and authorizations are persisted via `JdbcRegisteredClientRepository` / `JdbcOAuth2AuthorizationService`
+
+---
+
+## Security filter chains
+
+Spring Security evaluates filter chains in `@Order` sequence — the first chain whose `securityMatcher` matches the request wins.
+
+| Order | Chain | Matcher | Purpose |
+|-------|-------|---------|---------|
+| 1 | `authorizationServerSecurityFilterChain` | OAuth2/OIDC endpoints | Issues and manages tokens; handles OIDC discovery |
+| 2 | `resourceServerSecurityFilterChain` | `/api/**` | Enforces JWT on internal endpoints; `permitAll` on `/api/public/**` |
+| 3 | `defaultSecurityFilterChain` | everything else (catch-all) | Serves the `/login` form; supports the `authorization_code` human login flow |
+
+**Critical ordering constraint:** the Resource Server chain (`@Order(2)`) must come before the Form Login chain (`@Order(3)`). The Form Login chain has no `securityMatcher` and is a catch-all — if it ran first it would intercept `/api/**` requests and redirect them to `/login` instead of letting the Resource Server handle them.
+
+---
+
+## CORS
+
+Allowed origins (configured in `ResourceServerConfig`):
+- `http://localhost:5173` (aniannoth-overview dev server)
+- `http://localhost:4173` (aniannoth-overview preview)
+
+---
+
+## Bootstrap and token acquisition
+
+### Context
 
 keynor-core acts as both Authorization Server and Resource Server. No users or OAuth2 clients exist after a fresh Flyway migration — they must be inserted manually before any authenticated API call can succeed.
 
@@ -14,9 +59,7 @@ The `PasswordEncoder` bean is a plain **`BCryptPasswordEncoder`** — not a `Del
 > Store only the raw BCrypt hash: `$2a$10$...`
 > The `{bcrypt}` prefix is specific to `DelegatingPasswordEncoder` and will cause `"Encoded password does not look like BCrypt"` and `invalid_client` errors.
 
----
-
-## Step 1 — Generate a BCrypt hash
+### Step 1 — Generate a BCrypt hash
 
 Use `jshell` with the Spring Security Crypto jar from the local Maven repository:
 
@@ -38,9 +81,7 @@ $2a$10$ncuvtKlGkqK/UGdm8ebus.aWGXCjF8D9STYDp7P8RpoVeTmkCK6GC
 
 Do NOT add any prefix. Store this value exactly as printed.
 
----
-
-## Step 2 — Insert the ADMIN user
+### Step 2 — Insert the ADMIN user
 
 ```sql
 INSERT INTO users (id, email, password, role, active)
@@ -53,9 +94,7 @@ VALUES (
 );
 ```
 
----
-
-## Step 3 — Insert the SYSTEM client
+### Step 3 — Insert the SYSTEM client
 
 ```sql
 INSERT INTO oauth2_registered_client (
@@ -81,9 +120,7 @@ VALUES (
 
 Keep the plaintext secret in a local `.env.local` file (gitignored) — it cannot be recovered from the database after hashing.
 
----
-
-## Step 4 — Obtain a token (client_credentials)
+### Step 4 — Obtain a token (client_credentials)
 
 Used by agents and services (Aroneus, keynor-rpg, etc.) for service-to-service calls.
 
@@ -105,9 +142,7 @@ The response includes an `access_token` (Bearer JWT). Use it in subsequent API c
 Authorization: Bearer <access_token>
 ```
 
----
-
-## Step 5 — Obtain a token (authorization_code — ADMIN human flow)
+### Step 5 — Obtain a token (authorization_code — ADMIN human flow)
 
 Used for the admin panel. Open a browser and navigate to:
 ```
@@ -116,9 +151,7 @@ http://localhost:8080/oauth2/authorize?response_type=code&client_id=<admin-clien
 
 The Authorization Server redirects to `/login`. Submit ADMIN credentials. After login, the code is returned to the redirect URI and exchanged for a token via `POST /oauth2/token`.
 
----
-
-## Common errors
+### Common errors
 
 | Error | Cause | Fix |
 |-------|-------|-----|
@@ -126,3 +159,7 @@ The Authorization Server redirects to `/login`. Submit ADMIN credentials. After 
 | `invalid_client` | Wrong `client_id`, wrong secret, or hash mismatch | Verify with SELECT; regenerate hash if needed |
 | `invalid_grant` | Grant type not registered for this client | Check `authorization_grant_types` column |
 | Token invalid after app restart | RSA key is ephemeral in dev | Obtain a new token — existing tokens are invalidated on restart |
+
+---
+
+*Maintained by Imaws. Formerly `oauth2-bootstrap.md` — renamed and expanded to cover the full security model, not just the bootstrap procedure.*

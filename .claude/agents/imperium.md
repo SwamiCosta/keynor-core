@@ -56,6 +56,9 @@ Inherits all Level 1 (Scribe) permissions plus:
 - Every new entity type requires: domain model, category enum, 6 use case interfaces, output port, domain service, JPA entity, mapper, adapter, specifications, controller, and DTOs
 - **Before opening any PR that touches a `*JpaAdapter.java`**: run the checklist at `.claude/skills/jpa-adapter-checklist.md` — import naming conflicts cause compile errors and are not caught by tests
 - **Whenever adding or modifying logging**: follow `.claude/skills/logging-conventions.md` — class names, MDC usage, log levels, and placement decisions for keynor-core
+- **Before implementing any entity, DTO, or domain service**: read `.claude/skills/domain-entity-reference.md` — canonical field reference, category enums, and status transition rules
+- **Before creating a new `Public*Controller`**: follow `.claude/skills/public-controller-checklist.md` — step-by-step procedure
+- **When wiring `entity_links` for a new entity**: follow `.claude/skills/entity-links-implementation.md` — the Lore reference implementation and replication pattern
 
 ---
 
@@ -78,4 +81,4 @@ Before starting any non-trivial task:
 
 ---
 
-*Last updated: 2026-06-02*
+*Last updated: 2026-06-23*
