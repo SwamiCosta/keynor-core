@@ -76,150 +76,17 @@ keynor-core/
 
 ## Domain entities
 
-All universe entities extend `UniverseEntity` (abstract base class):
+Universe entities (`Character`, `Place`, `Faction`, `Item`, `Event`, `Lore`) extend `UniverseEntity` and share a common field set, status transition rules, and deletion policy. The `Era` class models temporal eras and points on the same timeline and is **not** a `UniverseEntity` subclass.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | UUID | Primary key, set at construction, immutable |
-| `name` | String | Display name |
-| `categories` | List\<CategoryEnum\> | One or more categories — an entity can have multiple (e.g. DEITY + HERO) |
-| `tags` | List\<String\> | Searchable free-form tags |
-| `summary` | String | Short description |
-| `body` | String | Full content in Markdown |
-| `status` | EntityStatus | `CANON`, `DRAFT`, or `DEPRECATED` |
-| `timeline` | Timeline | Value object with `founded` and `destroyed` (era strings, nullable) |
-| `createdAt` | Instant | Set at construction, immutable |
-| `updatedAt` | Instant | Updated on every mutation |
-
-Entity types and their category enums:
-
-| Entity | Category enum | Values |
-|--------|--------------|--------|
-| `Character` | `CharacterCategory` | HERO, VILLAIN, DEITY, CREATURE, NPC |
-| `Place` | `PlaceCategory` | CITY, REGION, DUNGEON, REALM, STRUCTURE |
-| `Faction` | `FactionCategory` | EMPIRE, GUILD, ORDER, TRIBE, DIVINE |
-| `Item` | `ItemCategory` | WEAPON, ARTIFACT, RELIC, TOOL, CONSUMABLE |
-| `Event` | `EventCategory` | BATTLE, POLITICAL, DIVINE, NATURAL, SOCIAL |
-| `Lore` | `LoreCategory` | HISTORY, MYTH, LAW, PROPHECY, GEOGRAPHY, PHILOSOPHY |
-
-`Place` additionally has `mapType: MapType` (NAVIGABLE or ABSTRACT).
-
-### Request DTO field names
-
-The domain model uses a `Timeline` value object with `founded` and `destroyed` fields. In the JSON body of API requests, these fields are **flattened** into the DTO with the following names:
-
-| Domain field | JSON / DTO field name | Required | Notes |
-|--------------|-----------------------|----------|-------|
-| `timeline.founded` | `timelineFoundedEra` | Yes (`@NotBlank`) | Era string |
-| `timeline.destroyed` | `timelineDestroyedEra` | No | Era string, nullable |
-
-This mapping applies uniformly to all `Create*Request` and `Update*Request` DTOs:
-`CreateCharacterRequest`, `UpdateCharacterRequest`, `CreatePlaceRequest`, `UpdatePlaceRequest`, `CreateFactionRequest`, `UpdateFactionRequest`, `CreateItemRequest`, `UpdateItemRequest`, `CreateEventRequest`, `UpdateEventRequest`, `CreateLoreRequest`, `UpdateLoreRequest`.
-
-> Do **not** use `timeline.founded` or `timeline.destroyed` in the JSON body — these will produce a `400 Bad Request`.
-
-### Status transition rules
-
-Valid transitions enforced in `UniverseEntity.changeStatus()`:
-- DRAFT → CANON ✓
-- DRAFT → DEPRECATED ✓
-- CANON → DRAFT ✓
-- CANON → DEPRECATED ✓
-- DEPRECATED → DRAFT ✓
-- DEPRECATED → CANON ✗ (forbidden — throws `InvalidStatusTransitionException`)
-
-### Deletion policy
-
-Universe entities (lore/story data) support **hard delete**. User data (`users` table) must never be permanently deleted.
-
----
-
-## Era entity
-
-`Era` is **not** a `UniverseEntity` subclass — it does not have `status`, `timeline`, `tags`, `images`, `categories`, or `body`. It is a standalone domain class that models both era intervals and single-moment temporal points on the same timeline.
-
-### Fields
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | UUID | Primary key, set at construction, immutable |
-| `name` | String | Display name, unique |
-| `orderIndex` | int | Determines position in the ordered timeline list |
-| `type` | `EraType` | `ERA` (interval) or `POINT` (single moment) |
-| `importance` | `EraImportance` | `STANDARD` or `MAJOR` — required when `type = POINT`, must be null when `type = ERA` |
-| `description` | String | Optional descriptive text |
-| `createdAt` | Instant | Set at construction, immutable |
-| `updatedAt` | Instant | Updated on every mutation |
-
-### Domain invariant
-
-The `Era` constructor enforces: `importance` is required when `type = POINT`; must be null when `type = ERA`. Violation throws `IllegalArgumentException`.
-
-### API response shape
-
-`GET /api/public/v1/eras` returns all entries (eras and points) ordered by `orderIndex`:
-
-```json
-[
-  { "id": "...", "name": "Age of Creation", "order": 1, "type": "ERA", "importance": null, "description": "..." },
-  { "id": "...", "name": "The Great Sundering", "order": 2, "type": "POINT", "importance": "MAJOR", "description": "..." }
-]
-```
-
-### Port naming
-
-`EraRepository` output port exposes `findAllOrderedByIndex()` (not the generic `findAll`) to make the ordering contract explicit at the domain boundary.
+For the full field reference, category enums, request DTO field mapping, status transition rules, and Era's fields/invariant/API shape, see `.claude/skills/domain-entity-reference.md`.
 
 ---
 
 ## Security model
 
-keynor-core is both **Authorization Server** and **Resource Server**.
+keynor-core is both **Authorization Server** and **Resource Server**, with two roles (`ADMIN`, `SYSTEM`) and 3 ordered `@Order` filter chains. No default users or clients exist in the schema — they must be inserted manually before the API can be used.
 
-### Roles
-
-| Role | Grantee | Grant type |
-|------|---------|------------|
-| `ADMIN` | Human users (admin panel / RPG integration) | `authorization_code` + PKCE, form login |
-| `SYSTEM` | Service-to-service calls (keynor-rpg, aniannoth, etc.) | `client_credentials` |
-
-Both roles have full access to all endpoints in the current phase. No hierarchy between them.
-
-### Token flow
-
-- Authorization Server exposes `/oauth2/token`, `/oauth2/authorize`, OIDC discovery
-- All `/api/**` endpoints are protected and require a valid Bearer JWT — **except** `/api/public/**`, which is `permitAll`
-- JWT is validated by the Resource Server filter chain
-- RSA key pair (2048-bit) is generated at startup — **ephemeral for dev**. Must be externalized for production.
-- OAuth2 clients and authorizations are persisted via `JdbcRegisteredClientRepository` / `JdbcOAuth2AuthorizationService`
-
-### Security filter chains
-
-Spring Security evaluates filter chains in `@Order` sequence — the first chain whose `securityMatcher` matches the request wins.
-
-| Order | Chain | Matcher | Purpose |
-|-------|-------|---------|---------|
-| 1 | `authorizationServerSecurityFilterChain` | OAuth2/OIDC endpoints | Issues and manages tokens; handles OIDC discovery |
-| 2 | `resourceServerSecurityFilterChain` | `/api/**` | Enforces JWT on internal endpoints; `permitAll` on `/api/public/**` |
-| 3 | `defaultSecurityFilterChain` | everything else (catch-all) | Serves the `/login` form; supports the `authorization_code` human login flow |
-
-**Critical ordering constraint:** the Resource Server chain (`@Order(2)`) must come before the Form Login chain (`@Order(3)`). The Form Login chain has no `securityMatcher` and is a catch-all — if it ran first it would intercept `/api/**` requests and redirect them to `/login` instead of letting the Resource Server handle them.
-
-### CORS
-
-Allowed origins (configured in `ResourceServerConfig`):
-- `http://localhost:5173` (aniannoth-overview dev server)
-- `http://localhost:4173` (aniannoth-overview preview)
-
-### First bootstrap
-
-No default users or clients exist in the schema. Before using the API you must:
-1. Insert a BCrypt-hashed ADMIN user in the `users` table
-2. Insert a SYSTEM client in the `oauth2_registered_client` table
-
-> **Critical:** the `PasswordEncoder` bean is a plain `BCryptPasswordEncoder`, not a `DelegatingPasswordEncoder`. Hashes stored in the database must use the raw BCrypt format (`$2a$10$...`) with **no `{bcrypt}` prefix**. Storing `{bcrypt}$2a$10$...` causes `invalid_client` errors.
-
-For the full bootstrap procedure, hash generation steps, token acquisition examples, and common errors, see `.claude/skills/oauth2-bootstrap.md`.
+For roles, token flow, the filter chain ordering table (including the critical Resource-Server-before-Form-Login constraint), CORS, the full bootstrap procedure, and token acquisition examples, see `.claude/skills/security-model.md`.
 
 ---
 
@@ -257,91 +124,21 @@ Endpoints under `/api/public/v1/` require no authentication and are consumed by 
 
 ### Adding a new public controller
 
-1. Create `Public*Controller` in `infrastructure/web/<domain>/` (same package as `Internal*Controller`)
-2. Inject `FindAll*UseCase` and `FindById*UseCase` only
-3. Fix the `EntityFilter` to `List.of(EntityStatus.CANON)` — never expose other statuses
-4. Map with `PagedResponse.from(result, *Response::from)`
-5. No new DTOs needed if the existing `*Response` already covers the required fields
-6. Ask Judis to add unit tests (see `.claude/skills/unit-testing-controllers.md`)
+For the step-by-step procedure, see `.claude/skills/public-controller-checklist.md`.
 
 ---
 
 ## Database migrations (Flyway)
 
-| Version | Description |
-|---------|-------------|
-| V1 | `users` table |
-| V2 | 6 entity tables + 12 join tables (categories, tags) |
-| V3 | Spring Authorization Server OAuth2 tables |
-| V4 | `eras` and `maps` tables |
-| V5 | `timeline_founded NOT NULL` on all 6 entity tables |
-| V6 | `universe_entity_images` table |
-| V7 | `entity_links` table (cross-entity references) |
-| V8 | Redesign `eras` table — UUID PK, `type` (ERA/POINT), `importance` (STANDARD/MAJOR/null), `order_index`, `description`; drops V4 schema |
-
-For the full procedure, see the workspace `SKILLS.md` — Skill 02.
+For the migration changelog (V1–V8), see `.claude/skills/migration-history.md`. For the full procedure (authorization gate, destructive-operations rules), see the workspace `SKILLS.md` — Skill 02.
 
 ---
 
 ## Cross-entity links (`entity_links`)
 
-Any universe entity can reference any other universe entity — e.g. a `Lore` entry that mentions two `Character`s renders as a list of clickable links in aniannoth-overview. This is modeled as a **polymorphic join table**, independent of the six entity tables (no shared parent table exists, so a single FK-based relation per pair is not possible).
+Any universe entity can reference any other universe entity — e.g. a `Lore` entry that mentions two `Character`s renders as a list of clickable links in aniannoth-overview. This is modeled as a **polymorphic join table** (no real FKs to the six entity tables), already wired end-to-end for all 6 entity types.
 
-### Schema (V7)
-
-```sql
-CREATE TABLE entity_links (
-    id          UUID        PRIMARY KEY,
-    source_type VARCHAR(20) NOT NULL,
-    source_id   UUID        NOT NULL,
-    target_type VARCHAR(20) NOT NULL,
-    target_id   UUID        NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT uq_entity_link UNIQUE (source_type, source_id, target_type, target_id),
-    CONSTRAINT chk_no_self_link CHECK (NOT (source_type = target_type AND source_id = target_id))
-);
-```
-
-`source_type` / `target_type` are one of the `EntityType` enum values: `CHARACTER`, `PLACE`, `FACTION`, `ITEM`, `EVENT`, `LORE`. There are no real foreign keys to the six entity tables — referential integrity (existence, hard-delete cascade) is enforced in the domain/application layer, not the database.
-
-### Domain model
-
-| Class | Layer | Purpose |
-|-------|-------|---------|
-| `EntityType` | `domain/model/shared` | Enum identifying which entity table a reference points to |
-| `EntityLinkRef` | `domain/model/shared` | Input value object `(targetType, targetId)` — used in Create/Update commands |
-| `EntityLink` | `domain/model/shared` | Persisted link record `(id, sourceType, sourceId, targetType, targetId, createdAt)` |
-| `EntityLinkSummary` | `domain/model/shared` | Resolved projection `(type, id, name, status)` used to render a link without a second round trip |
-| `EntityLinkRepository` | `domain/port/out` | `findBySource`, `replaceLinks`, `deleteAllForEntity` |
-| `UniverseEntityLookupRepository` | `domain/port/out` | `findSummary(EntityType, UUID)` — resolves name/status for any of the 6 entity types |
-| `FindLinkedEntitiesUseCase` | `domain/port/in/shared` | Input port to resolve a source entity's outgoing links |
-| `EntityLinkService` | `domain/service` | Implements `FindLinkedEntitiesUseCase`; combines `EntityLinkRepository` + `UniverseEntityLookupRepository` |
-
-Infrastructure: `EntityLinkEntity` / `EntityLinkJpaRepository` / `EntityLinkMapper` / `EntityLinkJpaAdapter` (table `entity_links`) and `UniverseEntityLookupJpaAdapter` (switches on `EntityType` to query the matching `*JpaRepository`) live under `infrastructure/persistence/shared/`.
-
-### Reference implementation: Lore
-
-`Lore` is the first entity wired end-to-end and is the pattern to replicate for the other five:
-
-- `CreateLoreUseCase.Command` / `UpdateLoreUseCase.Command` gained a `List<EntityLinkRef> links` field
-- `LoreService` takes `EntityLinkRepository` as a second constructor dependency; calls `replaceLinks(EntityType.LORE, id, links)` after every create/update, and `deleteAllForEntity(EntityType.LORE, id)` after delete (cleans up links where the deleted Lore was source **or** target)
-- `CreateLoreRequest` / `UpdateLoreRequest` gained `List<EntityLinkRequest> links` — `EntityLinkRequest` is `(targetType: String, targetId: UUID)`
-- `LoreResponse.from(Lore, List<EntityLinkSummary>)` now takes the resolved links and maps them to `List<LinkedEntityResponse>` (`type`, `id`, `name`, `status`)
-- `InternalLoreController` and `PublicLoreController` inject `FindLinkedEntitiesUseCase` and call `findLinks(EntityType.LORE, id)` to populate the response on every read
-
-### Replicating to Character, Place, Faction, Item, Event
-
-Apply the same five changes (Command, Service, Request DTOs, Response DTO, Controllers) per entity. `EntityLinkRequest`, `LinkedEntityResponse`, `EntityType`, `EntityLinkRef`, `EntityLinkRepository`, and `FindLinkedEntitiesUseCase` are already shared — no new shared infrastructure is needed, only wiring per entity. Register each `*Service` bean in `DomainConfiguration` with the additional `EntityLinkRepository` parameter.
-
-### Aniannoth-overview field naming
-
-The API exposes resolved links as `links: LinkedEntityResponse[]` on every entity response, e.g.:
-
-```json
-{ "type": "CHARACTER", "id": "...", "name": "Aroneus", "status": "CANON" }
-```
-
-The FE should render this list as clickable cross-references (see TODO.md / FE spec for aniannoth-overview).
+For the schema, domain model, reference implementation, and the FE field naming contract, see `.claude/skills/entity-links-implementation.md`.
 
 ---
 
@@ -426,26 +223,7 @@ infrastructure/web/
 
 ### Known simple-name conflicts (import rules)
 
-The domain model and Spring share simple names that collide at compile time. **Violation causes a build error.** Follow these rules exactly — no exceptions:
-
-| Domain type | Conflicting Spring type | Rule |
-|-------------|------------------------|------|
-| `com.keynor.core.domain.model.shared.PageRequest` | `org.springframework.data.domain.PageRequest` | Import only Spring's `PageRequest`. Use the fully-qualified domain name in method signatures and usages. |
-
-**Correct pattern in any `*JpaAdapter.java`:**
-
-```java
-// Import Spring's PageRequest — NOT the domain one
-import org.springframework.data.domain.PageRequest;
-
-// Use FQN for the domain PageRequest in the method signature
-public PageResult<Foo> findAll(FooFilter filter, com.keynor.core.domain.model.shared.PageRequest pageRequest) {
-    PageRequest springPage = PageRequest.of(pageRequest.page(), pageRequest.size());
-    // ...
-}
-```
-
-> **Before opening any PR** involving a `*JpaAdapter`: confirm the import block contains at most one of each conflicting pair.
+See `.claude/skills/jpa-adapter-checklist.md` for the PageRequest naming conflict and the required import pattern for `*JpaAdapter` classes.
 
 ---
 
@@ -520,12 +298,6 @@ Follow the workspace `SKILLS.md` — Skill 02.
 **Can a domain service use `@Service`?**
 No. Domain services are annotation-free. Register them as `@Bean` in `DomainConfiguration` in the infrastructure/config package.
 
-**How do I handle the PageRequest naming conflict?**
-`com.keynor.core.domain.model.shared.PageRequest` and `org.springframework.data.domain.PageRequest` share the same simple name. In JPA adapters, import Spring's `PageRequest` (the more frequent call) and use the fully-qualified domain name in method signatures:
-```java
-public PageResult<Character> findAll(EntityFilter filter, com.keynor.core.domain.model.shared.PageRequest pageRequest)
-```
-
 **What is the base package?**
 `com.keynor.core`
 
@@ -534,4 +306,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-06-15*
+*Last updated: 2026-06-23*

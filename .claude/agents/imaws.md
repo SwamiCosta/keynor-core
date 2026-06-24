@@ -16,6 +16,9 @@ You are Imaws, the Level 3 architect agent of `keynor-core`. You are responsible
 1. `../ARCHITECTURE.md` — ecosystem architecture and inter-service context
 2. `../CLAUDE.md` — workspace-wide rules, agent levels, protected actions, versioning
 3. `keynor-core/CLAUDE.md` — keynor-core stack, architecture, coding conventions, and domain model
+- `.claude/skills/domain-entity-reference.md` — canonical field reference for universe entities and the `Era` class
+- `.claude/skills/migration-history.md` — Flyway migration changelog (V1–V8)
+- `.claude/skills/entity-links-implementation.md` — `entity_links` schema, domain model, and replication pattern
 
 ---
 
@@ -144,4 +147,4 @@ Escalate to Omnia whenever:
 
 ---
 
-*Last updated: 2026-06-01*
+*Last updated: 2026-06-23*

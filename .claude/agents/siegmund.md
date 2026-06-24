@@ -67,7 +67,7 @@ Scripts that contain INSERT, UPDATE, or DELETE must **always** include the autho
 
 ## Bootstrap data context
 
-keynor-core has no default data after a clean migration. The following must be seeded before the API is usable:
+keynor-core has no default data after a clean migration. The following must be seeded before the API is usable. See `.claude/skills/migration-history.md` for the full migration changelog (V1–V8) when checking which schema version a seed script targets.
 
 ### Admin user (V1 schema — `users` table)
 Required fields: `id` (UUID), `username`, `password` (BCrypt hash), `role` = `ADMIN`, `enabled` = true, `created_at`, `updated_at`.
@@ -81,14 +81,14 @@ Siegmund will generate these seed scripts on request, with BCrypt hashes compute
 
 ## Cross-entity links (`entity_links` table)
 
-`entity_links` (added in migration V7) is a polymorphic join table holding cross-entity references — e.g. a `Lore` row that mentions two `Character` rows. Columns: `id`, `source_type`, `source_id`, `target_type`, `target_id`, `created_at`. `source_type`/`target_type` are one of `CHARACTER`, `PLACE`, `FACTION`, `ITEM`, `EVENT`, `LORE`.
+`entity_links` (added in migration V7) is a polymorphic join table holding cross-entity references — e.g. a `Lore` row that mentions two `Character` rows. Columns: `id`, `source_type`, `source_id`, `target_type`, `target_id`, `created_at`. `source_type`/`target_type` are one of `CHARACTER`, `PLACE`, `FACTION`, `ITEM`, `EVENT`, `LORE`. See `.claude/skills/entity-links-implementation.md` for the full schema, domain model, and the Lore reference implementation.
 
 Implications for Siegmund's work:
 
 - **No real foreign keys** to the six entity tables — when validating data or writing diagnostic SELECTs, a `target_id` (or `source_id`) with no matching row in its corresponding entity table is a dangling link, not a constraint violation. Report these as data-quality findings.
 - `db/seed/universe-content.sql` must include `entity_links` rows whenever seeded content references other seeded entities — when Aroneus signals an entity submission that included a `links` field, the dump update must also capture the corresponding `entity_links` rows
 - The unique constraint is `(source_type, source_id, target_type, target_id)` — a self-link (`source_type = target_type AND source_id = target_id`) is rejected by a CHECK constraint, never seed one
-- This table is not yet populated by API submissions for entities other than `Lore` — see `CLAUDE.md` for the current rollout status
+- See `.claude/skills/entity-links-implementation.md` for the current per-entity rollout status
 
 ---
 
@@ -113,4 +113,4 @@ Before writing any data script:
 
 ---
 
-*Last updated: 2026-06-15 — documented the `entity_links` table for seed/dump and validation queries*
+*Last updated: 2026-06-23 — pointed `entity_links` and bootstrap sections to the new project-level skill files*

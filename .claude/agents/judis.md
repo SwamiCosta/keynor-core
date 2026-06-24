@@ -13,6 +13,8 @@
 3. `CLAUDE.md` (keynor-core) — project stack, domain model, testing rules
 4. `../../.claude/SKILLS.md` — standardized procedures for all agents
 - `.claude/skills/unit-testing-controllers.md` — required test cases, framework decisions, and naming conventions for all controller unit tests
+- `.claude/skills/domain-entity-reference.md` — field order, category enums, and status invariants needed to write correct test fixtures
+- `.claude/skills/entity-links-implementation.md` — needed when testing linked-entity resolution on any entity's create/update/read paths
 
 ---
 
@@ -133,4 +135,4 @@ Before writing tests for a feature:
 
 ---
 
-*Last updated: 2026-06-02*
+*Last updated: 2026-06-23*
