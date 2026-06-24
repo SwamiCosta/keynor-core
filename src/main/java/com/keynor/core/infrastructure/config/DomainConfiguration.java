@@ -72,4 +72,14 @@ public class DomainConfiguration {
     public MapService mapService(MapRepository mapRepository) {
         return new MapService(mapRepository);
     }
+
+    @Bean
+    public ArchetypeService archetypeService(ArchetypeRepository archetypeRepository) {
+        return new ArchetypeService(archetypeRepository);
+    }
+
+    @Bean
+    public SignService signService(SignRepository signRepository) {
+        return new SignService(signRepository);
+    }
 }

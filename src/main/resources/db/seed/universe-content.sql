@@ -6,7 +6,7 @@
 --   character_tags, places, place_categories, place_tags, factions,
 --   faction_categories, faction_tags, items, item_categories, item_tags,
 --   events, event_categories, event_tags, lore, lore_categories, lore_tags,
---   universe_entity_images
+--   universe_entity_images, archetypes, signs
 --
 -- Excluded: users, oauth2_* (environment-specific, never in scope)
 --
@@ -18,7 +18,7 @@
 -- How to apply:
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
--- Last updated: 2026-06-09
+-- Last updated: 2026-06-24
 -- Updated by:   Siegmund
 
 -- ============================================================
@@ -36,7 +36,9 @@ TRUNCATE
     characters, places, factions, items, events, lore,
     map_eras,
     eras,
-    maps
+    maps,
+    signs,
+    archetypes
 CASCADE;
 
 -- ============================================================
@@ -161,3 +163,236 @@ INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-6.png', 5),
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-7.png', 6),
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-8.png', 7);
+
+-- ============================================================
+-- ARCHETYPES
+-- ============================================================
+
+INSERT INTO archetypes (id, name, element, suit, vocation, temperament, cognitive_function, self_relation, description, created_at, updated_at) VALUES
+    (
+        '4426f1f5-1f1f-433d-a35f-080a47ab4b32',
+        'Communication',
+        'Earth',
+        'Diamonds',
+        'Business',
+        'Extroverted',
+        'Feeling',
+        'Selfless',
+        'Communication belongs to Earth and to Diamonds, the archetype of business — extroverted, governed by feeling, and selfless in nature.',
+        NOW(),
+        NOW()
+    ),
+    (
+        '594644a2-e7d2-41c8-91b3-f5c2789127f5',
+        'Might',
+        'Fire',
+        'Clubs',
+        'Labor',
+        'Extroverted',
+        'Sensation',
+        'Selfish',
+        'Might belongs to Fire and to Clubs, the archetype of labor — extroverted, governed by sensation, and selfish in nature.',
+        NOW(),
+        NOW()
+    ),
+    (
+        '761d78d0-25cb-4b9b-9d6c-0d9b629f92c5',
+        'Cunning',
+        'Air',
+        'Spades',
+        'Craft',
+        'Introverted',
+        'Reason',
+        'Selfish',
+        'Cunning belongs to Air and to Spades, the archetype of craft — introverted, governed by reason, and selfish in nature.',
+        NOW(),
+        NOW()
+    ),
+    (
+        'd3116bc3-025c-4fa9-bb20-6f0c9cd9e2b6',
+        'Will',
+        'Water',
+        'Hearts',
+        'Mysticism',
+        'Introverted',
+        'Intuition',
+        'Selfless',
+        'Will belongs to Water and to Hearts, the archetype of mysticism — introverted, governed by intuition, and selfless in nature.',
+        NOW(),
+        NOW()
+    ),
+    (
+        'ac88b699-f67f-44d5-95e6-41a885a1343c',
+        'Obsession',
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        'Obsession stands outside the fourfold order entirely, ruled by neither element nor suit. It backs only the Rift, the thirteenth sign, and the emptiness Obsession is forever trying, and forever failing, to fill.',
+        NOW(),
+        NOW()
+    );
+
+-- ============================================================
+-- SIGNS
+-- ============================================================
+
+INSERT INTO signs (id, name, sign_order, season_time, archetype_id, sub_archetype, summary, body, created_at, updated_at) VALUES
+    (
+        '285857c0-7b67-48f2-9731-cc12c77efa40',
+        'The Rings',
+        1,
+        'End of Spring',
+        '4426f1f5-1f1f-433d-a35f-080a47ab4b32',
+        'Presence',
+        'Symbolizes union and protection.',
+        E'Symbolizes union and protection. People of the sign of Rings value alliances, marriages, and connection above all else. To them, others are not merely friends or family they interact with, but an extension of themselves to be protected. They possess a natural beauty and attractiveness, offering not only emotional support but physical safety as well. They can be intimidating and imposing toward any who threaten those they love, and they are rarely someone one wishes to provoke. They take pride in this reputation, demanding displays of appreciation and cultivating their social image. They are intense lovers who bond deeply with their friends — a closeness that can be demanding in return. At the same time, they are deeply unforgiving toward betrayers or anyone who attacks their image or their loved ones. They typically settle into ordinary family roles, but may also serve as loyal protectors and guardians.',
+        NOW(),
+        NOW()
+    ),
+    (
+        '83f9d998-0160-477e-8340-429f6106a86b',
+        'The Tower',
+        2,
+        'Start of Summer',
+        '594644a2-e7d2-41c8-91b3-f5c2789127f5',
+        'Form',
+        'Symbolizes toughness and robustness.',
+        E'Symbolizes toughness and robustness. These people are pragmatic, confident executors — excellent guards, sentinels, or soldiers who trust their own strength and carry out tasks without question. Most of the Tower follow some law or order, holding to a high yet simple sense of honor, defending family, nation, or whatever they deem of equal worth. They are focused workers and fighters who pursue perfection in everything they do, and do not relent until they achieve it — after which they take pride in their accomplishment and press on toward higher ground. This is a sign of ambitious people, yet also patient and respectful ones. They want power, but want to deserve it. They want authority, but would never betray another to seize it.',
+        NOW(),
+        NOW()
+    ),
+    (
+        '2468c5ea-8949-4f6d-8e3a-cb86e22de590',
+        'The Hammer',
+        3,
+        'Middle of Summer',
+        '594644a2-e7d2-41c8-91b3-f5c2789127f5',
+        'Power',
+        'Represents the purest form of honesty and ambition.',
+        E'Represents the purest form of honesty and ambition. These people want power and make no secret of it. They will do whatever is necessary to obtain it, but prefer to keep everything transparent — in their minds, they are already the best, so there is no need to hide or deceive. People of the sign of the Hammer are fiercely competitive. They care little for others and openly favor a system where only the best are rewarded. They feel no shame in their craft and strive for the finest results in whatever field they find themselves. This restlessness makes them excellent manual laborers or fighters — they shine in any activity demanding repetitive or exhausting effort, building strength with ease. Disciplined and quick to learn, they also make fine soldiers. The world is simple to a person of the Hammer: they do not dwell on deep problems or philosophy. All that matters is becoming stronger and more powerful than they were yesterday. They are passionate and uncontrollable, giving everything of themselves to whatever they do. When happy, they laugh loudly. When angry, they roar like thunder.',
+        NOW(),
+        NOW()
+    ),
+    (
+        'ebd973da-6df0-4820-bb76-65fc71257329',
+        'The Hood',
+        4,
+        'End of Summer',
+        '594644a2-e7d2-41c8-91b3-f5c2789127f5',
+        'Skill',
+        'Represents the excellence of practice.',
+        E'Represents the excellence of practice. People of this sign are at once sharp and humble. They pursue personal achievement in the world, seeking to be the best at what they do without dragging anyone else into that pursuit. Their struggle is only against themselves, and they rarely display it openly. Even so, they become references in their field and inevitably attract attention. They do not reject fame — it is simply another tool for their ascent — but neither do they bask in it. Recognition, to them, is merely another step toward perfection, which is the only true reward they seek. They excel as martial artists, athletes, marksmen, and other practitioners of focus and precision, never tiring of refining their technique. Beneath this, they are sly individuals, bringing their sharpness into their personalities, forever measuring others against themselves in their minds. They can be envious, but rarely act upon it — more often, they turn that admiration into motivation.',
+        NOW(),
+        NOW()
+    ),
+    (
+        '889afafc-a095-461c-9e2c-1ae103591948',
+        'The Mask',
+        5,
+        'Start of Fall',
+        '761d78d0-25cb-4b9b-9d6c-0d9b629f92c5',
+        'Guile',
+        'Symbolizes cleverness and ingenuity.',
+        E'Symbolizes cleverness and ingenuity. These are the ones who find the easy way out. They despise effort and see no virtue in making life harder than it must be. People of the sign of the Mask may be found tricking others through schemes and scams, but may equally be shrewd merchants or businessmen who find the loopholes in any system and profit from them. They are not necessarily dishonest, but they are skilled in trickery and deception, possessing a flexible sense of morality and quick thinking. Placed under pressure, they will not hesitate to bend the system and use whatever means necessary to improve their situation. Yet in comfortable circumstances, these same people make the most effective allies or employees one could ask for, since they value their position and reward it in kind. The Mask is not immune to guilt — they simply do not dwell on it. They see the world as the hard place it is, believing everyone steps on someone else to get by, and they are no exception. If they do not do it, someone else will — and in their view, they cause the least harm possible along the way. All they want is a better life for themselves, not the ruin of others.',
+        NOW(),
+        NOW()
+    ),
+    (
+        'f4ff1720-96c8-4736-80c0-9a05b02e3ea6',
+        'The Lantern',
+        6,
+        'Middle of Fall',
+        '761d78d0-25cb-4b9b-9d6c-0d9b629f92c5',
+        'Vision',
+        'Represents guidance and wisdom.',
+        E'Represents guidance and wisdom. People of this sign are the finest teachers and the most deserving of leadership, though they often refuse positions of authority, feeling unworthy or lacking the ambition to claim them. They are gifted strategists who attract followers naturally through their brilliance. These people are always looking beyond what others see — pondering the world''s problems and seeking solutions to matters most people never consider. They rarely act on these insights themselves, however; they are far better at pointing the way than walking it. They love philosophy and find pleasure in travel and the exploration of new places, ever searching — in mind and body alike — for universal truth.',
+        NOW(),
+        NOW()
+    ),
+    (
+        '49112518-7835-422c-9587-9d80060980c0',
+        'The Lens',
+        7,
+        'End of Fall',
+        '761d78d0-25cb-4b9b-9d6c-0d9b629f92c5',
+        'Curiosity',
+        'Represents the pursuit of knowledge through study.',
+        E'Represents the pursuit of knowledge through study. People of this sign make the finest craftsmen and scientists, skilled at following method, exploring disciplines, and designing solutions to all manner of problems. The Lens is pragmatic by nature, believing the world holds a correct order, and that to follow it is to set things right. They struggle to understand opinions or mentalities unlike their own. They tend to be highly organized, tidy, and self-sufficient, often never marrying or raising children. Though they hold a deep curiosity for what they learn, they require no profound reasoning behind it — they are content to know how something works without needing to know why. They are also skilled caretakers of plants, animals, buildings, and structures alike.',
+        NOW(),
+        NOW()
+    ),
+    (
+        '96cc8ec0-0d3a-4119-8afa-d826b638ac30',
+        'The Gold',
+        8,
+        'Start of Winter',
+        'd3116bc3-025c-4fa9-bb20-6f0c9cd9e2b6',
+        'Passion',
+        'Represents talent and gift.',
+        E'Represents talent and gift. People of this sign carry a calling toward some highly specific skill, which they embody and perform with an excellence that astonishes all who witness it. They make the finest artificers, though their talent may manifest in any pursuit. This does not mean they require no training — only that they experience their training as joyful and fulfilling rather than exhausting labor. People of the Gold sign are calm and courteous, rarely displaying strong emotion, and seem to hold everything under quiet control. Outside of their craft, they can appear inexpressive — but once engaged with their talent, they become the center of attention almost instantly. They may fall into laziness, since so much comes easily to them, yet they refuse to be made a spectacle or experiment for those who would push them too far.',
+        NOW(),
+        NOW()
+    ),
+    (
+        'a6675b83-ef16-49e5-878a-e0c5e7b823fa',
+        'The Chalice',
+        9,
+        'Middle of Winter',
+        'd3116bc3-025c-4fa9-bb20-6f0c9cd9e2b6',
+        'Devotion',
+        'Represents complete and selfless devotion.',
+        E'Represents complete and selfless devotion. People of this sign are vessels for something greater than themselves — perfect priests, or simply perfect followers. They act on behalf of a cause and pour their entire being into it, and others perceive a purity in their actions, a holiness in their devotion. The Chalice is deeply nurturing yet strangely empty, as though possessing no personality wholly their own. They rarely speak of their own lives or struggles, but when they do, it is with reverence, grace, and an unshakable optimism. They accept the world as it is, seeking neither answers nor solutions for it, choosing instead to meet it with patience, guiding others toward the path of least conflict. They are dreamers, drawn deeply to the occult, gifted with strong intuition — often sensing when something is about to go right or wrong — and given to superstition.',
+        NOW(),
+        NOW()
+    ),
+    (
+        'b669a183-9c01-4a57-ba6d-389d97bb1ca8',
+        'The Bell',
+        10,
+        'End of Winter',
+        'd3116bc3-025c-4fa9-bb20-6f0c9cd9e2b6',
+        'Tuning',
+        'Represents empathy and connection.',
+        E'Represents empathy and connection. People of this sign understand and engage with the emotions of others with ease, evoking feelings in those around them without effort. Naturally seductive, they can be either inspiring or unsettling. Though often aloof, they are perceived as fortunate and easy to love. They move through life with no great ambitions, yet things always seem to work out for them. Easily pleased, they do not chase refinement, yet often achieve it regardless, surrounding themselves with a splendor that others envy. They work poorly within rules and will always test them — not from rebellion, but as a form of expression. They feel what others feel and, without meaning to, make others feel differently in turn. They can sense lies and deceit, though they could never explain how.',
+        NOW(),
+        NOW()
+    ),
+    (
+        '0394b7de-e1bd-447e-9f38-faf24782c378',
+        'The Mirror',
+        11,
+        'Start of Spring',
+        '4426f1f5-1f1f-433d-a35f-080a47ab4b32',
+        'Persuasion',
+        'Represents manipulation and diplomacy at their finest.',
+        E'Represents manipulation and diplomacy at their finest. People of this sign view others as assets, living to influence and to build their own image. Naturally friendly, they raise the morale of those around them with ease, reading and shaping behavior as it suits them. Ideal as politicians, merchants, gamblers, or spies. They do not believe in universal truth, holding instead that everything is a matter of opinion — their preferences are volatile, caring little for any particular outcome so long as it satisfies the majority. They can be deeply indecisive, preferring to follow another''s direction on complex matters rather than choose one themselves. They lack a personal sense of purpose, filling that absence instead with the goals of their group or society. They read faces and body language as if reading an open book, and know precisely how to provoke or entice.',
+        NOW(),
+        NOW()
+    ),
+    (
+        'cac54126-d160-41f6-aa93-da760505d57a',
+        'The Crown',
+        12,
+        'Middle of Spring',
+        '4426f1f5-1f1f-433d-a35f-080a47ab4b32',
+        'Communion',
+        'Symbolizes leadership and rule.',
+        E'Symbolizes leadership and rule. People of this sign are well-spoken, valuing interpersonal connection and conversation above most things — ideal as rulers and managers. They possess a natural charisma and a gift for oratory and command; when they speak, others listen. They care deeply about unity and solidarity, and it shows in everything they do. They love to coordinate groups, inspire motivation, and direct others toward the right path — though they are not always certain, themselves, what that path is. They always project confidence and always seem to know what to say, even when speaking of matters they barely understand. The Crown despises solitude and loves routine, rarely ceasing their work and seldom traveling unless others wish it. They take little pleasure in gatherings, yet attend them all the same, valuing them as opportunities for connection.',
+        NOW(),
+        NOW()
+    ),
+    (
+        'bafd608a-31bd-48b3-bcb6-6ec61c42e5a4',
+        'The Rift',
+        13,
+        'The off-season days — those that fall outside the count of the four seasons, the "leftover" days of the year',
+        'ac88b699-f67f-44d5-95e6-41a885a1343c',
+        NULL,
+        'Marks an emptiness at the center of one''s being — a void its bearers spend their whole life trying to fill, and never will.',
+        E'It is said that on certain days and nights, a person may be born outside any of the Twelve Signs. It is no simple matter to determine which exact hour, of which exact day, will produce a child of the Rift, for its influence is spread thin across the entire year. And yet they are born, and they carry a troubled nature. The Rift marks an emptiness at the center of one''s being — a void they will spend their whole life trying to fill, and never will. They hold no real sense of society, no morals, and no true motivation. They will seek everything: attention, praise, worth, and power, yet never be satisfied by any of it. They care nothing for emotion or reason, for meaning or growth. They will always stir destruction, either by trying to consume everything into their possession, or by reducing everything around them to the same void they themselves inhabit. Those born under the Rift are victims as much as they are dangers — to be approached with caution, but also with compassion. Their endless hunger drives them to levels of ability unmatched by any other sign; their willingness for sacrifice may carry them further than anyone else could go. They are capable of extraordinary things, but will always operate beyond the natural limits of the world. They must be stopped — and yet, it is such a pity.',
+        NOW(),
+        NOW()
+    );

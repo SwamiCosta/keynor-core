@@ -18,6 +18,7 @@
 | V8 | Redesign `eras` table — UUID PK, `type` (ERA/POINT), `importance` (STANDARD/MAJOR/null), `order_index`, `description`; drops V4 schema |
 | V9 | Add `timeline_founded_era_id` / `timeline_destroyed_era_id` (UUID, FK to `eras.id`) to all 6 entity tables; additive only, legacy `timeline_founded`/`timeline_destroyed` VARCHAR columns untouched |
 | V10 | Drop legacy `timeline_founded` / `timeline_destroyed` VARCHAR columns from all 6 entity tables, now superseded by the V9 `*_era_id` columns |
+| V11 | `archetypes` and `signs` tables — closed reference/lookup sets for the Aelimic cosmology (5 archetypes, 13 signs including the Rift); `signs.archetype_id` is a `NOT NULL` FK to `archetypes.id` |
 
 For the full procedure (authorization gate, destructive-operations rules, Flyway-merge-is-execution warning), see the workspace `SKILLS.md` — Skill 02.
 

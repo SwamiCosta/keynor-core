@@ -22,7 +22,8 @@ factions, faction_categories, faction_tags,
 items, item_categories, item_tags,
 events, event_categories, event_tags,
 lore, lore_categories, lore_tags,
-universe_entity_images
+universe_entity_images,
+archetypes, signs
 ```
 
 **Excluded tables** (never in scope):
@@ -81,7 +82,7 @@ INSERT INTO eras ...
 
 Triggered when: the user asks Siegmund to update the dump after a data change in the local DB.
 
-1. User runs `pg_dump --data-only --column-inserts -t maps -t eras -t map_eras -t characters -t character_categories -t character_tags -t places -t place_categories -t place_tags -t factions -t faction_categories -t faction_tags -t items -t item_categories -t item_tags -t events -t event_categories -t event_tags -t lore -t lore_categories -t lore_tags -t universe_entity_images keynor_core` and shares the output with Siegmund
+1. User runs `pg_dump --data-only --column-inserts -t maps -t eras -t map_eras -t characters -t character_categories -t character_tags -t places -t place_categories -t place_tags -t factions -t faction_categories -t faction_tags -t items -t item_categories -t item_tags -t events -t event_categories -t event_tags -t lore -t lore_categories -t lore_tags -t universe_entity_images -t archetypes -t signs keynor_core` and shares the output with Siegmund
 2. Siegmund takes the output and reformats it into the canonical file format (TRUNCATE block + ordered INSERTs)
 3. Siegmund replaces `db/seed/universe-content.sql` with the new content
 4. Siegmund commits to a `task/*` branch and opens a PR
