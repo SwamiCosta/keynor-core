@@ -60,8 +60,6 @@ public class ItemMapper {
     private TimelineEmbeddable toEmbeddable(Item item) {
         if (item.getTimeline() == null) return null;
         TimelineEmbeddable embeddable = new TimelineEmbeddable();
-        embeddable.setTimelineFounded(item.getTimeline().founded());
-        embeddable.setTimelineDestroyed(item.getTimeline().destroyed());
         embeddable.setTimelineFoundedEraId(resolveEraId(item.getTimeline().founded()));
         embeddable.setTimelineDestroyedEraId(resolveEraId(item.getTimeline().destroyed()));
         return embeddable;

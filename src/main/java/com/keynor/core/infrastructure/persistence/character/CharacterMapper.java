@@ -60,8 +60,6 @@ public class CharacterMapper {
     private TimelineEmbeddable toEmbeddable(Character character) {
         if (character.getTimeline() == null) return null;
         TimelineEmbeddable embeddable = new TimelineEmbeddable();
-        embeddable.setTimelineFounded(character.getTimeline().founded());
-        embeddable.setTimelineDestroyed(character.getTimeline().destroyed());
         embeddable.setTimelineFoundedEraId(resolveEraId(character.getTimeline().founded()));
         embeddable.setTimelineDestroyedEraId(resolveEraId(character.getTimeline().destroyed()));
         return embeddable;

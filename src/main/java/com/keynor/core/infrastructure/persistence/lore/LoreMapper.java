@@ -60,8 +60,6 @@ public class LoreMapper {
     private TimelineEmbeddable toEmbeddable(Lore lore) {
         if (lore.getTimeline() == null) return null;
         TimelineEmbeddable embeddable = new TimelineEmbeddable();
-        embeddable.setTimelineFounded(lore.getTimeline().founded());
-        embeddable.setTimelineDestroyed(lore.getTimeline().destroyed());
         embeddable.setTimelineFoundedEraId(resolveEraId(lore.getTimeline().founded()));
         embeddable.setTimelineDestroyedEraId(resolveEraId(lore.getTimeline().destroyed()));
         return embeddable;
