@@ -102,4 +102,45 @@ The `Era` constructor enforces: `importance` is required when `type = POINT`; mu
 
 ---
 
+## Archetype and Sign entities
+
+Like `Era`, `Archetype` and `Sign` are **not** `UniverseEntity` subclasses — no `status`, `timeline`, `tags`, `images`, or `categories`. Both are closed reference/lookup sets (5 archetypes, 13 signs) modeling the Aelimic cosmology and are read-only at the API level — no create/update/delete use cases or internal controller exist for either.
+
+### Archetype fields
+
+| Field | Type | Description |
+|-------|------|--------------|
+| `id` | UUID | Primary key, set at construction, immutable |
+| `name` | String | Display name, unique (e.g. "Communication") |
+| `element` | String | Nullable — null only for `Obsession` |
+| `suit` | String | Nullable — null only for `Obsession` |
+| `vocation` | String | Nullable — null only for `Obsession` |
+| `temperament` | String | Nullable — null only for `Obsession` |
+| `cognitiveFunction` | String | Nullable — null only for `Obsession` |
+| `selfRelation` | String | Nullable — null only for `Obsession` |
+| `description` | String | Descriptive text |
+| `createdAt` / `updatedAt` | Instant | Set at construction / updated on mutation |
+
+### Sign fields
+
+| Field | Type | Description |
+|-------|------|--------------|
+| `id` | UUID | Primary key, set at construction, immutable |
+| `name` | String | Display name, unique (e.g. "The Rings") |
+| `signOrder` | int | Position 1–13 in the seasonal cycle (13 = the Rift) |
+| `seasonTime` | String | When in the year the sign falls |
+| `archetypeId` | UUID | `NOT NULL` FK to `archetypes.id` |
+| `subArchetype` | String | Nullable — null only for The Rift (sign 13), which has no sub-archetype |
+| `summary` | String | Short one-line description |
+| `body` | String | Full descriptive text |
+| `createdAt` / `updatedAt` | Instant | Set at construction / updated on mutation |
+
+`SignResponse.archetypeId` is a plain `UUID`, not a nested `Archetype` object — callers that need archetype details make a second call to `GET /api/public/v1/archetypes/{id}`.
+
+### Port naming
+
+`ArchetypeRepository` exposes `findAll()`. `SignRepository` exposes `findAllOrderedBySignOrder()` (not the generic `findAll`), mirroring `EraRepository`'s explicit-ordering convention.
+
+---
+
 *Maintained by Imaws. Update whenever a domain field, category enum, or status invariant changes.*

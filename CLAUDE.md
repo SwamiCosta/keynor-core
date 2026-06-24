@@ -100,6 +100,8 @@ Endpoints under `/api/public/v1/` require no authentication and are consumed by 
 - Responses always follow the `PagedResponse<T>` shape: `content`, `page`, `size`, `totalElements`
 - `findById` endpoints are included on all public controllers
 
+**Exception — closed reference/lookup sets:** `Era`, `Archetype`, and `Sign` are not `UniverseEntity` subclasses. They have no `status` field (so the CANON-only filter does not apply) and are fixed, non-paginated sets, so their list endpoints return a plain JSON array of all entries instead of `PagedResponse<T>`, and accept no query parameters. See `.claude/skills/domain-entity-reference.md`.
+
 ### Available endpoints
 
 | Controller | Endpoints |
@@ -112,6 +114,8 @@ Endpoints under `/api/public/v1/` require no authentication and are consumed by 
 | `PublicLoreController` | `GET /api/public/v1/lore`, `GET /api/public/v1/lore/{id}` |
 | `PublicEraController` | `GET /api/public/v1/eras`, `GET /api/public/v1/eras/{id}` |
 | `PublicMapController` | `GET /api/public/v1/maps`, `GET /api/public/v1/maps/{id}` |
+| `PublicArchetypeController` | `GET /api/public/v1/archetypes`, `GET /api/public/v1/archetypes/{id}` |
+| `PublicSignController` | `GET /api/public/v1/signs`, `GET /api/public/v1/signs/{id}` |
 
 ### Query parameters (list endpoints)
 
@@ -213,6 +217,10 @@ infrastructure/web/
 │   └── PublicEraController.java           ← no internal controller yet
 ├── map/
 │   └── PublicMapController.java
+├── archetype/
+│   └── PublicArchetypeController.java     ← no internal controller — closed reference set
+├── sign/
+│   └── PublicSignController.java          ← no internal controller — closed reference set
 └── handler/
     └── GlobalExceptionHandler.java
 ```
@@ -306,4 +314,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-06-23*
+*Last updated: 2026-06-24*
