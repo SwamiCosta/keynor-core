@@ -3,15 +3,18 @@ package com.keynor.core.domain.service;
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.exception.InvalidStatusTransitionException;
+import com.keynor.core.domain.exception.UnknownEraNameException;
 import com.keynor.core.domain.model.faction.Faction;
 import com.keynor.core.domain.model.faction.FactionCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
+import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.faction.CreateFactionUseCase;
 import com.keynor.core.domain.port.in.faction.UpdateFactionUseCase;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
+import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.domain.port.out.FactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,11 +40,14 @@ class FactionServiceTest {
     @Mock
     private EntityLinkRepository entityLinkRepository;
 
+    @Mock
+    private EraRepository eraRepository;
+
     private FactionService factionService;
 
     @BeforeEach
     void setUp() {
-        factionService = new FactionService(factionRepository, entityLinkRepository);
+        factionService = new FactionService(factionRepository, entityLinkRepository, eraRepository);
     }
 
     @Test
@@ -74,6 +80,20 @@ class FactionServiceTest {
         assertThatThrownBy(() -> factionService.create(command))
                 .isInstanceOf(DuplicateEntityNameException.class)
                 .hasMessageContaining("The Silver Order");
+        verify(factionRepository, never()).save(any());
+    }
+
+    @Test
+    void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
+        var command = new CreateFactionUseCase.Command(
+                "The Silver Order", null, null, List.of(), List.of(), List.of(FactionCategory.ORDER),
+                new Timeline("Nonexistent Era", null), null);
+        when(factionRepository.existsByName("The Silver Order")).thenReturn(false);
+        when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> factionService.create(command))
+                .isInstanceOf(UnknownEraNameException.class)
+                .hasMessageContaining("Nonexistent Era");
         verify(factionRepository, never()).save(any());
     }
 

@@ -2,12 +2,16 @@ package com.keynor.core.infrastructure.persistence.character;
 
 import com.keynor.core.domain.model.character.Character;
 import com.keynor.core.domain.model.character.CharacterCategory;
+import com.keynor.core.domain.model.era.Era;
+import com.keynor.core.domain.model.era.EraType;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.out.CharacterRepository;
+import com.keynor.core.domain.port.out.EraRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,12 +33,24 @@ class CharacterJpaAdapterIntegrationTest {
     @Autowired
     private CharacterRepository characterRepository;
 
+    @Autowired
+    private EraRepository eraRepository;
+
+    private String eraName;
+
+    @BeforeEach
+    void seedEra() {
+        Instant now = Instant.now();
+        Era era = eraRepository.save(new Era(UUID.randomUUID(), "Test Era", 0, EraType.ERA, null, null, now, now));
+        eraName = era.getName();
+    }
+
     private Character buildCharacter(String name, EntityStatus status, CharacterCategory category) {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         return new Character(id, name, "Summary of " + name, "Body text",
                 List.of("tag"), List.of(),
-                List.of(category), status, new Timeline("era-1", null), now, now);
+                List.of(category), status, new Timeline(eraName, null), now, now);
     }
 
     @Test

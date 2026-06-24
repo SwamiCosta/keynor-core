@@ -2,14 +2,17 @@ package com.keynor.core.domain.service;
 
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
+import com.keynor.core.domain.exception.UnknownEraNameException;
 import com.keynor.core.domain.model.place.Place;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
+import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.place.*;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
+import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.domain.port.out.PlaceRepository;
 
 import java.time.Instant;
@@ -26,10 +29,15 @@ public class PlaceService implements
 
     private final PlaceRepository placeRepository;
     private final EntityLinkRepository entityLinkRepository;
+    private final EraRepository eraRepository;
 
-    public PlaceService(PlaceRepository placeRepository, EntityLinkRepository entityLinkRepository) {
+    public PlaceService(
+            PlaceRepository placeRepository,
+            EntityLinkRepository entityLinkRepository,
+            EraRepository eraRepository) {
         this.placeRepository = placeRepository;
         this.entityLinkRepository = entityLinkRepository;
+        this.eraRepository = eraRepository;
     }
 
     @Override
@@ -37,6 +45,7 @@ public class PlaceService implements
         if (placeRepository.existsByName(command.name())) {
             throw new DuplicateEntityNameException("Place", command.name());
         }
+        validateTimeline(command.timeline());
         Instant now = Instant.now();
         Place place = new Place(
                 UUID.randomUUID(),
@@ -60,6 +69,7 @@ public class PlaceService implements
     public Place update(UUID id, UpdatePlaceUseCase.Command command) {
         Place place = placeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Place", id));
+        validateTimeline(command.timeline());
         place.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.mapType(), command.timeline());
         Place saved = placeRepository.save(place);
         entityLinkRepository.replaceLinks(EntityType.PLACE, saved.getId(), command.links() != null ? command.links() : List.of());
@@ -92,5 +102,18 @@ public class PlaceService implements
     @Override
     public PageResult<Place> findAll(EntityFilter filter, PageRequest pageRequest) {
         return placeRepository.findAll(filter, pageRequest);
+    }
+
+    private void validateTimeline(Timeline timeline) {
+        if (timeline == null) return;
+        validateEraName(timeline.founded());
+        validateEraName(timeline.destroyed());
+    }
+
+    private void validateEraName(String eraName) {
+        if (eraName == null) return;
+        if (eraRepository.findByName(eraName).isEmpty()) {
+            throw new UnknownEraNameException(eraName);
+        }
     }
 }

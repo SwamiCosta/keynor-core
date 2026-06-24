@@ -3,16 +3,19 @@ package com.keynor.core.domain.service;
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.exception.InvalidStatusTransitionException;
+import com.keynor.core.domain.exception.UnknownEraNameException;
 import com.keynor.core.domain.model.character.Character;
 import com.keynor.core.domain.model.character.CharacterCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
+import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.character.CreateCharacterUseCase;
 import com.keynor.core.domain.port.in.character.UpdateCharacterUseCase;
 import com.keynor.core.domain.port.out.CharacterRepository;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
+import com.keynor.core.domain.port.out.EraRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,11 +40,14 @@ class CharacterServiceTest {
     @Mock
     private EntityLinkRepository entityLinkRepository;
 
+    @Mock
+    private EraRepository eraRepository;
+
     private CharacterService characterService;
 
     @BeforeEach
     void setUp() {
-        characterService = new CharacterService(characterRepository, entityLinkRepository);
+        characterService = new CharacterService(characterRepository, entityLinkRepository, eraRepository);
     }
 
     @Test
@@ -141,6 +147,20 @@ class CharacterServiceTest {
 
         assertThat(result.getName()).isEqualTo("New Name");
         assertThat(result.getCategories()).containsExactlyInAnyOrder(CharacterCategory.HERO, CharacterCategory.DEITY);
+    }
+
+    @Test
+    void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
+        var command = new CreateCharacterUseCase.Command(
+                "Araveth", null, null, List.of(), List.of(), List.of(CharacterCategory.HERO),
+                new Timeline("Nonexistent Era", null), null);
+        when(characterRepository.existsByName("Araveth")).thenReturn(false);
+        when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> characterService.create(command))
+                .isInstanceOf(UnknownEraNameException.class)
+                .hasMessageContaining("Nonexistent Era");
+        verify(characterRepository, never()).save(any());
     }
 
     @Test

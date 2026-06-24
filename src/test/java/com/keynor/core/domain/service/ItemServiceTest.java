@@ -3,15 +3,18 @@ package com.keynor.core.domain.service;
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.exception.InvalidStatusTransitionException;
+import com.keynor.core.domain.exception.UnknownEraNameException;
 import com.keynor.core.domain.model.item.Item;
 import com.keynor.core.domain.model.item.ItemCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
+import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.item.CreateItemUseCase;
 import com.keynor.core.domain.port.in.item.UpdateItemUseCase;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
+import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.domain.port.out.ItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,11 +40,14 @@ class ItemServiceTest {
     @Mock
     private EntityLinkRepository entityLinkRepository;
 
+    @Mock
+    private EraRepository eraRepository;
+
     private ItemService itemService;
 
     @BeforeEach
     void setUp() {
-        itemService = new ItemService(itemRepository, entityLinkRepository);
+        itemService = new ItemService(itemRepository, entityLinkRepository, eraRepository);
     }
 
     @Test
@@ -74,6 +80,20 @@ class ItemServiceTest {
         assertThatThrownBy(() -> itemService.create(command))
                 .isInstanceOf(DuplicateEntityNameException.class)
                 .hasMessageContaining("Shadowblade");
+        verify(itemRepository, never()).save(any());
+    }
+
+    @Test
+    void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
+        var command = new CreateItemUseCase.Command(
+                "Shadowblade", null, null, List.of(), List.of(), List.of(ItemCategory.WEAPON),
+                new Timeline("Nonexistent Era", null), null);
+        when(itemRepository.existsByName("Shadowblade")).thenReturn(false);
+        when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> itemService.create(command))
+                .isInstanceOf(UnknownEraNameException.class)
+                .hasMessageContaining("Nonexistent Era");
         verify(itemRepository, never()).save(any());
     }
 

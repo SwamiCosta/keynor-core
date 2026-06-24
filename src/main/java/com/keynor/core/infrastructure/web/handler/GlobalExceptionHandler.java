@@ -3,6 +3,7 @@ package com.keynor.core.infrastructure.web.handler;
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.exception.InvalidStatusTransitionException;
+import com.keynor.core.domain.exception.UnknownEraNameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,12 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleInvalidTransition(InvalidStatusTransitionException ex) {
         log.warn("Invalid status transition: {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+    }
+
+    @ExceptionHandler(UnknownEraNameException.class)
+    public ProblemDetail handleUnknownEraName(UnknownEraNameException ex) {
+        log.warn("Unknown era name: {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

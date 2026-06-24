@@ -1,19 +1,31 @@
 package com.keynor.core.infrastructure.persistence.lore;
 
+import com.keynor.core.domain.exception.UnknownEraNameException;
+import com.keynor.core.domain.model.era.Era;
 import com.keynor.core.domain.model.lore.Lore;
 import com.keynor.core.domain.model.shared.Timeline;
+import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.infrastructure.persistence.shared.TimelineEmbeddable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Component
 public class LoreMapper {
 
+    private final EraRepository eraRepository;
+
+    public LoreMapper(EraRepository eraRepository) {
+        this.eraRepository = eraRepository;
+    }
+
     public Lore toDomain(LoreEntity entity) {
         Timeline timeline = null;
         if (entity.getTimeline() != null) {
-            timeline = new Timeline(entity.getTimeline().getTimelineFounded(), entity.getTimeline().getTimelineDestroyed());
+            timeline = new Timeline(
+                    resolveEraName(entity.getTimeline().getTimelineFoundedEraId()),
+                    resolveEraName(entity.getTimeline().getTimelineDestroyedEraId()));
         }
         return new Lore(
                 entity.getId(),
@@ -50,6 +62,20 @@ public class LoreMapper {
         TimelineEmbeddable embeddable = new TimelineEmbeddable();
         embeddable.setTimelineFounded(lore.getTimeline().founded());
         embeddable.setTimelineDestroyed(lore.getTimeline().destroyed());
+        embeddable.setTimelineFoundedEraId(resolveEraId(lore.getTimeline().founded()));
+        embeddable.setTimelineDestroyedEraId(resolveEraId(lore.getTimeline().destroyed()));
         return embeddable;
+    }
+
+    private String resolveEraName(UUID eraId) {
+        if (eraId == null) return null;
+        return eraRepository.findById(eraId).map(Era::getName).orElse(null);
+    }
+
+    private UUID resolveEraId(String eraName) {
+        if (eraName == null) return null;
+        return eraRepository.findByName(eraName)
+                .map(Era::getId)
+                .orElseThrow(() -> new UnknownEraNameException(eraName));
     }
 }
