@@ -33,6 +33,11 @@ public class EraJpaAdapter implements EraRepository {
     }
 
     @Override
+    public Optional<Era> findByName(String name) {
+        return jpaRepository.findByName(name).map(mapper::toDomain);
+    }
+
+    @Override
     public Era save(Era era) {
         return mapper.toDomain(jpaRepository.save(mapper.toEntity(era)));
     }

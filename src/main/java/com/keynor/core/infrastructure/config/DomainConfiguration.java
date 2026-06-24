@@ -9,33 +9,51 @@ import org.springframework.context.annotation.Configuration;
 public class DomainConfiguration {
 
     @Bean
-    public CharacterService characterService(CharacterRepository characterRepository, EntityLinkRepository entityLinkRepository) {
-        return new CharacterService(characterRepository, entityLinkRepository);
+    public CharacterService characterService(
+            CharacterRepository characterRepository,
+            EntityLinkRepository entityLinkRepository,
+            EraRepository eraRepository) {
+        return new CharacterService(characterRepository, entityLinkRepository, eraRepository);
     }
 
     @Bean
-    public PlaceService placeService(PlaceRepository placeRepository, EntityLinkRepository entityLinkRepository) {
-        return new PlaceService(placeRepository, entityLinkRepository);
+    public PlaceService placeService(
+            PlaceRepository placeRepository,
+            EntityLinkRepository entityLinkRepository,
+            EraRepository eraRepository) {
+        return new PlaceService(placeRepository, entityLinkRepository, eraRepository);
     }
 
     @Bean
-    public FactionService factionService(FactionRepository factionRepository, EntityLinkRepository entityLinkRepository) {
-        return new FactionService(factionRepository, entityLinkRepository);
+    public FactionService factionService(
+            FactionRepository factionRepository,
+            EntityLinkRepository entityLinkRepository,
+            EraRepository eraRepository) {
+        return new FactionService(factionRepository, entityLinkRepository, eraRepository);
     }
 
     @Bean
-    public ItemService itemService(ItemRepository itemRepository, EntityLinkRepository entityLinkRepository) {
-        return new ItemService(itemRepository, entityLinkRepository);
+    public ItemService itemService(
+            ItemRepository itemRepository,
+            EntityLinkRepository entityLinkRepository,
+            EraRepository eraRepository) {
+        return new ItemService(itemRepository, entityLinkRepository, eraRepository);
     }
 
     @Bean
-    public EventService eventService(EventRepository eventRepository, EntityLinkRepository entityLinkRepository) {
-        return new EventService(eventRepository, entityLinkRepository);
+    public EventService eventService(
+            EventRepository eventRepository,
+            EntityLinkRepository entityLinkRepository,
+            EraRepository eraRepository) {
+        return new EventService(eventRepository, entityLinkRepository, eraRepository);
     }
 
     @Bean
-    public LoreService loreService(LoreRepository loreRepository, EntityLinkRepository entityLinkRepository) {
-        return new LoreService(loreRepository, entityLinkRepository);
+    public LoreService loreService(
+            LoreRepository loreRepository,
+            EntityLinkRepository entityLinkRepository,
+            EraRepository eraRepository) {
+        return new LoreService(loreRepository, entityLinkRepository, eraRepository);
     }
 
     @Bean

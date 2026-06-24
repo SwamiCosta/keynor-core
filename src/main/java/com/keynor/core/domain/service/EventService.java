@@ -2,14 +2,17 @@ package com.keynor.core.domain.service;
 
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
+import com.keynor.core.domain.exception.UnknownEraNameException;
 import com.keynor.core.domain.model.event.Event;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
+import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.event.*;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
+import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.domain.port.out.EventRepository;
 
 import java.time.Instant;
@@ -26,10 +29,15 @@ public class EventService implements
 
     private final EventRepository eventRepository;
     private final EntityLinkRepository entityLinkRepository;
+    private final EraRepository eraRepository;
 
-    public EventService(EventRepository eventRepository, EntityLinkRepository entityLinkRepository) {
+    public EventService(
+            EventRepository eventRepository,
+            EntityLinkRepository entityLinkRepository,
+            EraRepository eraRepository) {
         this.eventRepository = eventRepository;
         this.entityLinkRepository = entityLinkRepository;
+        this.eraRepository = eraRepository;
     }
 
     @Override
@@ -37,6 +45,7 @@ public class EventService implements
         if (eventRepository.existsByName(command.name())) {
             throw new DuplicateEntityNameException("Event", command.name());
         }
+        validateTimeline(command.timeline());
         Instant now = Instant.now();
         Event event = new Event(
                 UUID.randomUUID(),
@@ -59,6 +68,7 @@ public class EventService implements
     public Event update(UUID id, UpdateEventUseCase.Command command) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Event", id));
+        validateTimeline(command.timeline());
         event.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
         Event saved = eventRepository.save(event);
         entityLinkRepository.replaceLinks(EntityType.EVENT, saved.getId(), command.links() != null ? command.links() : List.of());
@@ -91,5 +101,18 @@ public class EventService implements
     @Override
     public PageResult<Event> findAll(EntityFilter filter, PageRequest pageRequest) {
         return eventRepository.findAll(filter, pageRequest);
+    }
+
+    private void validateTimeline(Timeline timeline) {
+        if (timeline == null) return;
+        validateEraName(timeline.founded());
+        validateEraName(timeline.destroyed());
+    }
+
+    private void validateEraName(String eraName) {
+        if (eraName == null) return;
+        if (eraRepository.findByName(eraName).isEmpty()) {
+            throw new UnknownEraNameException(eraName);
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.keynor.core.domain.service;
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.exception.InvalidStatusTransitionException;
+import com.keynor.core.domain.exception.UnknownEraNameException;
 import com.keynor.core.domain.model.place.MapType;
 import com.keynor.core.domain.model.place.Place;
 import com.keynor.core.domain.model.place.PlaceCategory;
@@ -10,9 +11,11 @@ import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
+import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.place.CreatePlaceUseCase;
 import com.keynor.core.domain.port.in.place.UpdatePlaceUseCase;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
+import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.domain.port.out.PlaceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,11 +41,14 @@ class PlaceServiceTest {
     @Mock
     private EntityLinkRepository entityLinkRepository;
 
+    @Mock
+    private EraRepository eraRepository;
+
     private PlaceService placeService;
 
     @BeforeEach
     void setUp() {
-        placeService = new PlaceService(placeRepository, entityLinkRepository);
+        placeService = new PlaceService(placeRepository, entityLinkRepository, eraRepository);
     }
 
     @Test
@@ -77,6 +83,20 @@ class PlaceServiceTest {
         assertThatThrownBy(() -> placeService.create(command))
                 .isInstanceOf(DuplicateEntityNameException.class)
                 .hasMessageContaining("Thornvale");
+        verify(placeRepository, never()).save(any());
+    }
+
+    @Test
+    void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
+        var command = new CreatePlaceUseCase.Command(
+                "Thornvale", null, null, List.of(), List.of(), List.of(PlaceCategory.CITY),
+                MapType.NAVIGABLE, new Timeline("Nonexistent Era", null), null);
+        when(placeRepository.existsByName("Thornvale")).thenReturn(false);
+        when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> placeService.create(command))
+                .isInstanceOf(UnknownEraNameException.class)
+                .hasMessageContaining("Nonexistent Era");
         verify(placeRepository, never()).save(any());
     }
 

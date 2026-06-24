@@ -3,15 +3,18 @@ package com.keynor.core.domain.service;
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.exception.InvalidStatusTransitionException;
+import com.keynor.core.domain.exception.UnknownEraNameException;
 import com.keynor.core.domain.model.event.Event;
 import com.keynor.core.domain.model.event.EventCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
+import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.event.CreateEventUseCase;
 import com.keynor.core.domain.port.in.event.UpdateEventUseCase;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
+import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.domain.port.out.EventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,11 +40,14 @@ class EventServiceTest {
     @Mock
     private EntityLinkRepository entityLinkRepository;
 
+    @Mock
+    private EraRepository eraRepository;
+
     private EventService eventService;
 
     @BeforeEach
     void setUp() {
-        eventService = new EventService(eventRepository, entityLinkRepository);
+        eventService = new EventService(eventRepository, entityLinkRepository, eraRepository);
     }
 
     @Test
@@ -74,6 +80,20 @@ class EventServiceTest {
         assertThatThrownBy(() -> eventService.create(command))
                 .isInstanceOf(DuplicateEntityNameException.class)
                 .hasMessageContaining("The Battle of Kor");
+        verify(eventRepository, never()).save(any());
+    }
+
+    @Test
+    void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
+        var command = new CreateEventUseCase.Command(
+                "The Battle of Kor", null, null, List.of(), List.of(), List.of(EventCategory.BATTLE),
+                new Timeline("Nonexistent Era", null), null);
+        when(eventRepository.existsByName("The Battle of Kor")).thenReturn(false);
+        when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> eventService.create(command))
+                .isInstanceOf(UnknownEraNameException.class)
+                .hasMessageContaining("Nonexistent Era");
         verify(eventRepository, never()).save(any());
     }
 

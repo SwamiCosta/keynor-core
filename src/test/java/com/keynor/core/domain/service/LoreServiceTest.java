@@ -3,15 +3,18 @@ package com.keynor.core.domain.service;
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.exception.InvalidStatusTransitionException;
+import com.keynor.core.domain.exception.UnknownEraNameException;
 import com.keynor.core.domain.model.lore.Lore;
 import com.keynor.core.domain.model.lore.LoreCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
+import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.lore.CreateLoreUseCase;
 import com.keynor.core.domain.port.in.lore.UpdateLoreUseCase;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
+import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.domain.port.out.LoreRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,11 +40,14 @@ class LoreServiceTest {
     @Mock
     private EntityLinkRepository entityLinkRepository;
 
+    @Mock
+    private EraRepository eraRepository;
+
     private LoreService loreService;
 
     @BeforeEach
     void setUp() {
-        loreService = new LoreService(loreRepository, entityLinkRepository);
+        loreService = new LoreService(loreRepository, entityLinkRepository, eraRepository);
     }
 
     @Test
@@ -90,6 +96,20 @@ class LoreServiceTest {
         assertThatThrownBy(() -> loreService.create(command))
                 .isInstanceOf(DuplicateEntityNameException.class)
                 .hasMessageContaining("The Age of Silence");
+        verify(loreRepository, never()).save(any());
+    }
+
+    @Test
+    void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
+        var command = new CreateLoreUseCase.Command(
+                "The Age of Silence", null, null, List.of(), List.of(), List.of(LoreCategory.HISTORY),
+                new Timeline("Nonexistent Era", null), null, List.of());
+        when(loreRepository.existsByName("The Age of Silence")).thenReturn(false);
+        when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> loreService.create(command))
+                .isInstanceOf(UnknownEraNameException.class)
+                .hasMessageContaining("Nonexistent Era");
         verify(loreRepository, never()).save(any());
     }
 

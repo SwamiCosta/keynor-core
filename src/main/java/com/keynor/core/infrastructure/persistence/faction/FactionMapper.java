@@ -1,19 +1,31 @@
 package com.keynor.core.infrastructure.persistence.faction;
 
+import com.keynor.core.domain.exception.UnknownEraNameException;
+import com.keynor.core.domain.model.era.Era;
 import com.keynor.core.domain.model.faction.Faction;
 import com.keynor.core.domain.model.shared.Timeline;
+import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.infrastructure.persistence.shared.TimelineEmbeddable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Component
 public class FactionMapper {
 
+    private final EraRepository eraRepository;
+
+    public FactionMapper(EraRepository eraRepository) {
+        this.eraRepository = eraRepository;
+    }
+
     public Faction toDomain(FactionEntity entity) {
         Timeline timeline = null;
         if (entity.getTimeline() != null) {
-            timeline = new Timeline(entity.getTimeline().getTimelineFounded(), entity.getTimeline().getTimelineDestroyed());
+            timeline = new Timeline(
+                    resolveEraName(entity.getTimeline().getTimelineFoundedEraId()),
+                    resolveEraName(entity.getTimeline().getTimelineDestroyedEraId()));
         }
         return new Faction(
                 entity.getId(),
@@ -50,6 +62,20 @@ public class FactionMapper {
         TimelineEmbeddable embeddable = new TimelineEmbeddable();
         embeddable.setTimelineFounded(faction.getTimeline().founded());
         embeddable.setTimelineDestroyed(faction.getTimeline().destroyed());
+        embeddable.setTimelineFoundedEraId(resolveEraId(faction.getTimeline().founded()));
+        embeddable.setTimelineDestroyedEraId(resolveEraId(faction.getTimeline().destroyed()));
         return embeddable;
+    }
+
+    private String resolveEraName(UUID eraId) {
+        if (eraId == null) return null;
+        return eraRepository.findById(eraId).map(Era::getName).orElse(null);
+    }
+
+    private UUID resolveEraId(String eraName) {
+        if (eraName == null) return null;
+        return eraRepository.findByName(eraName)
+                .map(Era::getId)
+                .orElseThrow(() -> new UnknownEraNameException(eraName));
     }
 }

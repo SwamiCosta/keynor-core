@@ -2,15 +2,18 @@ package com.keynor.core.domain.service;
 
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
+import com.keynor.core.domain.exception.UnknownEraNameException;
 import com.keynor.core.domain.model.character.Character;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
+import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.character.*;
 import com.keynor.core.domain.port.out.CharacterRepository;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
+import com.keynor.core.domain.port.out.EraRepository;
 
 import java.time.Instant;
 import java.util.List;
@@ -26,10 +29,15 @@ public class CharacterService implements
 
     private final CharacterRepository characterRepository;
     private final EntityLinkRepository entityLinkRepository;
+    private final EraRepository eraRepository;
 
-    public CharacterService(CharacterRepository characterRepository, EntityLinkRepository entityLinkRepository) {
+    public CharacterService(
+            CharacterRepository characterRepository,
+            EntityLinkRepository entityLinkRepository,
+            EraRepository eraRepository) {
         this.characterRepository = characterRepository;
         this.entityLinkRepository = entityLinkRepository;
+        this.eraRepository = eraRepository;
     }
 
     @Override
@@ -37,6 +45,7 @@ public class CharacterService implements
         if (characterRepository.existsByName(command.name())) {
             throw new DuplicateEntityNameException("Character", command.name());
         }
+        validateTimeline(command.timeline());
         Instant now = Instant.now();
         Character character = new Character(
                 UUID.randomUUID(),
@@ -59,6 +68,7 @@ public class CharacterService implements
     public Character update(UUID id, UpdateCharacterUseCase.Command command) {
         Character character = characterRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Character", id));
+        validateTimeline(command.timeline());
         character.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
         Character saved = characterRepository.save(character);
         entityLinkRepository.replaceLinks(EntityType.CHARACTER, saved.getId(), command.links() != null ? command.links() : List.of());
@@ -91,5 +101,18 @@ public class CharacterService implements
     @Override
     public PageResult<Character> findAll(EntityFilter filter, PageRequest pageRequest) {
         return characterRepository.findAll(filter, pageRequest);
+    }
+
+    private void validateTimeline(Timeline timeline) {
+        if (timeline == null) return;
+        validateEraName(timeline.founded());
+        validateEraName(timeline.destroyed());
+    }
+
+    private void validateEraName(String eraName) {
+        if (eraName == null) return;
+        if (eraRepository.findByName(eraName).isEmpty()) {
+            throw new UnknownEraNameException(eraName);
+        }
     }
 }
