@@ -60,8 +60,6 @@ public class EventMapper {
     private TimelineEmbeddable toEmbeddable(Event event) {
         if (event.getTimeline() == null) return null;
         TimelineEmbeddable embeddable = new TimelineEmbeddable();
-        embeddable.setTimelineFounded(event.getTimeline().founded());
-        embeddable.setTimelineDestroyed(event.getTimeline().destroyed());
         embeddable.setTimelineFoundedEraId(resolveEraId(event.getTimeline().founded()));
         embeddable.setTimelineDestroyedEraId(resolveEraId(event.getTimeline().destroyed()));
         return embeddable;

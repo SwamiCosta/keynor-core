@@ -16,6 +16,8 @@
 | V6 | `universe_entity_images` table |
 | V7 | `entity_links` table (cross-entity references) |
 | V8 | Redesign `eras` table — UUID PK, `type` (ERA/POINT), `importance` (STANDARD/MAJOR/null), `order_index`, `description`; drops V4 schema |
+| V9 | Add `timeline_founded_era_id` / `timeline_destroyed_era_id` (UUID, FK to `eras.id`) to all 6 entity tables; additive only, legacy `timeline_founded`/`timeline_destroyed` VARCHAR columns untouched |
+| V10 | Drop legacy `timeline_founded` / `timeline_destroyed` VARCHAR columns from all 6 entity tables, now superseded by the V9 `*_era_id` columns |
 
 For the full procedure (authorization gate, destructive-operations rules, Flyway-merge-is-execution warning), see the workspace `SKILLS.md` — Skill 02.
 

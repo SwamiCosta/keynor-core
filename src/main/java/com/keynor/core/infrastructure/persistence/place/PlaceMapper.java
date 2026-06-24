@@ -62,8 +62,6 @@ public class PlaceMapper {
     private TimelineEmbeddable toEmbeddable(Place place) {
         if (place.getTimeline() == null) return null;
         TimelineEmbeddable embeddable = new TimelineEmbeddable();
-        embeddable.setTimelineFounded(place.getTimeline().founded());
-        embeddable.setTimelineDestroyed(place.getTimeline().destroyed());
         embeddable.setTimelineFoundedEraId(resolveEraId(place.getTimeline().founded()));
         embeddable.setTimelineDestroyedEraId(resolveEraId(place.getTimeline().destroyed()));
         return embeddable;

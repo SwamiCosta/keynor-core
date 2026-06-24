@@ -60,8 +60,6 @@ public class FactionMapper {
     private TimelineEmbeddable toEmbeddable(Faction faction) {
         if (faction.getTimeline() == null) return null;
         TimelineEmbeddable embeddable = new TimelineEmbeddable();
-        embeddable.setTimelineFounded(faction.getTimeline().founded());
-        embeddable.setTimelineDestroyed(faction.getTimeline().destroyed());
         embeddable.setTimelineFoundedEraId(resolveEraId(faction.getTimeline().founded()));
         embeddable.setTimelineDestroyedEraId(resolveEraId(faction.getTimeline().destroyed()));
         return embeddable;
