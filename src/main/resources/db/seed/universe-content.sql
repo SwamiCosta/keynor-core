@@ -6,7 +6,7 @@
 --   character_tags, places, place_categories, place_tags, factions,
 --   faction_categories, faction_tags, items, item_categories, item_tags,
 --   events, event_categories, event_tags, lore, lore_categories, lore_tags,
---   universe_entity_images, archetypes, signs
+--   entity_links, universe_entity_images, archetypes, signs
 --
 -- Excluded: users, oauth2_* (environment-specific, never in scope)
 --
@@ -19,7 +19,7 @@
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
 -- Last updated: 2026-06-26
--- Updated by:   Siegmund
+-- Updated by:   Siegmund (Ani <-> "The Origin of Twelve" link, Ani + "The Twelve Aelimic Signs" images)
 
 -- ============================================================
 -- TRUNCATE (join tables first, then parents, then root tables)
@@ -27,6 +27,7 @@
 
 TRUNCATE
     universe_entity_images,
+    entity_links,
     character_tags, character_categories,
     place_tags, place_categories,
     faction_tags, faction_categories,
@@ -168,6 +169,14 @@ INSERT INTO lore_tags (lore_id, tag) VALUES
     ('ea292de9-5429-4ecb-b821-7e1e168ffbca', 'Dixia');
 
 -- ============================================================
+-- ENTITY LINKS (cross-entity references)
+-- ============================================================
+
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES
+    ('73dc3a5b-2282-4197-9878-42b4c9beaf2d', 'CHARACTER', '988bdd8a-04a5-4e34-9857-f72918bec3a0', 'LORE', '334b7fb3-31e3-4a10-a3ce-4c6afb791934', '2026-06-26 08:47:01.552707+00'),
+    ('0749a74a-4130-4588-bb77-26f2919332ab', 'LORE', '334b7fb3-31e3-4a10-a3ce-4c6afb791934', 'CHARACTER', '988bdd8a-04a5-4e34-9857-f72918bec3a0', '2026-06-26 08:47:10.296516+00');
+
+-- ============================================================
 -- IMAGES
 -- ============================================================
 
@@ -179,7 +188,9 @@ INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-5.png', 4),
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-6.png', 5),
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-7.png', 6),
-    ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-8.png', 7);
+    ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-8.png', 7),
+    ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ani%2C%20the%20Firstborn%20God%20of%20Singularity.png', 0),
+    ('ea292de9-5429-4ecb-b821-7e1e168ffbca', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/lore/13%20Knights%20of%20Singisd%C3%B4nia.png', 0);
 
 -- ============================================================
 -- ARCHETYPES
