@@ -18,7 +18,7 @@
 -- How to apply:
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
--- Last updated: 2026-06-25
+-- Last updated: 2026-06-26
 -- Updated by:   Siegmund
 
 -- ============================================================
@@ -122,6 +122,16 @@ INSERT INTO character_tags (character_id, tag) VALUES
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'deity'),
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'totality'),
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'outer god');
+
+INSERT INTO characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id) VALUES ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'Ani', 'Ani, the Firstborn and the Primordial, is the god of unity itself — all existence pressed into a single, indivisible form, genderless and absolute. He is not approached as a power among powers, but as the seed from which division first became possible. Wherever he walks, it is said, the world takes root anew in his wake.', E'Ani is the god of unity — of singularity itself. He is called the Firstborn, the Primordial, for he is the representation of all existence pressed into a single, indivisible concept. He is at once everything and one: the totality of being folded into a solitary form.\n\nHe bears both genders within him, neither apart from the other, and his skin shines with every color of the visible spectrum, as though light itself had chosen to take a shape. He carries himself with a stillness beyond stillness — serene, tranquil, eternally wrapped in the sensation of completeness, as one who lacks for nothing and seeks for nothing more.\n\nHis body yields to nothing. It is infinitely resistant, like crystal grown without flaw and without end. He carries no weapon, no tool, no burden of any kind — and yet, should an enemy rise against him, he need only summon a thousand arms to answer the threat, each one as certain as the last. His presence alone is so dense that the space around him bends beneath its weight, folding inward as though the world itself leaned closer to listen.\n\nAnd still, wherever Ani walks, existence spills from his body in his wake — and where it falls, it takes root, and germinates, and grows.', 'CANON', '2026-06-26 08:29:53.246395+00', '2026-06-26 08:30:21.811663+00', '48ed4b49-b7b5-4d4b-9715-00dcaa819209', NULL);
+
+INSERT INTO character_categories (character_id, category) VALUES ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'DEITY');
+
+INSERT INTO character_tags (character_id, tag) VALUES
+    ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'deity'),
+    ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'unity'),
+    ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'singularity'),
+    ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'firstborn');
 
 -- ============================================================
 -- LORE
