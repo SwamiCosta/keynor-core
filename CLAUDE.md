@@ -35,6 +35,16 @@
 
 ---
 
+## Local environment assumptions
+
+The user always has Docker Compose running (PostgreSQL) and an application instance already up before invoking any agent in this project.
+
+- **Use what is already running.** Never start, stop, or restart the database, the application, or any container — and never provision a disposable substitute (e.g. `docker run maven:...` as a stand-in for a missing local JDK).
+- **If something required is not running or not reachable**, stop and report it to the user. Do not work around it by starting something new.
+- Applies to Imperium (compile/test against the running app), Judis (Testcontainers, `mvn verify`), and Siegmund (`pg_dump`, diagnostic `SELECT`s against the running database).
+
+---
+
 ## Architecture
 
 keynor-core follows **hexagonal architecture** (ports & adapters). The domain layer has zero framework dependencies.
@@ -314,4 +324,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-06-24*
+*Last updated: 2026-06-26*

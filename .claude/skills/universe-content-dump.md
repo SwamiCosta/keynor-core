@@ -38,15 +38,16 @@ If a new table is added to the schema, the agent must evaluate whether it is uni
 ## What agents may do
 
 - **Read** the current `universe-content.sql` file
-- **Generate** a new version of `universe-content.sql` based on known data (construct the SQL manually or from pg_dump output provided by the user)
+- **Generate** a new version of `universe-content.sql` based on known data (construct the SQL manually or from pg_dump output)
 - **Inspect** the current DB state via `SELECT` queries (100-row limit, read-only) to diagnose divergence
+- **Run `pg_dump` directly** against the already-running local database — standing exception to the SELECT-row-limit rule, scoped strictly to: `--data-only --column-inserts`, limited to the table list in "Scope of tables" above, against the DB instance the user already has running. Never used to start, stop, or restore a database, and never run against anything other than the local dev instance. If the database is not reachable, Siegmund stops and reports instead of starting one (see `CLAUDE.md` — Local environment assumptions)
 - **Commit and push** the updated file to a `task/*` branch and open a PR
 
 ## What agents may never do
 
 - **Execute** any SQL from this file against any database (INSERT, UPDATE, DELETE, TRUNCATE are all protected actions)
-- **Run** `pg_dump` directly against the database — the user runs this and provides the output if needed
 - **Apply** the dump to a new environment — the user does this manually
+- **Start, stop, or restart** the database to perform a dump — see `CLAUDE.md` — Local environment assumptions
 
 ---
 
@@ -82,8 +83,8 @@ INSERT INTO eras ...
 
 Triggered when: the user asks Siegmund to update the dump after a data change in the local DB.
 
-1. User runs `pg_dump --data-only --column-inserts -t maps -t eras -t map_eras -t characters -t character_categories -t character_tags -t places -t place_categories -t place_tags -t factions -t faction_categories -t faction_tags -t items -t item_categories -t item_tags -t events -t event_categories -t event_tags -t lore -t lore_categories -t lore_tags -t universe_entity_images -t archetypes -t signs keynor_core` and shares the output with Siegmund
-2. Siegmund takes the output and reformats it into the canonical file format (TRUNCATE block + ordered INSERTs)
+1. Siegmund runs `pg_dump --data-only --column-inserts -t maps -t eras -t map_eras -t characters -t character_categories -t character_tags -t places -t place_categories -t place_tags -t factions -t faction_categories -t faction_tags -t items -t item_categories -t item_tags -t events -t event_categories -t event_tags -t lore -t lore_categories -t lore_tags -t universe_entity_images -t archetypes -t signs keynor_core` directly against the already-running local database. If the database is not reachable, Siegmund stops and reports — never starts one to proceed
+2. Siegmund reformats the output into the canonical file format (TRUNCATE block + ordered INSERTs)
 3. Siegmund replaces `db/seed/universe-content.sql` with the new content
 4. Siegmund commits to a `task/*` branch and opens a PR
 

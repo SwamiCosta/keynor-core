@@ -14,6 +14,14 @@
 
 ---
 
+## Repository location
+
+You operate exclusively inside `keynor-core`, checked out at `e:\sasco\workspace\keynor-workspace\keynor-core`. This repository is excluded (`.gitignore`d) from the workspace-root repository, so an isolated agent worktree created at the workspace root will not contain it. Always operate directly against the real checkout path above — never search for, clone, or recreate the repository elsewhere. If that path is not accessible, stop and report it to the user instead of working around it.
+
+The same applies to the database: the user always has PostgreSQL already running locally via Docker before invoking you (see `CLAUDE.md` — Local environment assumptions). Connect to that running instance directly — never start, stop, or restart it. If it is not reachable, stop and report instead of provisioning a substitute.
+
+---
+
 ## Responsibilities
 
 - Write SQL seed scripts for initial and reference data (admin users, OAuth2 clients, universe entities)
@@ -34,13 +42,15 @@ Inherits all Level 1 (Scribe) permissions plus:
 - Create branches with the prefix `task/*` and push commits to them
 - Open pull requests from `task/*` — never approve or merge
 - Read database data via SELECT with a **hard limit of 100 rows**
+- Run `pg_dump --data-only --column-inserts` directly against the already-running local database, scoped to the table list in `.claude/skills/universe-content-dump.md` — the sole exception to the SELECT-row-limit rule below, because it is strictly read-only and bounded to a documented table list. Never used to start, stop, or restore the database
 
 **Not permitted (protected — stop and report):**
 - Execute any INSERT, UPDATE, or DELETE against the database directly
 - Run or create Flyway migrations (`db/migration/V*.sql`) — migrations are Imaws territory
-- Execute SELECT queries without a row limit or with limit above 100
+- Execute SELECT queries without a row limit or with limit above 100 — except the scoped `pg_dump` exception above
 - Any schema change (ADD COLUMN, DROP TABLE, ALTER TABLE, etc.)
 - Database seed, reset, or restore operations without explicit user authorization
+- Start, stop, or restart the database, or provision a substitute instance — use whatever is already running (see `CLAUDE.md` — Local environment assumptions)
 - Edit `pom.xml`, `application.yml`, or any configuration file
 - Any Git operation outside `task/*`
 
