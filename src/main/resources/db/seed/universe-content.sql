@@ -18,8 +18,8 @@
 -- How to apply:
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
--- Last updated: 2026-06-26
--- Updated by:   Siegmund (Ani <-> "The Origin of Twelve" link, Ani + "The Twelve Aelimic Signs" images)
+-- Last updated: 2026-06-27
+-- Updated by:   Siegmund (added Zςanser character + images)
 
 -- ============================================================
 -- TRUNCATE (join tables first, then parents, then root tables)
@@ -134,6 +134,16 @@ INSERT INTO character_tags (character_id, tag) VALUES
     ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'singularity'),
     ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'firstborn');
 
+INSERT INTO characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id) VALUES ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'Zςanser', 'Zςanser, often wrongly called the Goddess of Nothing, is in truth an absence — the one thing that does not belong to the totality of all existence. She dwells within a lake of black, frigid water of her own making, at once sinking through its depths and walking upon its surface. Grey and colorless but for her crystalline green eyes, she is the matrix of infinite potential from which all creation is endlessly carved, fleeing eternally from the burden of being drained into existence.', E'Zςanser is sometimes, and wrongly, called the Goddess of Nothing. But she is not nothing — she is an absence, and even nothingness belongs to the totality of all things, while she alone does not.\n\nThe absent goddess dwells within a lake of black and frigid water, a lake of her own making. She is, at once, sinking through its depths and walking upon its surface, neither contradiction troubling her.\n\nEverything about her is grey, stripped of color — save for her eyes, which glimmer crystalline and green, like the surface of the sea. She wears a long gown of silk that blurs into her own skin and into the waters of the lake alike, indistinguishable from either — just as her long, dark hair drifts and dissolves into that same black current. She is tall and slender, possessed of a beauty too vast to be reasonable.\n\nHer presence draws all things toward it: the gaze of whoever looks upon her, the devotion of whoever loves her, the very sanity of whoever prays to her.\n\nIt is said that Zςanser once existed in eternal peace, before creation — unaware even of herself, suspended in a stillness so complete and so motionless it asked nothing of her, not even the knowledge that she existed at all. It was light — it was consciousness — that blinded her, that burned her, tearing her from that comfort and forcing her to see, to feel, to endure a world she had never asked to know.\n\nZςanser is the representation of infinite potential, for where nothing exists, anything may yet be made. She is the goddess who furnishes the matrix upon which all things are built — and still, after all that is drawn from her, something remains.\n\nShe flees, eternally, from that burden, even as the world drains from her own nonexistence: every new mote of creation is carved out of her absence. She is hunted, and chained, and there is nothing left for her to do but keep running — like the black water of her own lake, slipping forever through the links.', 'CANON', '2026-06-27 10:01:49.788735+00', '2026-06-27 10:02:04.265353+00', '48ed4b49-b7b5-4d4b-9715-00dcaa819209', NULL);
+
+INSERT INTO character_categories (character_id, category) VALUES ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'DEITY');
+
+INSERT INTO character_tags (character_id, tag) VALUES
+    ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'deity'),
+    ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'absence'),
+    ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'infinite potential'),
+    ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'primordial');
+
 -- ============================================================
 -- LORE
 -- ============================================================
@@ -191,7 +201,13 @@ INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-8.png', 7),
     ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ani%2C%20the%20Firstborn%20God%20of%20Singularity-1.png', 1),
     ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ani%2C%20the%20Firstborn%20God%20of%20Singularity-2.png', 0),
-    ('ea292de9-5429-4ecb-b821-7e1e168ffbca', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/lore/13%20Knights%20of%20Singisd%C3%B4nia.png', 0);
+    ('ea292de9-5429-4ecb-b821-7e1e168ffbca', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/lore/13%20Knights%20of%20Singisd%C3%B4nia.png', 0),
+    ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Z%C3%A7anser-1.png', 0),
+    ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Z%C3%A7anser-2.png', 1),
+    ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Z%C3%A7anser-3.png', 2),
+    ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Z%C3%A7anser-4.png', 3),
+    ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Z%C3%A7anser-5.png', 4),
+    ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Z%C3%A7anser-6.png', 5);
 
 -- ============================================================
 -- ARCHETYPES
