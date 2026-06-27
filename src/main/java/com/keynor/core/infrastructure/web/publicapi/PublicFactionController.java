@@ -35,13 +35,11 @@ public class PublicFactionController {
     @GetMapping
     public ResponseEntity<PagedResponse<FactionResponse>> findAll(
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) List<String> tags,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         EntityFilter filter = new EntityFilter(
                 List.of(EntityStatus.CANON),
-                categories != null ? categories : List.of(),
-                tags != null ? tags : List.of());
+                categories != null ? categories : List.of());
         var result = findAllFactionsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 faction -> FactionResponse.from(faction, findLinkedEntitiesUseCase.findLinks(EntityType.FACTION, faction.getId()))));

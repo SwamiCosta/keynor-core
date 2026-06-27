@@ -53,7 +53,6 @@ public class LoreService implements
                 command.name(),
                 command.summary(),
                 command.body(),
-                command.tags(),
                 command.images(),
                 command.categories(),
                 initialStatus,
@@ -70,7 +69,7 @@ public class LoreService implements
         Lore lore = loreRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Lore", id));
         validateTimeline(command.timeline());
-        lore.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
+        lore.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
         Lore saved = loreRepository.save(lore);
         entityLinkRepository.replaceLinks(EntityType.LORE, saved.getId(), command.links() != null ? command.links() : List.of());
         return saved;

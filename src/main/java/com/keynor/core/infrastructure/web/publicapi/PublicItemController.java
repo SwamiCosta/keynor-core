@@ -35,13 +35,11 @@ public class PublicItemController {
     @GetMapping
     public ResponseEntity<PagedResponse<ItemResponse>> findAll(
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) List<String> tags,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         EntityFilter filter = new EntityFilter(
                 List.of(EntityStatus.CANON),
-                categories != null ? categories : List.of(),
-                tags != null ? tags : List.of());
+                categories != null ? categories : List.of());
         var result = findAllItemsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 item -> ItemResponse.from(item, findLinkedEntitiesUseCase.findLinks(EntityType.ITEM, item.getId()))));

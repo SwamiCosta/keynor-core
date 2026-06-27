@@ -52,7 +52,6 @@ public class CharacterService implements
                 command.name(),
                 command.summary(),
                 command.body(),
-                command.tags(),
                 command.images(),
                 command.categories(),
                 EntityStatus.DRAFT,
@@ -69,7 +68,7 @@ public class CharacterService implements
         Character character = characterRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Character", id));
         validateTimeline(command.timeline());
-        character.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
+        character.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
         Character saved = characterRepository.save(character);
         entityLinkRepository.replaceLinks(EntityType.CHARACTER, saved.getId(), command.links() != null ? command.links() : List.of());
         return saved;

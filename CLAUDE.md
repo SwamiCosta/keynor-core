@@ -132,7 +132,6 @@ Endpoints under `/api/public/v1/` require no authentication and are consumed by 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `categories` | `List<String>` | — | Filter by one or more category values |
-| `tags` | `List<String>` | — | Filter by one or more tags |
 | `page` | `int` | `0` | Zero-based page number |
 | `size` | `int` | `20` | Page size |
 
@@ -324,4 +323,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-06-26*
+*Last updated: 2026-06-27*

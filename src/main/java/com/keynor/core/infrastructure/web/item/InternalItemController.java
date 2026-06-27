@@ -55,12 +55,11 @@ public class InternalItemController {
     public ResponseEntity<PagedResponse<ItemResponse>> findAll(
             @RequestParam(required = false) List<String> statuses,
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) List<String> tags,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList() : List.of();
-        EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of(), tags != null ? tags : List.of());
+        EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of());
         var result = findAllItemsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 item -> ItemResponse.from(item, findLinkedEntitiesUseCase.findLinks(EntityType.ITEM, item.getId()))));
@@ -81,7 +80,6 @@ public class InternalItemController {
         List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new CreateItemUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 categories, timeline, links);
         var created = createItemUseCase.create(command);
@@ -97,7 +95,6 @@ public class InternalItemController {
         List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new UpdateItemUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 categories, timeline, links);
         var updated = updateItemUseCase.update(id, command);

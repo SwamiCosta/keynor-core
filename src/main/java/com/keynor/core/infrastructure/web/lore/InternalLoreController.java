@@ -55,12 +55,11 @@ public class InternalLoreController {
     public ResponseEntity<PagedResponse<LoreResponse>> findAll(
             @RequestParam(required = false) List<String> statuses,
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) List<String> tags,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList() : List.of();
-        EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of(), tags != null ? tags : List.of());
+        EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of());
         var result = findAllLoreUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 lore -> LoreResponse.from(lore, findLinkedEntitiesUseCase.findLinks(EntityType.LORE, lore.getId()))));
@@ -82,7 +81,6 @@ public class InternalLoreController {
         List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new CreateLoreUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 categories, timeline, initialStatus, links);
         var created = createLoreUseCase.create(command);
@@ -119,7 +117,6 @@ public class InternalLoreController {
         List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new UpdateLoreUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 categories, timeline, links);
         var updated = updateLoreUseCase.update(id, command);

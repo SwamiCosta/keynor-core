@@ -32,7 +32,6 @@ public class PlaceMapper {
                 entity.getName(),
                 entity.getSummary(),
                 entity.getBody(),
-                entity.getTags() != null ? new ArrayList<>(entity.getTags()) : new ArrayList<>(),
                 entity.getImages() != null ? new ArrayList<>(entity.getImages()) : new ArrayList<>(),
                 entity.getCategories() != null ? new ArrayList<>(entity.getCategories()) : new ArrayList<>(),
                 entity.getMapType(),
@@ -48,7 +47,6 @@ public class PlaceMapper {
         entity.setName(place.getName());
         entity.setSummary(place.getSummary());
         entity.setBody(place.getBody());
-        entity.setTags(new ArrayList<>(place.getTags()));
         entity.setImages(new ArrayList<>(place.getImages()));
         entity.setCategories(new ArrayList<>(place.getCategories()));
         entity.setMapType(place.getMapType());

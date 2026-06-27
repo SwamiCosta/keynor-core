@@ -55,12 +55,11 @@ public class InternalFactionController {
     public ResponseEntity<PagedResponse<FactionResponse>> findAll(
             @RequestParam(required = false) List<String> statuses,
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) List<String> tags,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList() : List.of();
-        EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of(), tags != null ? tags : List.of());
+        EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of());
         var result = findAllFactionsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 faction -> FactionResponse.from(faction, findLinkedEntitiesUseCase.findLinks(EntityType.FACTION, faction.getId()))));
@@ -81,7 +80,6 @@ public class InternalFactionController {
         List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new CreateFactionUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 categories, timeline, links);
         var created = createFactionUseCase.create(command);
@@ -97,7 +95,6 @@ public class InternalFactionController {
         List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new UpdateFactionUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 categories, timeline, links);
         var updated = updateFactionUseCase.update(id, command);

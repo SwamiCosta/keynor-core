@@ -4,12 +4,11 @@ import java.util.List;
 
 public record EntityFilter(
         List<EntityStatus> statuses,
-        List<String> categories,
-        List<String> tags
+        List<String> categories
 ) {
 
     public static EntityFilter empty() {
-        return new EntityFilter(List.of(), List.of(), List.of());
+        return new EntityFilter(List.of(), List.of());
     }
 
     public boolean hasStatusFilter() {
@@ -18,9 +17,5 @@ public record EntityFilter(
 
     public boolean hasCategoryFilter() {
         return categories != null && !categories.isEmpty();
-    }
-
-    public boolean hasTagFilter() {
-        return tags != null && !tags.isEmpty();
     }
 }

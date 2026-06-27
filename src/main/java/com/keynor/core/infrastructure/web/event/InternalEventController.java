@@ -55,12 +55,11 @@ public class InternalEventController {
     public ResponseEntity<PagedResponse<EventResponse>> findAll(
             @RequestParam(required = false) List<String> statuses,
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) List<String> tags,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList() : List.of();
-        EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of(), tags != null ? tags : List.of());
+        EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of());
         var result = findAllEventsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 event -> EventResponse.from(event, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, event.getId()))));
@@ -81,7 +80,6 @@ public class InternalEventController {
         List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new CreateEventUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 categories, timeline, links);
         var created = createEventUseCase.create(command);
@@ -97,7 +95,6 @@ public class InternalEventController {
         List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new UpdateEventUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 categories, timeline, links);
         var updated = updateEventUseCase.update(id, command);

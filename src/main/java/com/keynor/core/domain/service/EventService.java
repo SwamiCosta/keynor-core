@@ -52,7 +52,6 @@ public class EventService implements
                 command.name(),
                 command.summary(),
                 command.body(),
-                command.tags(),
                 command.images(),
                 command.categories(),
                 EntityStatus.DRAFT,
@@ -69,7 +68,7 @@ public class EventService implements
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Event", id));
         validateTimeline(command.timeline());
-        event.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
+        event.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
         Event saved = eventRepository.save(event);
         entityLinkRepository.replaceLinks(EntityType.EVENT, saved.getId(), command.links() != null ? command.links() : List.of());
         return saved;

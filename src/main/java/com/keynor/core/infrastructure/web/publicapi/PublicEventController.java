@@ -35,13 +35,11 @@ public class PublicEventController {
     @GetMapping
     public ResponseEntity<PagedResponse<EventResponse>> findAll(
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) List<String> tags,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         EntityFilter filter = new EntityFilter(
                 List.of(EntityStatus.CANON),
-                categories != null ? categories : List.of(),
-                tags != null ? tags : List.of());
+                categories != null ? categories : List.of());
         var result = findAllEventsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 event -> EventResponse.from(event, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, event.getId()))));

@@ -13,7 +13,6 @@ All universe entities extend `UniverseEntity` (abstract base class):
 | `id` | UUID | Primary key, set at construction, immutable |
 | `name` | String | Display name |
 | `categories` | List\<CategoryEnum\> | One or more categories — an entity can have multiple (e.g. DEITY + HERO) |
-| `tags` | List\<String\> | Searchable free-form tags |
 | `summary` | String | Short description |
 | `body` | String | Full content in Markdown |
 | `status` | EntityStatus | `CANON`, `DRAFT`, or `DEPRECATED` |
@@ -66,7 +65,7 @@ Universe entities (lore/story data) support **hard delete**. User data (`users` 
 
 ## Era entity
 
-`Era` is **not** a `UniverseEntity` subclass — it does not have `status`, `timeline`, `tags`, `images`, `categories`, or `body`. It is a standalone domain class that models both era intervals and single-moment temporal points on the same timeline.
+`Era` is **not** a `UniverseEntity` subclass — it does not have `status`, `timeline`, `images`, `categories`, or `body`. It is a standalone domain class that models both era intervals and single-moment temporal points on the same timeline.
 
 ### Fields
 
@@ -104,7 +103,7 @@ The `Era` constructor enforces: `importance` is required when `type = POINT`; mu
 
 ## Archetype and Sign entities
 
-Like `Era`, `Archetype` and `Sign` are **not** `UniverseEntity` subclasses — no `status`, `timeline`, `tags`, `images`, or `categories`. Both are closed reference/lookup sets (5 archetypes, 13 signs) modeling the Aelimic cosmology and are read-only at the API level — no create/update/delete use cases or internal controller exist for either.
+Like `Era`, `Archetype` and `Sign` are **not** `UniverseEntity` subclasses — no `status`, `timeline`, `images`, or `categories`. Both are closed reference/lookup sets (5 archetypes, 13 signs) modeling the Aelimic cosmology and are read-only at the API level — no create/update/delete use cases or internal controller exist for either.
 
 ### Archetype fields
 

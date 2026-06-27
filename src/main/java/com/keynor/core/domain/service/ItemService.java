@@ -52,7 +52,6 @@ public class ItemService implements
                 command.name(),
                 command.summary(),
                 command.body(),
-                command.tags(),
                 command.images(),
                 command.categories(),
                 EntityStatus.DRAFT,
@@ -69,7 +68,7 @@ public class ItemService implements
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Item", id));
         validateTimeline(command.timeline());
-        item.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
+        item.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
         Item saved = itemRepository.save(item);
         entityLinkRepository.replaceLinks(EntityType.ITEM, saved.getId(), command.links() != null ? command.links() : List.of());
         return saved;

@@ -23,9 +23,6 @@ public class CharacterSpecifications {
                     .toList();
             spec = spec.and(hasAnyCategory(categories));
         }
-        if (filter.hasTagFilter()) {
-            spec = spec.and(hasAnyTag(filter.tags()));
-        }
 
         return spec;
     }
@@ -38,13 +35,6 @@ public class CharacterSpecifications {
         return (root, query, cb) -> {
             var categoriesJoin = root.join("categories");
             return categoriesJoin.in(categories);
-        };
-    }
-
-    private static Specification<CharacterEntity> hasAnyTag(List<String> tags) {
-        return (root, query, cb) -> {
-            var tagsJoin = root.join("tags");
-            return tagsJoin.in(tags);
         };
     }
 }
