@@ -189,7 +189,8 @@ INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-6.png', 5),
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-7.png', 6),
     ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-8.png', 7),
-    ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ani%2C%20the%20Firstborn%20God%20of%20Singularity.png', 0),
+    ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ani%2C%20the%20Firstborn%20God%20of%20Singularity-1.png', 1),
+    ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ani%2C%20the%20Firstborn%20God%20of%20Singularity-2.png', 0),
     ('ea292de9-5429-4ecb-b821-7e1e168ffbca', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/lore/13%20Knights%20of%20Singisd%C3%B4nia.png', 0);
 
 -- ============================================================
