@@ -52,7 +52,6 @@ public class PlaceService implements
                 command.name(),
                 command.summary(),
                 command.body(),
-                command.tags(),
                 command.images(),
                 command.categories(),
                 command.mapType(),
@@ -70,7 +69,7 @@ public class PlaceService implements
         Place place = placeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Place", id));
         validateTimeline(command.timeline());
-        place.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.mapType(), command.timeline());
+        place.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.mapType(), command.timeline());
         Place saved = placeRepository.save(place);
         entityLinkRepository.replaceLinks(EntityType.PLACE, saved.getId(), command.links() != null ? command.links() : List.of());
         return saved;

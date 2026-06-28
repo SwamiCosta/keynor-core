@@ -35,13 +35,11 @@ public class PublicCharacterController {
     @GetMapping
     public ResponseEntity<PagedResponse<CharacterResponse>> findAll(
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) List<String> tags,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         EntityFilter filter = new EntityFilter(
                 List.of(EntityStatus.CANON),
-                categories != null ? categories : List.of(),
-                tags != null ? tags : List.of());
+                categories != null ? categories : List.of());
         var result = findAllCharactersUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 character -> CharacterResponse.from(character, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, character.getId()))));

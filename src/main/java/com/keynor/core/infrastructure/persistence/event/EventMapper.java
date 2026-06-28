@@ -32,7 +32,6 @@ public class EventMapper {
                 entity.getName(),
                 entity.getSummary(),
                 entity.getBody(),
-                entity.getTags() != null ? new ArrayList<>(entity.getTags()) : new ArrayList<>(),
                 entity.getImages() != null ? new ArrayList<>(entity.getImages()) : new ArrayList<>(),
                 entity.getCategories() != null ? new ArrayList<>(entity.getCategories()) : new ArrayList<>(),
                 entity.getStatus(),
@@ -47,7 +46,6 @@ public class EventMapper {
         entity.setName(event.getName());
         entity.setSummary(event.getSummary());
         entity.setBody(event.getBody());
-        entity.setTags(new ArrayList<>(event.getTags()));
         entity.setImages(new ArrayList<>(event.getImages()));
         entity.setCategories(new ArrayList<>(event.getCategories()));
         entity.setStatus(event.getStatus());

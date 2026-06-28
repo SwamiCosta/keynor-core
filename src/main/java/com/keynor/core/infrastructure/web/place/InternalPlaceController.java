@@ -56,13 +56,12 @@ public class InternalPlaceController {
     public ResponseEntity<PagedResponse<PlaceResponse>> findAll(
             @RequestParam(required = false) List<String> statuses,
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) List<String> tags,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList()
                 : List.of();
-        EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of(), tags != null ? tags : List.of());
+        EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of());
         var result = findAllPlacesUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 place -> PlaceResponse.from(place, findLinkedEntitiesUseCase.findLinks(EntityType.PLACE, place.getId()))));
@@ -84,7 +83,6 @@ public class InternalPlaceController {
         List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new CreatePlaceUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 categories, mapType, timeline, links);
         var created = createPlaceUseCase.create(command);
@@ -101,7 +99,6 @@ public class InternalPlaceController {
         List<EntityLinkRef> links = toLinkRefs(request.links());
         var command = new UpdatePlaceUseCase.Command(
                 request.name(), request.summary(), request.body(),
-                request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 categories, mapType, timeline, links);
         var updated = updatePlaceUseCase.update(id, command);

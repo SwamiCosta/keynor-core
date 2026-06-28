@@ -16,12 +16,12 @@ The dump covers all universe content tables — entities and their join tables:
 
 ```
 maps, map_eras, eras,
-characters, character_categories, character_tags,
-places, place_categories, place_tags,
-factions, faction_categories, faction_tags,
-items, item_categories, item_tags,
-events, event_categories, event_tags,
-lore, lore_categories, lore_tags,
+characters, character_categories,
+places, place_categories,
+factions, faction_categories,
+items, item_categories,
+events, event_categories,
+lore, lore_categories,
 universe_entity_images,
 archetypes, signs
 ```
@@ -65,8 +65,8 @@ The file opens with a `TRUNCATE ... CASCADE` block, followed by `INSERT` stateme
 
 TRUNCATE
     universe_entity_images,
-    character_tags, character_categories,
-    lore_tags, lore_categories,
+    character_categories,
+    lore_categories,
     -- ... all join tables first ...
     characters, lore, places, factions, items, events,
     map_eras, eras, maps
@@ -83,7 +83,7 @@ INSERT INTO eras ...
 
 Triggered when: the user asks Siegmund to update the dump after a data change in the local DB.
 
-1. Siegmund runs `pg_dump --data-only --column-inserts -t maps -t eras -t map_eras -t characters -t character_categories -t character_tags -t places -t place_categories -t place_tags -t factions -t faction_categories -t faction_tags -t items -t item_categories -t item_tags -t events -t event_categories -t event_tags -t lore -t lore_categories -t lore_tags -t universe_entity_images -t archetypes -t signs keynor_core` directly against the already-running local database. If the database is not reachable, Siegmund stops and reports — never starts one to proceed
+1. Siegmund runs `pg_dump --data-only --column-inserts -t maps -t eras -t map_eras -t characters -t character_categories -t places -t place_categories -t factions -t faction_categories -t items -t item_categories -t events -t event_categories -t lore -t lore_categories -t universe_entity_images -t archetypes -t signs keynor_core` directly against the already-running local database. If the database is not reachable, Siegmund stops and reports — never starts one to proceed
 2. Siegmund reformats the output into the canonical file format (TRUNCATE block + ordered INSERTs)
 3. Siegmund replaces `db/seed/universe-content.sql` with the new content
 4. Siegmund commits to a `task/*` branch and opens a PR

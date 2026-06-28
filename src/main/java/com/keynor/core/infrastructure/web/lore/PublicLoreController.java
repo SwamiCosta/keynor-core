@@ -35,13 +35,11 @@ public class PublicLoreController {
     @GetMapping
     public ResponseEntity<PagedResponse<LoreResponse>> findAll(
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) List<String> tags,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         EntityFilter filter = new EntityFilter(
                 List.of(EntityStatus.CANON),
-                categories != null ? categories : List.of(),
-                tags != null ? tags : List.of());
+                categories != null ? categories : List.of());
         var result = findAllLoreUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 lore -> LoreResponse.from(lore, findLinkedEntitiesUseCase.findLinks(EntityType.LORE, lore.getId()))));

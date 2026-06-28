@@ -10,7 +10,6 @@ public record UpdateEventRequest(
         @NotBlank String name,
         String summary,
         String body,
-        List<String> tags,
         List<String> images,
         @NotNull List<String> categories,
         @NotBlank String timelineFoundedEra,

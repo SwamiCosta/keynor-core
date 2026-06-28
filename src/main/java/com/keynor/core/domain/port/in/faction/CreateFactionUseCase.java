@@ -13,7 +13,6 @@ public interface CreateFactionUseCase {
             String name,
             String summary,
             String body,
-            List<String> tags,
             List<String> images,
             List<FactionCategory> categories,
             Timeline timeline,

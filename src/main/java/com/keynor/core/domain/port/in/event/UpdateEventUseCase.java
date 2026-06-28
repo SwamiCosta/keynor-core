@@ -14,7 +14,6 @@ public interface UpdateEventUseCase {
             String name,
             String summary,
             String body,
-            List<String> tags,
             List<String> images,
             List<EventCategory> categories,
             Timeline timeline,

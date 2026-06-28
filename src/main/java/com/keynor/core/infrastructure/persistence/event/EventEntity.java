@@ -27,11 +27,6 @@ public class EventEntity {
     private String body;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "event_tags", joinColumns = @JoinColumn(name = "event_id"))
-    @Column(name = "tag")
-    private List<String> tags = new ArrayList<>();
-
-    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "universe_entity_images", joinColumns = @JoinColumn(name = "entity_id"))
     @Column(name = "image_url")
     @OrderColumn(name = "display_order")
@@ -64,8 +59,6 @@ public class EventEntity {
     public void setSummary(String summary) { this.summary = summary; }
     public String getBody() { return body; }
     public void setBody(String body) { this.body = body; }
-    public List<String> getTags() { return tags; }
-    public void setTags(List<String> tags) { this.tags = tags; }
     public List<String> getImages() { return images; }
     public void setImages(List<String> images) { this.images = images; }
     public List<EventCategory> getCategories() { return categories; }

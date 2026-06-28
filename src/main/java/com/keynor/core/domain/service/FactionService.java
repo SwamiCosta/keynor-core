@@ -52,7 +52,6 @@ public class FactionService implements
                 command.name(),
                 command.summary(),
                 command.body(),
-                command.tags(),
                 command.images(),
                 command.categories(),
                 EntityStatus.DRAFT,
@@ -69,7 +68,7 @@ public class FactionService implements
         Faction faction = factionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Faction", id));
         validateTimeline(command.timeline());
-        faction.update(command.name(), command.summary(), command.body(), command.tags(), command.images(), command.categories(), command.timeline());
+        faction.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
         Faction saved = factionRepository.save(faction);
         entityLinkRepository.replaceLinks(EntityType.FACTION, saved.getId(), command.links() != null ? command.links() : List.of());
         return saved;

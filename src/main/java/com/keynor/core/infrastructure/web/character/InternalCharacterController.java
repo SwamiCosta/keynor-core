@@ -55,10 +55,9 @@ public class InternalCharacterController {
     public ResponseEntity<PagedResponse<CharacterResponse>> findAll(
             @RequestParam(required = false) List<String> statuses,
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) List<String> tags,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        EntityFilter filter = buildFilter(statuses, categories, tags);
+        EntityFilter filter = buildFilter(statuses, categories);
         var result = findAllCharactersUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 character -> CharacterResponse.from(character, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, character.getId()))));
@@ -77,7 +76,6 @@ public class InternalCharacterController {
                 request.name(),
                 request.summary(),
                 request.body(),
-                request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 parseCategories(request.categories()),
                 buildTimeline(request.timelineFoundedEra(), request.timelineDestroyedEra()),
@@ -94,7 +92,6 @@ public class InternalCharacterController {
                 request.name(),
                 request.summary(),
                 request.body(),
-                request.tags() != null ? request.tags() : List.of(),
                 request.images() != null ? request.images() : List.of(),
                 parseCategories(request.categories()),
                 buildTimeline(request.timelineFoundedEra(), request.timelineDestroyedEra()),
@@ -125,11 +122,11 @@ public class InternalCharacterController {
                 .toList();
     }
 
-    private EntityFilter buildFilter(List<String> statuses, List<String> categories, List<String> tags) {
+    private EntityFilter buildFilter(List<String> statuses, List<String> categories) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList()
                 : List.of();
-        return new EntityFilter(parsedStatuses, categories != null ? categories : List.of(), tags != null ? tags : List.of());
+        return new EntityFilter(parsedStatuses, categories != null ? categories : List.of());
     }
 
     private List<CharacterCategory> parseCategories(List<String> categories) {

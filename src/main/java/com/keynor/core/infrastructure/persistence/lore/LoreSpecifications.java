@@ -22,9 +22,6 @@ public class LoreSpecifications {
                     .toList();
             spec = spec.and((root, query, cb) -> root.join("categories").in(categories));
         }
-        if (filter.hasTagFilter()) {
-            spec = spec.and((root, query, cb) -> root.join("tags").in(filter.tags()));
-        }
 
         return spec;
     }

@@ -32,7 +32,6 @@ public class ItemMapper {
                 entity.getName(),
                 entity.getSummary(),
                 entity.getBody(),
-                entity.getTags() != null ? new ArrayList<>(entity.getTags()) : new ArrayList<>(),
                 entity.getImages() != null ? new ArrayList<>(entity.getImages()) : new ArrayList<>(),
                 entity.getCategories() != null ? new ArrayList<>(entity.getCategories()) : new ArrayList<>(),
                 entity.getStatus(),
@@ -47,7 +46,6 @@ public class ItemMapper {
         entity.setName(item.getName());
         entity.setSummary(item.getSummary());
         entity.setBody(item.getBody());
-        entity.setTags(new ArrayList<>(item.getTags()));
         entity.setImages(new ArrayList<>(item.getImages()));
         entity.setCategories(new ArrayList<>(item.getCategories()));
         entity.setStatus(item.getStatus());

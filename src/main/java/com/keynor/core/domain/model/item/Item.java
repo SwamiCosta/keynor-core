@@ -18,19 +18,18 @@ public class Item extends UniverseEntity {
             String name,
             String summary,
             String body,
-            List<String> tags,
             List<String> images,
             List<ItemCategory> categories,
             EntityStatus status,
             Timeline timeline,
             Instant createdAt,
             Instant updatedAt) {
-        super(id, name, summary, body, tags, images, status, timeline, createdAt, updatedAt);
+        super(id, name, summary, body, images, status, timeline, createdAt, updatedAt);
         this.categories = new ArrayList<>(categories);
     }
 
-    public void update(String name, String summary, String body, List<String> tags, List<String> images, List<ItemCategory> categories, Timeline timeline) {
-        updateBaseFields(name, summary, body, tags, images, timeline);
+    public void update(String name, String summary, String body, List<String> images, List<ItemCategory> categories, Timeline timeline) {
+        updateBaseFields(name, summary, body, images, timeline);
         this.categories = new ArrayList<>(categories);
     }
 
