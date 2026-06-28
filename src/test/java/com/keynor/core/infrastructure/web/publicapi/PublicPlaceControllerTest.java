@@ -53,7 +53,7 @@ class PublicPlaceControllerTest {
         when(findAllPlacesUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, null, 0, 20);
+        controller.findAll(null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllPlacesUseCase).findAll(filterCaptor.capture(), any());
@@ -65,7 +65,7 @@ class PublicPlaceControllerTest {
         when(findAllPlacesUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 2, 50, 0));
 
-        controller.findAll(null, null, 2, 50);
+        controller.findAll(null, 2, 50);
 
         ArgumentCaptor<PageRequest> pageCaptor = ArgumentCaptor.forClass(PageRequest.class);
         verify(findAllPlacesUseCase).findAll(any(), pageCaptor.capture());
@@ -77,13 +77,13 @@ class PublicPlaceControllerTest {
     void findAll_shouldReturnMappedPagedResponse() {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
-        Place place = new Place(id, "Erevan", "A city", "Body", List.of("city"),
+        Place place = new Place(id, "Erevan", "A city", "Body",
                 List.of(), List.of(PlaceCategory.CITY), null, EntityStatus.CANON, null, now, now);
         when(findAllPlacesUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(place), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, null, 0, 20);
+        var response = controller.findAll(null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<PlaceResponse> body = response.getBody();
@@ -98,7 +98,7 @@ class PublicPlaceControllerTest {
     void findById_shouldDelegateToUseCaseAndMapResult() {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
-        Place place = new Place(id, "Erevan", "A city", "Body", List.of(),
+        Place place = new Place(id, "Erevan", "A city", "Body",
                 List.of(), List.of(PlaceCategory.REGION), null, EntityStatus.CANON, null, now, now);
         when(findPlaceByIdUseCase.findById(id)).thenReturn(place);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());

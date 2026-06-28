@@ -14,5 +14,6 @@ public record CreateFactionRequest(
         @NotNull List<String> categories,
         @NotBlank String timelineFoundedEra,
         String timelineDestroyedEra,
+        String status,
         List<EntityLinkRequest> links) {
 }

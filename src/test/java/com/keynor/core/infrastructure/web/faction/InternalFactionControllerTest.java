@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -46,7 +47,7 @@ class InternalFactionControllerTest {
 
     private Faction buildFaction(UUID id) {
         Instant now = Instant.now();
-        return new Faction(id, "The Silver Order", "A guild", "Body", List.of("mages"),
+        return new Faction(id, "The Silver Order", "A guild", "Body",
                 List.of(), List.of(FactionCategory.ORDER), EntityStatus.DRAFT, null, now, now);
     }
 
@@ -65,7 +66,7 @@ class InternalFactionControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateFactionRequest("The Silver Order", "A guild", "Body",
-                List.of("mages"), List.of(), List.of("ORDER"), "era-1", null, null);
+                List.of(), List.of("ORDER"), "era-1", null, null, null);
 
         var response = controller.create(request);
 
@@ -82,7 +83,7 @@ class InternalFactionControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateFactionRequest("The Silver Order", null, null,
-                List.of(), List.of(), List.of("ORDER"), "era-1", null, null);
+                List.of(), List.of("ORDER"), "era-1", null, null, null);
 
         controller.create(request);
 
@@ -94,13 +95,60 @@ class InternalFactionControllerTest {
     }
 
     @Test
+    void create_shouldDefaultToDraftStatus_whenStatusIsNull() {
+        UUID id = UUID.randomUUID();
+        when(createFactionUseCase.create(any())).thenReturn(buildFaction(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
+
+        var request = new CreateFactionRequest("The Silver Order", null, null,
+                List.of(), List.of("ORDER"), "era-1", null, null, null);
+
+        controller.create(request);
+
+        ArgumentCaptor<CreateFactionUseCase.Command> captor =
+                ArgumentCaptor.forClass(CreateFactionUseCase.Command.class);
+        verify(createFactionUseCase).create(captor.capture());
+        assertThat(captor.getValue().status()).isEqualTo(EntityStatus.DRAFT);
+    }
+
+    @Test
+    void create_shouldPassCanonStatus_whenStatusIsCanon() {
+        UUID id = UUID.randomUUID();
+        Instant now = Instant.now();
+        Faction canonFaction = new Faction(id, "The Silver Order", null, null, List.of(),
+                List.of(FactionCategory.ORDER), EntityStatus.CANON, null, now, now);
+        when(createFactionUseCase.create(any())).thenReturn(canonFaction);
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
+
+        var request = new CreateFactionRequest("The Silver Order", null, null,
+                List.of(), List.of("ORDER"), "era-1", null, "CANON", null);
+
+        controller.create(request);
+
+        ArgumentCaptor<CreateFactionUseCase.Command> captor =
+                ArgumentCaptor.forClass(CreateFactionUseCase.Command.class);
+        verify(createFactionUseCase).create(captor.capture());
+        assertThat(captor.getValue().status()).isEqualTo(EntityStatus.CANON);
+    }
+
+    @Test
+    void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
+        var request = new CreateFactionRequest("The Silver Order", null, null,
+                List.of(), List.of("ORDER"), "era-1", null, "DEPRECATED", null);
+
+        assertThatThrownBy(() -> controller.create(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("DEPRECATED");
+    }
+
+    @Test
     void update_shouldReturn200AndResponseBody_whenCommandIsValid() {
         UUID id = UUID.randomUUID();
         when(updateFactionUseCase.update(eq(id), any())).thenReturn(buildFaction(id));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdateFactionRequest("Updated Name", null, null,
-                List.of(), List.of(), List.of("ORDER"), "era-1", null, null);
+                List.of(), List.of("ORDER"), "era-1", null, null);
 
         var response = controller.update(id, request);
 
@@ -138,7 +186,7 @@ class InternalFactionControllerTest {
                 .thenReturn(new PageResult<>(List.of(buildFaction(id)), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, null, null, 0, 20);
+        var response = controller.findAll(null, null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<FactionResponse> body = response.getBody();
@@ -155,7 +203,7 @@ class InternalFactionControllerTest {
         when(findAllFactionsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, null, null, 0, 20);
+        controller.findAll(null, null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllFactionsUseCase).findAll(filterCaptor.capture(), any());

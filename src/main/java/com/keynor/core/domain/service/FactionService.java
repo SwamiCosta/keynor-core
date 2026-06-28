@@ -47,6 +47,7 @@ public class FactionService implements
         }
         validateTimeline(command.timeline());
         Instant now = Instant.now();
+        EntityStatus initialStatus = command.status() != null ? command.status() : EntityStatus.DRAFT;
         Faction faction = new Faction(
                 UUID.randomUUID(),
                 command.name(),
@@ -54,7 +55,7 @@ public class FactionService implements
                 command.body(),
                 command.images(),
                 command.categories(),
-                EntityStatus.DRAFT,
+                initialStatus,
                 command.timeline(),
                 now,
                 now);

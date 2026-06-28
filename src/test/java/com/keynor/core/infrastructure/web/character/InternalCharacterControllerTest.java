@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -46,7 +47,7 @@ class InternalCharacterControllerTest {
 
     private Character buildCharacter(UUID id) {
         Instant now = Instant.now();
-        return new Character(id, "Araveth", "A hero", "Body", List.of("warrior"),
+        return new Character(id, "Araveth", "A hero", "Body",
                 List.of(), List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now);
     }
 
@@ -66,7 +67,7 @@ class InternalCharacterControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of("warrior"), List.of(), List.of("HERO"), "era-1", null, null);
+                List.of(), List.of("HERO"), "era-1", null, null, null);
 
         var response = controller.create(request);
 
@@ -83,7 +84,7 @@ class InternalCharacterControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of("warrior"), List.of("img.png"), List.of("HERO"), "era-1", null, null);
+                List.of("img.png"), List.of("HERO"), "era-1", null, null, null);
 
         controller.create(request);
 
@@ -95,6 +96,53 @@ class InternalCharacterControllerTest {
     }
 
     @Test
+    void create_shouldDefaultToDraftStatus_whenStatusIsNull() {
+        UUID id = UUID.randomUUID();
+        when(createCharacterUseCase.create(any())).thenReturn(buildCharacter(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
+
+        var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
+                List.of(), List.of("HERO"), "era-1", null, null, null);
+
+        controller.create(request);
+
+        ArgumentCaptor<CreateCharacterUseCase.Command> captor =
+                ArgumentCaptor.forClass(CreateCharacterUseCase.Command.class);
+        verify(createCharacterUseCase).create(captor.capture());
+        assertThat(captor.getValue().status()).isEqualTo(EntityStatus.DRAFT);
+    }
+
+    @Test
+    void create_shouldPassCanonStatus_whenStatusIsCanon() {
+        UUID id = UUID.randomUUID();
+        Instant now = Instant.now();
+        Character canonCharacter = new Character(id, "Araveth", null, null, List.of(),
+                List.of(CharacterCategory.HERO), EntityStatus.CANON, null, now, now);
+        when(createCharacterUseCase.create(any())).thenReturn(canonCharacter);
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
+
+        var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
+                List.of(), List.of("HERO"), "era-1", null, "CANON", null);
+
+        controller.create(request);
+
+        ArgumentCaptor<CreateCharacterUseCase.Command> captor =
+                ArgumentCaptor.forClass(CreateCharacterUseCase.Command.class);
+        verify(createCharacterUseCase).create(captor.capture());
+        assertThat(captor.getValue().status()).isEqualTo(EntityStatus.CANON);
+    }
+
+    @Test
+    void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
+        var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
+                List.of(), List.of("HERO"), "era-1", null, "DEPRECATED", null);
+
+        assertThatThrownBy(() -> controller.create(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("DEPRECATED");
+    }
+
+    @Test
     void update_shouldReturn200AndResponseBody_whenCommandIsValid() {
         UUID id = UUID.randomUUID();
         Character updated = buildCharacter(id);
@@ -102,7 +150,7 @@ class InternalCharacterControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdateCharacterRequest("Araveth Updated", "New summary", "New body",
-                List.of(), List.of(), List.of("HERO"), "era-1", null, null);
+                List.of(), List.of("HERO"), "era-1", null, null);
 
         var response = controller.update(id, request);
 
@@ -142,7 +190,7 @@ class InternalCharacterControllerTest {
                 .thenReturn(new PageResult<>(List.of(character), 1, 10, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, null, null, 1, 10);
+        var response = controller.findAll(null, null, 1, 10);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<CharacterResponse> body = response.getBody();
@@ -159,7 +207,7 @@ class InternalCharacterControllerTest {
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, null, null, 0, 20);
+        controller.findAll(null, null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllCharactersUseCase).findAll(filterCaptor.capture(), any());

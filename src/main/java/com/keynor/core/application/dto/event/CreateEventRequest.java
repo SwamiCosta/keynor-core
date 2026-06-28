@@ -14,5 +14,6 @@ public record CreateEventRequest(
         @NotNull List<String> categories,
         @NotBlank String timelineFoundedEra,
         String timelineDestroyedEra,
+        String status,
         List<EntityLinkRequest> links) {
 }

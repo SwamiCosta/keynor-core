@@ -14,5 +14,6 @@ public record CreateCharacterRequest(
         @NotNull List<String> categories,
         @NotBlank String timelineFoundedEra,
         String timelineDestroyedEra,
+        String status,
         List<EntityLinkRequest> links) {
 }

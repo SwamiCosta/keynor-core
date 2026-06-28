@@ -53,7 +53,7 @@ class PublicItemControllerTest {
         when(findAllItemsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, null, 0, 20);
+        controller.findAll(null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllItemsUseCase).findAll(filterCaptor.capture(), any());
@@ -65,7 +65,7 @@ class PublicItemControllerTest {
         when(findAllItemsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 3, 10, 0));
 
-        controller.findAll(null, null, 3, 10);
+        controller.findAll(null, 3, 10);
 
         ArgumentCaptor<PageRequest> pageCaptor = ArgumentCaptor.forClass(PageRequest.class);
         verify(findAllItemsUseCase).findAll(any(), pageCaptor.capture());
@@ -77,13 +77,13 @@ class PublicItemControllerTest {
     void findAll_shouldReturnMappedPagedResponse() {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
-        Item item = new Item(id, "Sword of Dawn", "A legendary blade", "Body", List.of("sword"),
+        Item item = new Item(id, "Sword of Dawn", "A legendary blade", "Body",
                 List.of(), List.of(ItemCategory.WEAPON), EntityStatus.CANON, null, now, now);
         when(findAllItemsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(item), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, null, 0, 20);
+        var response = controller.findAll(null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<ItemResponse> body = response.getBody();
@@ -98,7 +98,7 @@ class PublicItemControllerTest {
     void findById_shouldDelegateToUseCaseAndMapResult() {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
-        Item item = new Item(id, "Sword of Dawn", "A legendary blade", "Body", List.of(),
+        Item item = new Item(id, "Sword of Dawn", "A legendary blade", "Body",
                 List.of(), List.of(ItemCategory.ARTIFACT), EntityStatus.CANON, null, now, now);
         when(findItemByIdUseCase.findById(id)).thenReturn(item);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());

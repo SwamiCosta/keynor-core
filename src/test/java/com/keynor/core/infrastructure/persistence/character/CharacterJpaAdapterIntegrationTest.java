@@ -49,7 +49,7 @@ class CharacterJpaAdapterIntegrationTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         return new Character(id, name, "Summary of " + name, "Body text",
-                List.of("tag"), List.of(),
+                List.of(),
                 List.of(category), status, new Timeline(eraName, null), now, now);
     }
 
@@ -77,7 +77,7 @@ class CharacterJpaAdapterIntegrationTest {
     void findAll_shouldReturnOnlyMatchingStatus_whenStatusFilterApplied() {
         characterRepository.save(buildCharacter("Araveth", EntityStatus.DRAFT, CharacterCategory.HERO));
         characterRepository.save(buildCharacter("Morken", EntityStatus.CANON, CharacterCategory.VILLAIN));
-        EntityFilter canonFilter = new EntityFilter(List.of(EntityStatus.CANON), List.of(), List.of());
+        EntityFilter canonFilter = new EntityFilter(List.of(EntityStatus.CANON), List.of());
 
         PageResult<Character> result = characterRepository.findAll(canonFilter, new PageRequest(0, 10));
 

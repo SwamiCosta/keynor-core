@@ -54,7 +54,6 @@ class LoreServiceTest {
     void create_shouldReturnSavedLoreWithDraftStatus_whenStatusIsNull() {
         var command = new CreateLoreUseCase.Command(
                 "The Age of Silence", "A period of stillness", "Long description...",
-                List.of("history", "silence"),
                 List.of(),
                 List.of(LoreCategory.HISTORY),
                 null, null, List.of());
@@ -73,7 +72,6 @@ class LoreServiceTest {
     void create_shouldReturnSavedLoreWithCanonStatus_whenStatusIsCanon() {
         var command = new CreateLoreUseCase.Command(
                 "The Age of Silence", "A period of stillness", "Long description...",
-                List.of("history", "silence"),
                 List.of(),
                 List.of(LoreCategory.HISTORY),
                 null, EntityStatus.CANON, List.of());
@@ -89,7 +87,7 @@ class LoreServiceTest {
     @Test
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateLoreUseCase.Command(
-                "The Age of Silence", null, null, List.of(), List.of(),
+                "The Age of Silence", null, null, List.of(),
                 List.of(LoreCategory.MYTH), null, null, List.of());
         when(loreRepository.existsByName("The Age of Silence")).thenReturn(true);
 
@@ -102,7 +100,7 @@ class LoreServiceTest {
     @Test
     void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
         var command = new CreateLoreUseCase.Command(
-                "The Age of Silence", null, null, List.of(), List.of(), List.of(LoreCategory.HISTORY),
+                "The Age of Silence", null, null, List.of(), List.of(LoreCategory.HISTORY),
                 new Timeline("Nonexistent Era", null), null, List.of());
         when(loreRepository.existsByName("The Age of Silence")).thenReturn(false);
         when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
@@ -117,7 +115,7 @@ class LoreServiceTest {
     void findById_shouldReturnLore_whenLoreExists() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Lore lore = new Lore(id, "The Age of Silence", null, null, List.of(), List.of(),
+        Lore lore = new Lore(id, "The Age of Silence", null, null, List.of(),
                 List.of(LoreCategory.HISTORY), EntityStatus.DRAFT, null, now, now);
         when(loreRepository.findById(id)).thenReturn(Optional.of(lore));
 
@@ -152,7 +150,7 @@ class LoreServiceTest {
     void changeStatus_shouldTransitionFromDraftToCanon() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Lore lore = new Lore(id, "The Age of Silence", null, null, List.of(), List.of(),
+        Lore lore = new Lore(id, "The Age of Silence", null, null, List.of(),
                 List.of(LoreCategory.HISTORY), EntityStatus.DRAFT, null, now, now);
         when(loreRepository.findById(id)).thenReturn(Optional.of(lore));
         when(loreRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -166,7 +164,7 @@ class LoreServiceTest {
     void changeStatus_shouldThrowInvalidStatusTransitionException_whenDeprecatedToCanon() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Lore lore = new Lore(id, "The Age of Silence", null, null, List.of(), List.of(),
+        Lore lore = new Lore(id, "The Age of Silence", null, null, List.of(),
                 List.of(LoreCategory.HISTORY), EntityStatus.DEPRECATED, null, now, now);
         when(loreRepository.findById(id)).thenReturn(Optional.of(lore));
 
@@ -197,14 +195,14 @@ class LoreServiceTest {
     void update_shouldReplaceFields_whenLoreExists() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Lore lore = new Lore(id, "Old Name", null, null, List.of(), List.of(),
+        Lore lore = new Lore(id, "Old Name", null, null, List.of(),
                 List.of(LoreCategory.MYTH), EntityStatus.DRAFT, null, now, now);
         when(loreRepository.findById(id)).thenReturn(Optional.of(lore));
         when(loreRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         var command = new UpdateLoreUseCase.Command(
                 "New Name", "New summary", "New body",
-                List.of("tag1"), List.of(),
+                List.of(),
                 List.of(LoreCategory.HISTORY, LoreCategory.PROPHECY), null, List.of());
 
         Lore result = loreService.update(id, command);

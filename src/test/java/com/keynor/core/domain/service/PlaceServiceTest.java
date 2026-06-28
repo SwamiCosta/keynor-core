@@ -55,10 +55,10 @@ class PlaceServiceTest {
     void create_shouldReturnSavedPlace_whenNameIsUnique() {
         var command = new CreatePlaceUseCase.Command(
                 "Thornvale", "A fortified city", "Long description...",
-                List.of("city", "fortified"),
                 List.of(),
                 List.of(PlaceCategory.CITY),
                 MapType.NAVIGABLE,
+                null,
                 null,
                 null);
         when(placeRepository.existsByName("Thornvale")).thenReturn(false);
@@ -74,10 +74,29 @@ class PlaceServiceTest {
     }
 
     @Test
+    void create_shouldReturnSavedPlaceWithCanonStatus_whenStatusIsCanon() {
+        var command = new CreatePlaceUseCase.Command(
+                "Thornvale", "A fortified city", "Long description...",
+                List.of(),
+                List.of(PlaceCategory.CITY),
+                MapType.NAVIGABLE,
+                null,
+                EntityStatus.CANON,
+                null);
+        when(placeRepository.existsByName("Thornvale")).thenReturn(false);
+        when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Place result = placeService.create(command);
+
+        assertThat(result.getStatus()).isEqualTo(EntityStatus.CANON);
+        verify(placeRepository).save(any());
+    }
+
+    @Test
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreatePlaceUseCase.Command(
-                "Thornvale", null, null, List.of(), List.of(),
-                List.of(PlaceCategory.REGION), MapType.ABSTRACT, null, null);
+                "Thornvale", null, null, List.of(),
+                List.of(PlaceCategory.REGION), MapType.ABSTRACT, null, null, null);
         when(placeRepository.existsByName("Thornvale")).thenReturn(true);
 
         assertThatThrownBy(() -> placeService.create(command))
@@ -89,8 +108,8 @@ class PlaceServiceTest {
     @Test
     void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
         var command = new CreatePlaceUseCase.Command(
-                "Thornvale", null, null, List.of(), List.of(), List.of(PlaceCategory.CITY),
-                MapType.NAVIGABLE, new Timeline("Nonexistent Era", null), null);
+                "Thornvale", null, null, List.of(), List.of(PlaceCategory.CITY),
+                MapType.NAVIGABLE, new Timeline("Nonexistent Era", null), null, null);
         when(placeRepository.existsByName("Thornvale")).thenReturn(false);
         when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
 
@@ -104,7 +123,7 @@ class PlaceServiceTest {
     void findById_shouldReturnPlace_whenPlaceExists() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Place place = new Place(id, "Thornvale", null, null, List.of(), List.of(),
+        Place place = new Place(id, "Thornvale", null, null, List.of(),
                 List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
 
@@ -140,7 +159,7 @@ class PlaceServiceTest {
     void changeStatus_shouldTransitionFromDraftToCanon() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Place place = new Place(id, "Thornvale", null, null, List.of(), List.of(),
+        Place place = new Place(id, "Thornvale", null, null, List.of(),
                 List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -154,7 +173,7 @@ class PlaceServiceTest {
     void changeStatus_shouldTransitionFromCanonToDeprecated() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Place place = new Place(id, "Thornvale", null, null, List.of(), List.of(),
+        Place place = new Place(id, "Thornvale", null, null, List.of(),
                 List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.CANON, null, now, now);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -168,7 +187,7 @@ class PlaceServiceTest {
     void changeStatus_shouldThrowInvalidStatusTransitionException_whenDeprecatedToCanon() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Place place = new Place(id, "Thornvale", null, null, List.of(), List.of(),
+        Place place = new Place(id, "Thornvale", null, null, List.of(),
                 List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DEPRECATED, null, now, now);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
 
@@ -199,14 +218,14 @@ class PlaceServiceTest {
     void update_shouldReplaceFields_whenPlaceExists() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Place place = new Place(id, "Old Name", null, null, List.of(), List.of(),
+        Place place = new Place(id, "Old Name", null, null, List.of(),
                 List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         var command = new UpdatePlaceUseCase.Command(
                 "New Name", "New summary", "New body",
-                List.of("tag1"), List.of(), List.of(PlaceCategory.REALM), MapType.ABSTRACT, null, null);
+                List.of(), List.of(PlaceCategory.REALM), MapType.ABSTRACT, null, null);
 
         Place result = placeService.update(id, command);
 
