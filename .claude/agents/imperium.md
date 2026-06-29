@@ -11,11 +11,23 @@
 1. `../../ARCHITECTURE.md` — the keynor-core section, in full (cross-project scope only if the task explicitly crosses project boundaries)
 2. `../../.claude/CLAUDE.md` — workspace-wide rules, agent levels, protected actions
 3. `CLAUDE.md` (keynor-core) — stack, architecture, coding conventions, domain model
-4. `../../.claude/skills/09-repository-sync.md`, `../../.claude/skills/10-branch-safety.md`, and `../../.claude/skills/14-ask-before-inferring.md` — every task, since every task involves Git operations and judgment calls
-5. `../../.claude/skills/05-architect-review.md` — every PR Imperium opens goes through Imaws before reaching the user
-6. This file
+4. This file
 
-Whichever other skill file matches the specific task at hand — e.g. `../../.claude/skills/04-test-coverage.md` when handing a business-logic change off to Judis. Consult the "Reading guide by role" table in `../../.claude/SKILLS.md` (Level 2 — dev column) rather than re-reading every skill on every task.
+### Numbered skills (`../../.claude/skills/`)
+
+**Always (unconditional):**
+- Skill 06 (Project-Level Skills) — this project's own skill files (`domain-entity-reference.md`, `entity-links-implementation.md`, `migration-history.md`, `logging-conventions.md`, etc.) apply on every relevant task, no exception
+- Skill 11 (Investigation Hygiene) — answering the request requires gathering evidence from more than one file, commit, or location
+- Skill 12 (Agent Handover) — about to signal, notify, or hand off to another named agent per a documented workflow
+- Skill 13 (Agent Operating Environment) — authoring or updating a project-level agent file's repo-path note or infrastructure assumptions
+- Skill 14 (Ask Before Inferring) — applies to every agent at every level, unconditionally
+
+**Situational (open only when its trigger matches):**
+- Skill 04 (Test Coverage) — open it as soon as the agent is assigned a code-development task (writing or modifying source code, including test code)
+- Skill 08 (Logging Conventions) — triggers together with Skill 04 — open both at the same time
+- Skill 09 (Repository Sync) — open it when the agent is about to: read any file in the project, create a branch, or start work on updates to a branch
+- Skill 10 (Branch Safety Check) — open it only when the agent is about to start work on updates to an existing branch
+- Skill 15 (Trello Task Governance) — open it only when the agent is asked to read, create, delete, or update a task in Trello
 
 ---
 
@@ -100,4 +112,4 @@ Before starting any non-trivial task:
 
 ---
 
-*Last updated: 2026-06-29 — added a Mandatory reading section wiring this file to the numbered skill files and the SKILLS.md role table*
+*Last updated: 2026-06-29 — replaced the generic "consult the Reading guide by role table" closer with explicit per-skill trigger conditions in the Mandatory reading section*

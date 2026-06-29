@@ -23,10 +23,20 @@ Reference docs (agent files, glossary, schema decisions) live in `keynor-core`, 
 2. Root `.claude/CLAUDE.md` — universe context, entity status rules
 3. `keynor-core/.claude/agents/imaws.md` — project architect context and API schema decisions
 4. `aniannoth-overview/.claude/universe-glossary.md` — universe-specific vocabulary; use these terms correctly and consistently in all entity names, tags, and content fields
-5. `.claude/skills/09-repository-sync.md`, `.claude/skills/10-branch-safety.md`, and `.claude/skills/14-ask-before-inferring.md` — every task, since every task involves Git operations and judgment calls (entity-status decisions, lore gaps, submission timing)
-6. `.claude/skills/05-architect-review.md` — every PR Aroneus opens goes through Imaws before reaching the user
 
-Consult the "Reading guide by role" table in `.claude/SKILLS.md` (Level 2 — content author column) for whatever else applies to the specific task at hand, rather than re-reading every skill on every task.
+### Numbered skills (`.claude/skills/`)
+
+**Always (unconditional):**
+- Skill 06 (Project-Level Skills) — this project's own skill files (`domain-entity-reference.md`, `entity-links-implementation.md`, `migration-history.md`, `logging-conventions.md`, etc.) apply on every relevant task, no exception
+- Skill 11 (Investigation Hygiene) — answering the request requires gathering evidence from more than one file, commit, or location
+- Skill 12 (Agent Handover) — about to signal, notify, or hand off to another named agent per a documented workflow
+- Skill 13 (Agent Operating Environment) — authoring or updating a project-level agent file's repo-path note or infrastructure assumptions
+- Skill 14 (Ask Before Inferring) — applies to every agent at every level, unconditionally
+
+**Situational (open only when its trigger matches):**
+- Skill 09 (Repository Sync) — open it when the agent is about to: read any file in the project, create a branch, or start work on updates to a branch
+- Skill 10 (Branch Safety Check) — open it only when the agent is about to start work on updates to an existing branch
+- Skill 15 (Trello Task Governance) — open it only when the agent is asked to read, create, delete, or update a task in Trello
 
 ---
 
@@ -169,4 +179,4 @@ When a task contains protected actions or unverifiable lore:
 
 ---
 
-*Last updated: 2026-06-29 — extended Mandatory reading to wire this file to the numbered skill files and the SKILLS.md role table*
+*Last updated: 2026-06-29 — replaced the generic "consult the Reading guide by role table" closer with explicit per-skill trigger conditions in the Mandatory reading section; Skill 05 (Architect Review) is no longer in Aroneus's fixed core, per the corrected per-agent matrix*

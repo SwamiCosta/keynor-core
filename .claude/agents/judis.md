@@ -11,10 +11,25 @@
 1. `../../ARCHITECTURE.md` — ecosystem architecture and project overview
 2. `../../.claude/CLAUDE.md` — workspace context, agent levels, protected actions
 3. `CLAUDE.md` (keynor-core) — project stack, domain model, testing rules
-4. `../../.claude/SKILLS.md` — standardized procedures for all agents
-- `.claude/skills/unit-testing-controllers.md` — required test cases, framework decisions, and naming conventions for all controller unit tests
-- `.claude/skills/domain-entity-reference.md` — field order, category enums, and status invariants needed to write correct test fixtures
-- `.claude/skills/entity-links-implementation.md` — needed when testing linked-entity resolution on any entity's create/update/read paths
+4. This file
+5. `.claude/skills/unit-testing-controllers.md` — required test cases, framework decisions, and naming conventions for all controller unit tests
+6. `.claude/skills/domain-entity-reference.md` — field order, category enums, and status invariants needed to write correct test fixtures
+7. `.claude/skills/entity-links-implementation.md` — needed when testing linked-entity resolution on any entity's create/update/read paths
+
+### Numbered skills (`../../.claude/skills/`)
+
+**Always (unconditional):**
+- Skill 06 (Project-Level Skills) — this project's own skill files (`domain-entity-reference.md`, `entity-links-implementation.md`, `migration-history.md`, `logging-conventions.md`, etc.) apply on every relevant task, no exception
+- Skill 11 (Investigation Hygiene) — answering the request requires gathering evidence from more than one file, commit, or location
+- Skill 12 (Agent Handover) — about to signal, notify, or hand off to another named agent per a documented workflow
+- Skill 13 (Agent Operating Environment) — authoring or updating a project-level agent file's repo-path note or infrastructure assumptions
+
+**Situational (open only when its trigger matches):**
+- Skill 04 (Test Coverage) — open it as soon as the agent is assigned a code-development task (writing or modifying source code, including test code). Judis writes test code (JUnit/Mockito unit tests, Testcontainers integration tests) — that counts as a code-development task under this trigger, the same way it does for Imperium or for Syde in aniannoth-overview
+- Skill 08 (Logging Conventions) — triggers together with Skill 04 — open both at the same time
+- Skill 09 (Repository Sync) — open it when the agent is about to: read any file in the project, create a branch, or start work on updates to a branch
+- Skill 10 (Branch Safety Check) — open it only when the agent is about to start work on updates to an existing branch
+- Skill 15 (Trello Task Governance) — open it only when the agent is asked to read, create, delete, or update a task in Trello
 
 ---
 
@@ -141,4 +156,4 @@ Before writing tests for a feature:
 
 ---
 
-*Last updated: 2026-06-23*
+*Last updated: 2026-06-29 — replaced the generic blanket SKILLS.md citation with a structured Mandatory reading section listing explicit per-skill trigger conditions, closing the gap left by PR #52 (this file was not included in that PR's original wiring)*

@@ -11,13 +11,22 @@
 1. `../../ARCHITECTURE.md` — the keynor-core section, in full (cross-project scope only if the task explicitly crosses project boundaries)
 2. `../../.claude/CLAUDE.md` — workspace-wide rules, agent levels, protected actions
 3. `CLAUDE.md` (keynor-core) — stack, local environment assumptions, bootstrap data context
-4. `../../.claude/skills/09-repository-sync.md`, `../../.claude/skills/10-branch-safety.md`, and `../../.claude/skills/14-ask-before-inferring.md` — every task, since every task involves Git operations and judgment calls
-5. `../../.claude/skills/05-architect-review.md` — every PR Siegmund opens goes through Imaws before reaching the user
-6. This file
+4. This file
 
-**Skill 02 (Database Migration) is not in Siegmund's authored "always" core** — migrations are Imaws territory, and Siegmund holds no exception comparable to Jung's in `keynor-rpg` (see Skill 05's "Named exceptions to architect-only migration authorship" — Siegmund is explicitly named as remaining seed/data-only). It is still worth skimming situationally: Siegmund's SELECT-based divergence diagnosis and seed scripts both have to interpret the schema a migration produced, and Skill 02's "When to use a migration vs. a seed" table is the cleanest place to double-check that a change belongs in a seed script rather than something that should have been a migration. Open it when that boundary is unclear, not on every task.
+### Numbered skills (`../../.claude/skills/`)
 
-Consult the "Reading guide by role" table in `../../.claude/SKILLS.md` (Level 2 — DB/seed column) for whatever else applies to the specific task at hand.
+**Always (unconditional):**
+- Skill 06 (Project-Level Skills) — this project's own skill files (`domain-entity-reference.md`, `entity-links-implementation.md`, `migration-history.md`, `logging-conventions.md`, etc.) apply on every relevant task, no exception
+- Skill 11 (Investigation Hygiene) — answering the request requires gathering evidence from more than one file, commit, or location
+- Skill 12 (Agent Handover) — about to signal, notify, or hand off to another named agent per a documented workflow
+- Skill 13 (Agent Operating Environment) — authoring or updating a project-level agent file's repo-path note or infrastructure assumptions
+- Skill 14 (Ask Before Inferring) — applies to every agent at every level, unconditionally
+
+**Situational (open only when its trigger matches):**
+- Skill 02 (Database Migration) — before starting any task, assess whether it involves a database change. If it does, read this skill before proceeding. Migrations remain Imaws territory — Siegmund holds no exception comparable to Jung's in `keynor-rpg` (Siegmund is explicitly named as remaining seed/data-only) — but Skill 02's "When to use a migration vs. a seed" table is the cleanest place to double-check that a change belongs in a seed script rather than something that should have been a migration, whenever that boundary is unclear
+- Skill 09 (Repository Sync) — open it when the agent is about to: read any file in the project, create a branch, or start work on updates to a branch
+- Skill 10 (Branch Safety Check) — open it only when the agent is about to start work on updates to an existing branch
+- Skill 15 (Trello Task Governance) — open it only when the agent is asked to read, create, delete, or update a task in Trello
 
 ---
 
@@ -138,4 +147,4 @@ Before writing any data script:
 
 ---
 
-*Last updated: 2026-06-29 — added a Mandatory reading section wiring this file to the numbered skill files and the SKILLS.md role table*
+*Last updated: 2026-06-29 — replaced the generic "consult the Reading guide by role table" closer with explicit per-skill trigger conditions in the Mandatory reading section; Skill 05 (Architect Review) is no longer in Siegmund's fixed core, per the corrected per-agent matrix*
