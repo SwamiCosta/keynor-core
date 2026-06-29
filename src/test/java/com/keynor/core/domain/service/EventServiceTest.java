@@ -54,9 +54,9 @@ class EventServiceTest {
     void create_shouldReturnSavedEvent_whenNameIsUnique() {
         var command = new CreateEventUseCase.Command(
                 "The Battle of Kor", "A decisive battle", "Long description...",
-                List.of("battle", "war"),
                 List.of(),
                 List.of(EventCategory.BATTLE),
+                null,
                 null,
                 null);
         when(eventRepository.existsByName("The Battle of Kor")).thenReturn(false);
@@ -71,10 +71,28 @@ class EventServiceTest {
     }
 
     @Test
+    void create_shouldReturnSavedEventWithCanonStatus_whenStatusIsCanon() {
+        var command = new CreateEventUseCase.Command(
+                "The Battle of Kor", "A decisive battle", "Long description...",
+                List.of(),
+                List.of(EventCategory.BATTLE),
+                null,
+                EntityStatus.CANON,
+                null);
+        when(eventRepository.existsByName("The Battle of Kor")).thenReturn(false);
+        when(eventRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Event result = eventService.create(command);
+
+        assertThat(result.getStatus()).isEqualTo(EntityStatus.CANON);
+        verify(eventRepository).save(any());
+    }
+
+    @Test
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateEventUseCase.Command(
-                "The Battle of Kor", null, null, List.of(), List.of(),
-                List.of(EventCategory.POLITICAL), null, null);
+                "The Battle of Kor", null, null, List.of(),
+                List.of(EventCategory.POLITICAL), null, null, null);
         when(eventRepository.existsByName("The Battle of Kor")).thenReturn(true);
 
         assertThatThrownBy(() -> eventService.create(command))
@@ -86,8 +104,8 @@ class EventServiceTest {
     @Test
     void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
         var command = new CreateEventUseCase.Command(
-                "The Battle of Kor", null, null, List.of(), List.of(), List.of(EventCategory.BATTLE),
-                new Timeline("Nonexistent Era", null), null);
+                "The Battle of Kor", null, null, List.of(), List.of(EventCategory.BATTLE),
+                new Timeline("Nonexistent Era", null), null, null);
         when(eventRepository.existsByName("The Battle of Kor")).thenReturn(false);
         when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
 
@@ -101,7 +119,7 @@ class EventServiceTest {
     void findById_shouldReturnEvent_whenEventExists() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Event event = new Event(id, "The Battle of Kor", null, null, List.of(), List.of(),
+        Event event = new Event(id, "The Battle of Kor", null, null, List.of(),
                 List.of(EventCategory.BATTLE), EntityStatus.DRAFT, null, now, now);
         when(eventRepository.findById(id)).thenReturn(Optional.of(event));
 
@@ -136,7 +154,7 @@ class EventServiceTest {
     void changeStatus_shouldTransitionFromDraftToCanon() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Event event = new Event(id, "The Battle of Kor", null, null, List.of(), List.of(),
+        Event event = new Event(id, "The Battle of Kor", null, null, List.of(),
                 List.of(EventCategory.BATTLE), EntityStatus.DRAFT, null, now, now);
         when(eventRepository.findById(id)).thenReturn(Optional.of(event));
         when(eventRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -150,7 +168,7 @@ class EventServiceTest {
     void changeStatus_shouldThrowInvalidStatusTransitionException_whenDeprecatedToCanon() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Event event = new Event(id, "The Battle of Kor", null, null, List.of(), List.of(),
+        Event event = new Event(id, "The Battle of Kor", null, null, List.of(),
                 List.of(EventCategory.BATTLE), EntityStatus.DEPRECATED, null, now, now);
         when(eventRepository.findById(id)).thenReturn(Optional.of(event));
 
@@ -181,14 +199,14 @@ class EventServiceTest {
     void update_shouldReplaceFields_whenEventExists() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Event event = new Event(id, "Old Name", null, null, List.of(), List.of(),
+        Event event = new Event(id, "Old Name", null, null, List.of(),
                 List.of(EventCategory.SOCIAL), EntityStatus.DRAFT, null, now, now);
         when(eventRepository.findById(id)).thenReturn(Optional.of(event));
         when(eventRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         var command = new UpdateEventUseCase.Command(
                 "New Name", "New summary", "New body",
-                List.of("tag1"), List.of(),
+                List.of(),
                 List.of(EventCategory.BATTLE, EventCategory.DIVINE), null, null);
 
         Event result = eventService.update(id, command);

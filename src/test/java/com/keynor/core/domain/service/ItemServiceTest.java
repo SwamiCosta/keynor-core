@@ -54,9 +54,9 @@ class ItemServiceTest {
     void create_shouldReturnSavedItem_whenNameIsUnique() {
         var command = new CreateItemUseCase.Command(
                 "Shadowblade", "A cursed sword", "Long description...",
-                List.of("sword", "cursed"),
                 List.of(),
                 List.of(ItemCategory.WEAPON),
+                null,
                 null,
                 null);
         when(itemRepository.existsByName("Shadowblade")).thenReturn(false);
@@ -71,10 +71,28 @@ class ItemServiceTest {
     }
 
     @Test
+    void create_shouldReturnSavedItemWithCanonStatus_whenStatusIsCanon() {
+        var command = new CreateItemUseCase.Command(
+                "Shadowblade", "A cursed sword", "Long description...",
+                List.of(),
+                List.of(ItemCategory.WEAPON),
+                null,
+                EntityStatus.CANON,
+                null);
+        when(itemRepository.existsByName("Shadowblade")).thenReturn(false);
+        when(itemRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Item result = itemService.create(command);
+
+        assertThat(result.getStatus()).isEqualTo(EntityStatus.CANON);
+        verify(itemRepository).save(any());
+    }
+
+    @Test
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateItemUseCase.Command(
-                "Shadowblade", null, null, List.of(), List.of(),
-                List.of(ItemCategory.ARTIFACT), null, null);
+                "Shadowblade", null, null, List.of(),
+                List.of(ItemCategory.ARTIFACT), null, null, null);
         when(itemRepository.existsByName("Shadowblade")).thenReturn(true);
 
         assertThatThrownBy(() -> itemService.create(command))
@@ -86,8 +104,8 @@ class ItemServiceTest {
     @Test
     void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
         var command = new CreateItemUseCase.Command(
-                "Shadowblade", null, null, List.of(), List.of(), List.of(ItemCategory.WEAPON),
-                new Timeline("Nonexistent Era", null), null);
+                "Shadowblade", null, null, List.of(), List.of(ItemCategory.WEAPON),
+                new Timeline("Nonexistent Era", null), null, null);
         when(itemRepository.existsByName("Shadowblade")).thenReturn(false);
         when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
 
@@ -101,7 +119,7 @@ class ItemServiceTest {
     void findById_shouldReturnItem_whenItemExists() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Item item = new Item(id, "Shadowblade", null, null, List.of(), List.of(),
+        Item item = new Item(id, "Shadowblade", null, null, List.of(),
                 List.of(ItemCategory.WEAPON), EntityStatus.DRAFT, null, now, now);
         when(itemRepository.findById(id)).thenReturn(Optional.of(item));
 
@@ -136,7 +154,7 @@ class ItemServiceTest {
     void changeStatus_shouldTransitionFromDraftToCanon() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Item item = new Item(id, "Shadowblade", null, null, List.of(), List.of(),
+        Item item = new Item(id, "Shadowblade", null, null, List.of(),
                 List.of(ItemCategory.WEAPON), EntityStatus.DRAFT, null, now, now);
         when(itemRepository.findById(id)).thenReturn(Optional.of(item));
         when(itemRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -150,7 +168,7 @@ class ItemServiceTest {
     void changeStatus_shouldThrowInvalidStatusTransitionException_whenDeprecatedToCanon() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Item item = new Item(id, "Shadowblade", null, null, List.of(), List.of(),
+        Item item = new Item(id, "Shadowblade", null, null, List.of(),
                 List.of(ItemCategory.WEAPON), EntityStatus.DEPRECATED, null, now, now);
         when(itemRepository.findById(id)).thenReturn(Optional.of(item));
 
@@ -181,14 +199,14 @@ class ItemServiceTest {
     void update_shouldReplaceFields_whenItemExists() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Item item = new Item(id, "Old Name", null, null, List.of(), List.of(),
+        Item item = new Item(id, "Old Name", null, null, List.of(),
                 List.of(ItemCategory.TOOL), EntityStatus.DRAFT, null, now, now);
         when(itemRepository.findById(id)).thenReturn(Optional.of(item));
         when(itemRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         var command = new UpdateItemUseCase.Command(
                 "New Name", "New summary", "New body",
-                List.of("tag1"), List.of(),
+                List.of(),
                 List.of(ItemCategory.WEAPON, ItemCategory.ARTIFACT), null, null);
 
         Item result = itemService.update(id, command);

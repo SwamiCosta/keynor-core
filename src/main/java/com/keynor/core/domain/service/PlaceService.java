@@ -47,6 +47,7 @@ public class PlaceService implements
         }
         validateTimeline(command.timeline());
         Instant now = Instant.now();
+        EntityStatus initialStatus = command.status() != null ? command.status() : EntityStatus.DRAFT;
         Place place = new Place(
                 UUID.randomUUID(),
                 command.name(),
@@ -55,7 +56,7 @@ public class PlaceService implements
                 command.images(),
                 command.categories(),
                 command.mapType(),
-                EntityStatus.DRAFT,
+                initialStatus,
                 command.timeline(),
                 now,
                 now);

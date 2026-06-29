@@ -51,14 +51,14 @@ class PublicCharacterControllerTest {
         List<String> images = List.of("https://example.com/araveth.png");
         Character character = new Character(
                 id, "Araveth", "A wandering hero", "Body",
-                List.of("hero"), images,
+                images,
                 List.of(CharacterCategory.HERO),
                 EntityStatus.CANON, null, now, now);
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(character), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, null, 0, 20);
+        var response = controller.findAll(null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<CharacterResponse> body = response.getBody();
@@ -76,7 +76,7 @@ class PublicCharacterControllerTest {
                 "https://example.com/img2.png");
         Character character = new Character(
                 id, "Araveth", "A wandering hero", "Body",
-                List.of(), images,
+                images,
                 List.of(CharacterCategory.HERO),
                 EntityStatus.CANON, null, now, now);
         when(findCharacterByIdUseCase.findById(id)).thenReturn(character);
@@ -97,14 +97,14 @@ class PublicCharacterControllerTest {
         UUID id = UUID.randomUUID();
         Character character = new Character(
                 id, "Araveth", null, null,
-                List.of(), List.of(),
+                List.of(),
                 List.of(CharacterCategory.NPC),
                 EntityStatus.CANON, null, now, now);
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(character), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, null, 0, 20);
+        var response = controller.findAll(null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();

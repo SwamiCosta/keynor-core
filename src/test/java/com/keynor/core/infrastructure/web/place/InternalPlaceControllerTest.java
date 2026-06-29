@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -47,7 +48,7 @@ class InternalPlaceControllerTest {
 
     private Place buildPlace(UUID id) {
         Instant now = Instant.now();
-        return new Place(id, "Thornvale", "A city", "Body", List.of("city"),
+        return new Place(id, "Thornvale", "A city", "Body",
                 List.of(), List.of(PlaceCategory.CITY), MapType.NAVIGABLE,
                 EntityStatus.DRAFT, null, now, now);
     }
@@ -67,7 +68,7 @@ class InternalPlaceControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreatePlaceRequest("Thornvale", "A city", "Body",
-                List.of("city"), List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null);
+                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null, null);
 
         var response = controller.create(request);
 
@@ -84,7 +85,7 @@ class InternalPlaceControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreatePlaceRequest("Thornvale", null, null,
-                List.of(), List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null);
+                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null, null);
 
         controller.create(request);
 
@@ -95,13 +96,60 @@ class InternalPlaceControllerTest {
     }
 
     @Test
+    void create_shouldDefaultToDraftStatus_whenStatusIsNull() {
+        UUID id = UUID.randomUUID();
+        when(createPlaceUseCase.create(any())).thenReturn(buildPlace(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
+
+        var request = new CreatePlaceRequest("Thornvale", null, null,
+                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null, null);
+
+        controller.create(request);
+
+        ArgumentCaptor<CreatePlaceUseCase.Command> captor =
+                ArgumentCaptor.forClass(CreatePlaceUseCase.Command.class);
+        verify(createPlaceUseCase).create(captor.capture());
+        assertThat(captor.getValue().status()).isEqualTo(EntityStatus.DRAFT);
+    }
+
+    @Test
+    void create_shouldPassCanonStatus_whenStatusIsCanon() {
+        UUID id = UUID.randomUUID();
+        Instant now = Instant.now();
+        Place canonPlace = new Place(id, "Thornvale", null, null, List.of(),
+                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.CANON, null, now, now);
+        when(createPlaceUseCase.create(any())).thenReturn(canonPlace);
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
+
+        var request = new CreatePlaceRequest("Thornvale", null, null,
+                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, "CANON", null);
+
+        controller.create(request);
+
+        ArgumentCaptor<CreatePlaceUseCase.Command> captor =
+                ArgumentCaptor.forClass(CreatePlaceUseCase.Command.class);
+        verify(createPlaceUseCase).create(captor.capture());
+        assertThat(captor.getValue().status()).isEqualTo(EntityStatus.CANON);
+    }
+
+    @Test
+    void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
+        var request = new CreatePlaceRequest("Thornvale", null, null,
+                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, "DEPRECATED", null);
+
+        assertThatThrownBy(() -> controller.create(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("DEPRECATED");
+    }
+
+    @Test
     void update_shouldReturn200AndResponseBody_whenCommandIsValid() {
         UUID id = UUID.randomUUID();
         when(updatePlaceUseCase.update(eq(id), any())).thenReturn(buildPlace(id));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdatePlaceRequest("Thornvale Updated", null, null,
-                List.of(), List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null);
+                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null);
 
         var response = controller.update(id, request);
 
@@ -139,7 +187,7 @@ class InternalPlaceControllerTest {
                 .thenReturn(new PageResult<>(List.of(buildPlace(id)), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, null, null, 0, 20);
+        var response = controller.findAll(null, null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<PlaceResponse> body = response.getBody();
@@ -156,7 +204,7 @@ class InternalPlaceControllerTest {
         when(findAllPlacesUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, null, null, 0, 20);
+        controller.findAll(null, null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllPlacesUseCase).findAll(filterCaptor.capture(), any());

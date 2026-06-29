@@ -78,10 +78,11 @@ public class InternalItemController {
         Timeline timeline = (request.timelineFoundedEra() != null || request.timelineDestroyedEra() != null)
                 ? new Timeline(request.timelineFoundedEra(), request.timelineDestroyedEra()) : null;
         List<EntityLinkRef> links = toLinkRefs(request.links());
+        EntityStatus initialStatus = parseCreationStatus(request.status());
         var command = new CreateItemUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.images() != null ? request.images() : List.of(),
-                categories, timeline, links);
+                categories, timeline, initialStatus, links);
         var created = createItemUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(ItemResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.ITEM, created.getId())));
     }
@@ -120,5 +121,16 @@ public class InternalItemController {
         return links.stream()
                 .map(link -> new EntityLinkRef(EntityType.valueOf(link.targetType().toUpperCase()), link.targetId()))
                 .toList();
+    }
+
+    private EntityStatus parseCreationStatus(String rawStatus) {
+        if (rawStatus == null) {
+            return EntityStatus.DRAFT;
+        }
+        EntityStatus status = EntityStatus.valueOf(rawStatus.toUpperCase());
+        if (status == EntityStatus.DEPRECATED) {
+            throw new IllegalArgumentException("Status DEPRECATED is not allowed on creation. Allowed values: DRAFT, CANON");
+        }
+        return status;
     }
 }

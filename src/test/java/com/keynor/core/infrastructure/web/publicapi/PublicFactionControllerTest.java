@@ -53,7 +53,7 @@ class PublicFactionControllerTest {
         when(findAllFactionsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, null, 0, 20);
+        controller.findAll(null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllFactionsUseCase).findAll(filterCaptor.capture(), any());
@@ -65,7 +65,7 @@ class PublicFactionControllerTest {
         when(findAllFactionsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 1, 30, 0));
 
-        controller.findAll(null, null, 1, 30);
+        controller.findAll(null, 1, 30);
 
         ArgumentCaptor<PageRequest> pageCaptor = ArgumentCaptor.forClass(PageRequest.class);
         verify(findAllFactionsUseCase).findAll(any(), pageCaptor.capture());
@@ -77,13 +77,13 @@ class PublicFactionControllerTest {
     void findAll_shouldReturnMappedPagedResponse() {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
-        Faction faction = new Faction(id, "The Iron Order", "A guild", "Body", List.of("guild"),
+        Faction faction = new Faction(id, "The Iron Order", "A guild", "Body",
                 List.of(), List.of(FactionCategory.ORDER), EntityStatus.CANON, null, now, now);
         when(findAllFactionsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(faction), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, null, 0, 20);
+        var response = controller.findAll(null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<FactionResponse> body = response.getBody();
@@ -98,7 +98,7 @@ class PublicFactionControllerTest {
     void findById_shouldDelegateToUseCaseAndMapResult() {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
-        Faction faction = new Faction(id, "The Iron Order", "A guild", "Body", List.of(),
+        Faction faction = new Faction(id, "The Iron Order", "A guild", "Body",
                 List.of(), List.of(FactionCategory.GUILD), EntityStatus.CANON, null, now, now);
         when(findFactionByIdUseCase.findById(id)).thenReturn(faction);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());

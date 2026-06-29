@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -46,7 +47,7 @@ class InternalItemControllerTest {
 
     private Item buildItem(UUID id) {
         Instant now = Instant.now();
-        return new Item(id, "Shadowblade", "A cursed sword", "Body", List.of("sword"),
+        return new Item(id, "Shadowblade", "A cursed sword", "Body",
                 List.of(), List.of(ItemCategory.WEAPON), EntityStatus.DRAFT, null, now, now);
     }
 
@@ -65,7 +66,7 @@ class InternalItemControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateItemRequest("Shadowblade", "A cursed sword", "Body",
-                List.of("sword"), List.of(), List.of("WEAPON"), "era-1", null, null);
+                List.of(), List.of("WEAPON"), "era-1", null, null, null);
 
         var response = controller.create(request);
 
@@ -82,7 +83,7 @@ class InternalItemControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateItemRequest("Shadowblade", null, null,
-                List.of(), List.of(), List.of("WEAPON"), "era-1", null, null);
+                List.of(), List.of("WEAPON"), "era-1", null, null, null);
 
         controller.create(request);
 
@@ -94,13 +95,60 @@ class InternalItemControllerTest {
     }
 
     @Test
+    void create_shouldDefaultToDraftStatus_whenStatusIsNull() {
+        UUID id = UUID.randomUUID();
+        when(createItemUseCase.create(any())).thenReturn(buildItem(id));
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
+
+        var request = new CreateItemRequest("Shadowblade", null, null,
+                List.of(), List.of("WEAPON"), "era-1", null, null, null);
+
+        controller.create(request);
+
+        ArgumentCaptor<CreateItemUseCase.Command> captor =
+                ArgumentCaptor.forClass(CreateItemUseCase.Command.class);
+        verify(createItemUseCase).create(captor.capture());
+        assertThat(captor.getValue().status()).isEqualTo(EntityStatus.DRAFT);
+    }
+
+    @Test
+    void create_shouldPassCanonStatus_whenStatusIsCanon() {
+        UUID id = UUID.randomUUID();
+        Instant now = Instant.now();
+        Item canonItem = new Item(id, "Shadowblade", null, null, List.of(),
+                List.of(ItemCategory.WEAPON), EntityStatus.CANON, null, now, now);
+        when(createItemUseCase.create(any())).thenReturn(canonItem);
+        when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
+
+        var request = new CreateItemRequest("Shadowblade", null, null,
+                List.of(), List.of("WEAPON"), "era-1", null, "CANON", null);
+
+        controller.create(request);
+
+        ArgumentCaptor<CreateItemUseCase.Command> captor =
+                ArgumentCaptor.forClass(CreateItemUseCase.Command.class);
+        verify(createItemUseCase).create(captor.capture());
+        assertThat(captor.getValue().status()).isEqualTo(EntityStatus.CANON);
+    }
+
+    @Test
+    void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
+        var request = new CreateItemRequest("Shadowblade", null, null,
+                List.of(), List.of("WEAPON"), "era-1", null, "DEPRECATED", null);
+
+        assertThatThrownBy(() -> controller.create(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("DEPRECATED");
+    }
+
+    @Test
     void update_shouldReturn200AndResponseBody_whenCommandIsValid() {
         UUID id = UUID.randomUUID();
         when(updateItemUseCase.update(eq(id), any())).thenReturn(buildItem(id));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdateItemRequest("Shadowblade Updated", null, null,
-                List.of(), List.of(), List.of("WEAPON"), "era-1", null, null);
+                List.of(), List.of("WEAPON"), "era-1", null, null);
 
         var response = controller.update(id, request);
 
@@ -138,7 +186,7 @@ class InternalItemControllerTest {
                 .thenReturn(new PageResult<>(List.of(buildItem(id)), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, null, null, 0, 20);
+        var response = controller.findAll(null, null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<ItemResponse> body = response.getBody();
@@ -155,7 +203,7 @@ class InternalItemControllerTest {
         when(findAllItemsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, null, null, 0, 20);
+        controller.findAll(null, null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllItemsUseCase).findAll(filterCaptor.capture(), any());

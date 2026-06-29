@@ -15,5 +15,6 @@ public record CreatePlaceRequest(
         String mapType,
         @NotBlank String timelineFoundedEra,
         String timelineDestroyedEra,
+        String status,
         List<EntityLinkRequest> links) {
 }

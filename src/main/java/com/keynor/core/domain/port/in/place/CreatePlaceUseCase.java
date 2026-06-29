@@ -4,6 +4,7 @@ import com.keynor.core.domain.model.place.MapType;
 import com.keynor.core.domain.model.place.Place;
 import com.keynor.core.domain.model.place.PlaceCategory;
 import com.keynor.core.domain.model.shared.EntityLinkRef;
+import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.Timeline;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public interface CreatePlaceUseCase {
             List<PlaceCategory> categories,
             MapType mapType,
             Timeline timeline,
+            EntityStatus status,
             List<EntityLinkRef> links) {}
 
     Place create(Command command);

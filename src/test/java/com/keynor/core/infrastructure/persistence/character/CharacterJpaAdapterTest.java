@@ -35,7 +35,7 @@ class CharacterJpaAdapterTest {
                 "https://example.com/image2.png");
         Character character = new Character(
                 id, "Araveth", "A hero", "Long body",
-                List.of("hero"), images,
+                images,
                 List.of(CharacterCategory.HERO),
                 EntityStatus.DRAFT, null, now, now);
 

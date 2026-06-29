@@ -48,7 +48,7 @@ class InternalLoreControllerTest {
     private Lore buildLore(UUID id) {
         Instant now = Instant.now();
         return new Lore(id, "The Age of Silence", "A period of stillness", "Body",
-                List.of("history"), List.of(), List.of(LoreCategory.HISTORY),
+                List.of(), List.of(LoreCategory.HISTORY),
                 EntityStatus.DRAFT, null, now, now);
     }
 
@@ -66,7 +66,7 @@ class InternalLoreControllerTest {
         when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
 
         var request = new CreateLoreRequest("The Age of Silence", "A period of stillness", "Body",
-                List.of("history"), List.of(), List.of("HISTORY"), "era-1", null, null, null);
+                List.of(), List.of("HISTORY"), "era-1", null, null, null);
 
         var response = controller.create(request);
 
@@ -82,7 +82,7 @@ class InternalLoreControllerTest {
         when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
 
         var request = new CreateLoreRequest("The Age of Silence", null, null,
-                List.of(), List.of(), List.of("HISTORY"), "era-1", null, null, null);
+                List.of(), List.of("HISTORY"), "era-1", null, null, null);
 
         controller.create(request);
 
@@ -99,7 +99,7 @@ class InternalLoreControllerTest {
         when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
 
         var request = new CreateLoreRequest("The Age of Silence", null, null,
-                List.of(), List.of(), List.of("HISTORY"), "era-1", null, null, null);
+                List.of(), List.of("HISTORY"), "era-1", null, null, null);
 
         controller.create(request);
 
@@ -113,12 +113,12 @@ class InternalLoreControllerTest {
     void create_shouldPassCanonStatus_whenStatusIsCanon() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Lore canonLore = new Lore(id, "The Age of Silence", null, null, List.of(), List.of(),
+        Lore canonLore = new Lore(id, "The Age of Silence", null, null, List.of(),
                 List.of(LoreCategory.HISTORY), EntityStatus.CANON, null, now, now);
         when(createLoreUseCase.create(any())).thenReturn(canonLore);
 
         var request = new CreateLoreRequest("The Age of Silence", null, null,
-                List.of(), List.of(), List.of("HISTORY"), "era-1", null, "CANON", null);
+                List.of(), List.of("HISTORY"), "era-1", null, "CANON", null);
 
         controller.create(request);
 
@@ -131,7 +131,7 @@ class InternalLoreControllerTest {
     @Test
     void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
         var request = new CreateLoreRequest("The Age of Silence", null, null,
-                List.of(), List.of(), List.of("HISTORY"), "era-1", null, "DEPRECATED", null);
+                List.of(), List.of("HISTORY"), "era-1", null, "DEPRECATED", null);
 
         assertThatThrownBy(() -> controller.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -144,7 +144,7 @@ class InternalLoreControllerTest {
         when(updateLoreUseCase.update(eq(id), any())).thenReturn(buildLore(id));
 
         var request = new UpdateLoreRequest("Updated Lore", null, null,
-                List.of(), List.of(), List.of("HISTORY"), "era-1", null, null);
+                List.of(), List.of("HISTORY"), "era-1", null, null);
 
         var response = controller.update(id, request);
 
@@ -180,7 +180,7 @@ class InternalLoreControllerTest {
         when(findAllLoreUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(buildLore(id)), 0, 20, 1));
 
-        var response = controller.findAll(null, null, null, 0, 20);
+        var response = controller.findAll(null, null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<LoreResponse> body = response.getBody();
@@ -197,7 +197,7 @@ class InternalLoreControllerTest {
         when(findAllLoreUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, null, null, 0, 20);
+        controller.findAll(null, null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllLoreUseCase).findAll(filterCaptor.capture(), any());

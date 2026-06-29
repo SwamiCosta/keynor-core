@@ -54,9 +54,9 @@ class FactionServiceTest {
     void create_shouldReturnSavedFaction_whenNameIsUnique() {
         var command = new CreateFactionUseCase.Command(
                 "The Silver Order", "A guild of mages", "Long description...",
-                List.of("mages", "arcane"),
                 List.of(),
                 List.of(FactionCategory.ORDER),
+                null,
                 null,
                 null);
         when(factionRepository.existsByName("The Silver Order")).thenReturn(false);
@@ -71,10 +71,28 @@ class FactionServiceTest {
     }
 
     @Test
+    void create_shouldReturnSavedFactionWithCanonStatus_whenStatusIsCanon() {
+        var command = new CreateFactionUseCase.Command(
+                "The Silver Order", "A guild of mages", "Long description...",
+                List.of(),
+                List.of(FactionCategory.ORDER),
+                null,
+                EntityStatus.CANON,
+                null);
+        when(factionRepository.existsByName("The Silver Order")).thenReturn(false);
+        when(factionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Faction result = factionService.create(command);
+
+        assertThat(result.getStatus()).isEqualTo(EntityStatus.CANON);
+        verify(factionRepository).save(any());
+    }
+
+    @Test
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateFactionUseCase.Command(
-                "The Silver Order", null, null, List.of(), List.of(),
-                List.of(FactionCategory.GUILD), null, null);
+                "The Silver Order", null, null, List.of(),
+                List.of(FactionCategory.GUILD), null, null, null);
         when(factionRepository.existsByName("The Silver Order")).thenReturn(true);
 
         assertThatThrownBy(() -> factionService.create(command))
@@ -86,8 +104,8 @@ class FactionServiceTest {
     @Test
     void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
         var command = new CreateFactionUseCase.Command(
-                "The Silver Order", null, null, List.of(), List.of(), List.of(FactionCategory.ORDER),
-                new Timeline("Nonexistent Era", null), null);
+                "The Silver Order", null, null, List.of(), List.of(FactionCategory.ORDER),
+                new Timeline("Nonexistent Era", null), null, null);
         when(factionRepository.existsByName("The Silver Order")).thenReturn(false);
         when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
 
@@ -101,7 +119,7 @@ class FactionServiceTest {
     void findById_shouldReturnFaction_whenFactionExists() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Faction faction = new Faction(id, "The Silver Order", null, null, List.of(), List.of(),
+        Faction faction = new Faction(id, "The Silver Order", null, null, List.of(),
                 List.of(FactionCategory.ORDER), EntityStatus.DRAFT, null, now, now);
         when(factionRepository.findById(id)).thenReturn(Optional.of(faction));
 
@@ -136,7 +154,7 @@ class FactionServiceTest {
     void changeStatus_shouldTransitionFromDraftToCanon() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Faction faction = new Faction(id, "The Silver Order", null, null, List.of(), List.of(),
+        Faction faction = new Faction(id, "The Silver Order", null, null, List.of(),
                 List.of(FactionCategory.ORDER), EntityStatus.DRAFT, null, now, now);
         when(factionRepository.findById(id)).thenReturn(Optional.of(faction));
         when(factionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -150,7 +168,7 @@ class FactionServiceTest {
     void changeStatus_shouldThrowInvalidStatusTransitionException_whenDeprecatedToCanon() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Faction faction = new Faction(id, "The Silver Order", null, null, List.of(), List.of(),
+        Faction faction = new Faction(id, "The Silver Order", null, null, List.of(),
                 List.of(FactionCategory.ORDER), EntityStatus.DEPRECATED, null, now, now);
         when(factionRepository.findById(id)).thenReturn(Optional.of(faction));
 
@@ -181,14 +199,14 @@ class FactionServiceTest {
     void update_shouldReplaceFields_whenFactionExists() {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        Faction faction = new Faction(id, "Old Name", null, null, List.of(), List.of(),
+        Faction faction = new Faction(id, "Old Name", null, null, List.of(),
                 List.of(FactionCategory.GUILD), EntityStatus.DRAFT, null, now, now);
         when(factionRepository.findById(id)).thenReturn(Optional.of(faction));
         when(factionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         var command = new UpdateFactionUseCase.Command(
                 "New Name", "New summary", "New body",
-                List.of("tag1"), List.of(),
+                List.of(),
                 List.of(FactionCategory.EMPIRE, FactionCategory.ORDER), null, null);
 
         Faction result = factionService.update(id, command);

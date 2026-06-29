@@ -72,6 +72,7 @@ public class InternalCharacterController {
     @PostMapping
     public ResponseEntity<CharacterResponse> create(@Valid @RequestBody CreateCharacterRequest request) {
         List<EntityLinkRef> links = toLinkRefs(request.links());
+        EntityStatus initialStatus = parseCreationStatus(request.status());
         var command = new CreateCharacterUseCase.Command(
                 request.name(),
                 request.summary(),
@@ -79,6 +80,7 @@ public class InternalCharacterController {
                 request.images() != null ? request.images() : List.of(),
                 parseCategories(request.categories()),
                 buildTimeline(request.timelineFoundedEra(), request.timelineDestroyedEra()),
+                initialStatus,
                 links);
         var created = createCharacterUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -136,5 +138,16 @@ public class InternalCharacterController {
     private Timeline buildTimeline(String founded, String destroyed) {
         if (founded == null && destroyed == null) return null;
         return new Timeline(founded, destroyed);
+    }
+
+    private EntityStatus parseCreationStatus(String rawStatus) {
+        if (rawStatus == null) {
+            return EntityStatus.DRAFT;
+        }
+        EntityStatus status = EntityStatus.valueOf(rawStatus.toUpperCase());
+        if (status == EntityStatus.DEPRECATED) {
+            throw new IllegalArgumentException("Status DEPRECATED is not allowed on creation. Allowed values: DRAFT, CANON");
+        }
+        return status;
     }
 }

@@ -53,7 +53,7 @@ class PublicLoreControllerTest {
         when(findAllLoreUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, null, 0, 20);
+        controller.findAll(null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllLoreUseCase).findAll(filterCaptor.capture(), any());
@@ -65,7 +65,7 @@ class PublicLoreControllerTest {
         when(findAllLoreUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 3, 15, 0));
 
-        controller.findAll(null, null, 3, 15);
+        controller.findAll(null, 3, 15);
 
         ArgumentCaptor<PageRequest> pageCaptor = ArgumentCaptor.forClass(PageRequest.class);
         verify(findAllLoreUseCase).findAll(any(), pageCaptor.capture());
@@ -78,12 +78,12 @@ class PublicLoreControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Lore lore = new Lore(id, "The Great Myth", "A summary", "Body text",
-                List.of("myth"), List.of(), List.of(LoreCategory.MYTH),
+                List.of(), List.of(LoreCategory.MYTH),
                 EntityStatus.CANON, null, now, now);
         when(findAllLoreUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(lore), 0, 20, 1));
 
-        var response = controller.findAll(null, null, 0, 20);
+        var response = controller.findAll(null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<LoreResponse> body = response.getBody();
@@ -99,7 +99,7 @@ class PublicLoreControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Lore lore = new Lore(id, "The Great Myth", "A summary", "Body text",
-                List.of(), List.of(), List.of(LoreCategory.HISTORY),
+                List.of(), List.of(LoreCategory.HISTORY),
                 EntityStatus.CANON, null, now, now);
         when(findLoreByIdUseCase.findById(id)).thenReturn(lore);
 

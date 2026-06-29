@@ -47,6 +47,7 @@ public class ItemService implements
         }
         validateTimeline(command.timeline());
         Instant now = Instant.now();
+        EntityStatus initialStatus = command.status() != null ? command.status() : EntityStatus.DRAFT;
         Item item = new Item(
                 UUID.randomUUID(),
                 command.name(),
@@ -54,7 +55,7 @@ public class ItemService implements
                 command.body(),
                 command.images(),
                 command.categories(),
-                EntityStatus.DRAFT,
+                initialStatus,
                 command.timeline(),
                 now,
                 now);
