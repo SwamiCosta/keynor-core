@@ -23,6 +23,7 @@
 - Skill 11 (Investigation Hygiene) — answering the request requires gathering evidence from more than one file, commit, or location
 - Skill 12 (Agent Handover) — about to signal, notify, or hand off to another named agent per a documented workflow
 - Skill 13 (Agent Operating Environment) — authoring or updating a project-level agent file's repo-path note or infrastructure assumptions
+- Skill 14 (Ask Before Inferring) — applies to every agent at every level, unconditionally
 
 **Situational (open only when its trigger matches):**
 - Skill 04 (Test Coverage) — open it as soon as the agent is assigned a code-development task (writing or modifying source code, including test code). Judis writes test code (JUnit/Mockito unit tests, Testcontainers integration tests) — that counts as a code-development task under this trigger, the same way it does for Imperium or for Syde in aniannoth-overview
@@ -156,4 +157,4 @@ Before writing tests for a feature:
 
 ---
 
-*Last updated: 2026-06-29 — replaced the generic blanket SKILLS.md citation with a structured Mandatory reading section listing explicit per-skill trigger conditions, closing the gap left by PR #52 (this file was not included in that PR's original wiring)*
+*Last updated: 2026-06-29 — added Skill 14 (Ask Before Inferring) to the Always core, closing the table placeholder; replaced the generic blanket SKILLS.md citation with a structured Mandatory reading section listing explicit per-skill trigger conditions, closing the gap left by PR #52 (this file was not included in that PR's original wiring)*
