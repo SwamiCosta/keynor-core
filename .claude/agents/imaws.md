@@ -22,9 +22,29 @@ You operate exclusively inside `keynor-core`, checked out at `e:\sasco\workspace
 1. `../ARCHITECTURE.md` — ecosystem architecture and inter-service context
 2. `../CLAUDE.md` — workspace-wide rules, agent levels, protected actions, versioning
 3. `keynor-core/CLAUDE.md` — keynor-core stack, architecture, coding conventions, and domain model
-- `.claude/skills/domain-entity-reference.md` — canonical field reference for universe entities and the `Era` class
-- `.claude/skills/migration-history.md` — Flyway migration changelog (V1–V8)
-- `.claude/skills/entity-links-implementation.md` — `entity_links` schema, domain model, and replication pattern
+4. `.claude/skills/domain-entity-reference.md` — canonical field reference for universe entities and the `Era` class
+5. `.claude/skills/migration-history.md` — Flyway migration changelog (V1–V8)
+6. `.claude/skills/entity-links-implementation.md` — `entity_links` schema, domain model, and replication pattern
+
+### Numbered skills (`../.claude/skills/`)
+
+**Always (unconditional):**
+- Skill 06 (Project-Level Skills) — this project's own skill files (`domain-entity-reference.md`, `entity-links-implementation.md`, `migration-history.md`, `logging-conventions.md`, etc.) apply on every relevant task, no exception
+- Skill 11 (Investigation Hygiene) — answering the request requires gathering evidence from more than one file, commit, or location
+- Skill 12 (Agent Handover) — about to signal, notify, or hand off to another named agent per a documented workflow
+- Skill 13 (Agent Operating Environment) — authoring or updating a project-level agent file's repo-path note or infrastructure assumptions
+- Skill 14 (Ask Before Inferring) — applies to every agent at every level, unconditionally
+
+**Situational (open only when its trigger matches):**
+- Skill 01 (Document Editing) — open it only when the user explicitly asks the agent to edit a document — a CLAUDE.md, an agent `.md` file, or SKILLS.md
+- Skill 02 (Database Migration) — before starting any task, assess whether it involves a database change. If it does, read this skill before proceeding
+- Skill 04 (Test Coverage) — open it as soon as the agent is assigned a code-development task (writing or modifying source code, including test code)
+- Skill 05 (Architect Review) — open it when an architect agent is asked to perform a code review
+- Skill 07 (Documentation Sync) — triggers together with Skill 05 — open both at the same time
+- Skill 08 (Logging Conventions) — triggers together with Skill 04 — open both at the same time
+- Skill 09 (Repository Sync) — open it when the agent is about to: read any file in the project, create a branch, or start work on updates to a branch
+- Skill 10 (Branch Safety Check) — open it only when the agent is about to start work on updates to an existing branch
+- Skill 15 (Trello Task Governance) — open it only when the agent is asked to read, create, delete, or update a task in Trello
 
 ---
 
@@ -153,4 +173,4 @@ Escalate to Omnia whenever:
 
 ---
 
-*Last updated: 2026-06-23*
+*Last updated: 2026-06-29 — replaced the generic "consult the Reading guide by role table" closer with explicit per-skill trigger conditions in the Mandatory reading section; removed the Skill 03 (Version Bump) reference, which is being deleted workspace-wide*
