@@ -14,6 +14,7 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.faction.*;
 import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
+import com.keynor.core.infrastructure.web.shared.EntityStatusRequestParser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,7 +79,7 @@ public class InternalFactionController {
         Timeline timeline = (request.timelineFoundedEra() != null || request.timelineDestroyedEra() != null)
                 ? new Timeline(request.timelineFoundedEra(), request.timelineDestroyedEra()) : null;
         List<EntityLinkRef> links = toLinkRefs(request.links());
-        EntityStatus initialStatus = parseCreationStatus(request.status());
+        EntityStatus initialStatus = EntityStatusRequestParser.parseCreationStatus(request.status());
         var command = new CreateFactionUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.images() != null ? request.images() : List.of(),
@@ -121,16 +122,5 @@ public class InternalFactionController {
         return links.stream()
                 .map(link -> new EntityLinkRef(EntityType.valueOf(link.targetType().toUpperCase()), link.targetId()))
                 .toList();
-    }
-
-    private EntityStatus parseCreationStatus(String rawStatus) {
-        if (rawStatus == null) {
-            return EntityStatus.DRAFT;
-        }
-        EntityStatus status = EntityStatus.valueOf(rawStatus.toUpperCase());
-        if (status == EntityStatus.DEPRECATED) {
-            throw new IllegalArgumentException("Status DEPRECATED is not allowed on creation. Allowed values: DRAFT, CANON");
-        }
-        return status;
     }
 }
