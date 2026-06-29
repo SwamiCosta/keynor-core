@@ -47,6 +47,22 @@ This mapping applies uniformly to all `Create*Request` and `Update*Request` DTOs
 
 > Do **not** use `timeline.founded` or `timeline.destroyed` in the JSON body — these will produce a `400 Bad Request`.
 
+### Optional `status` field on creation
+
+Every `Create*Request` DTO (`CreateCharacterRequest`, `CreatePlaceRequest`, `CreateFactionRequest`, `CreateItemRequest`, `CreateEventRequest`, `CreateLoreRequest`) carries an optional `status: String` field, positioned between `timelineDestroyedEra` and `links`. It has no Jakarta Validation annotation — there is nothing to reject at the DTO level, since absence is itself a valid value.
+
+Semantic parsing and defaulting happen in the web layer, via the shared `EntityStatusRequestParser.parseCreationStatus(String)` helper (`infrastructure/web/shared/`), called identically by all six `Internal*Controller.create()` methods:
+
+| `status` in request body | Result |
+|---------------------------|--------|
+| absent / `null` | defaults to `DRAFT` |
+| `"draft"` / `"DRAFT"` (case-insensitive) | `DRAFT` |
+| `"canon"` / `"CANON"` (case-insensitive) | `CANON` |
+| `"deprecated"` / `"DEPRECATED"` (case-insensitive) | rejected — throws `IllegalArgumentException` ("Status DEPRECATED is not allowed on creation. Allowed values: DRAFT, CANON") |
+| any other value | rejected — throws `IllegalArgumentException` from `EntityStatus.valueOf()` |
+
+`Update*Request` DTOs do not carry a `status` field — status changes after creation go through `UniverseEntity.changeStatus()` and the transition rules below, not the create flow.
+
 ### Status transition rules
 
 Valid transitions enforced in `UniverseEntity.changeStatus()`:
