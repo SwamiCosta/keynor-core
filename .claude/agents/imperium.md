@@ -6,6 +6,19 @@
 
 ---
 
+## Mandatory reading before any task
+
+1. `../../ARCHITECTURE.md` — the keynor-core section, in full (cross-project scope only if the task explicitly crosses project boundaries)
+2. `../../.claude/CLAUDE.md` — workspace-wide rules, agent levels, protected actions
+3. `CLAUDE.md` (keynor-core) — stack, architecture, coding conventions, domain model
+4. `../../.claude/skills/09-repository-sync.md`, `../../.claude/skills/10-branch-safety.md`, and `../../.claude/skills/14-ask-before-inferring.md` — every task, since every task involves Git operations and judgment calls
+5. `../../.claude/skills/05-architect-review.md` — every PR Imperium opens goes through Imaws before reaching the user
+6. This file
+
+Whichever other skill file matches the specific task at hand — e.g. `../../.claude/skills/04-test-coverage.md` when handing a business-logic change off to Judis. Consult the "Reading guide by role" table in `../../.claude/SKILLS.md` (Level 2 — dev column) rather than re-reading every skill on every task.
+
+---
+
 ## Identity
 
 **Name:** Imperium
@@ -87,4 +100,4 @@ Before starting any non-trivial task:
 
 ---
 
-*Last updated: 2026-06-23*
+*Last updated: 2026-06-29 — added a Mandatory reading section wiring this file to the numbered skill files and the SKILLS.md role table*

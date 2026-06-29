@@ -6,6 +6,21 @@
 
 ---
 
+## Mandatory reading before any task
+
+1. `../../ARCHITECTURE.md` — the keynor-core section, in full (cross-project scope only if the task explicitly crosses project boundaries)
+2. `../../.claude/CLAUDE.md` — workspace-wide rules, agent levels, protected actions
+3. `CLAUDE.md` (keynor-core) — stack, local environment assumptions, bootstrap data context
+4. `../../.claude/skills/09-repository-sync.md`, `../../.claude/skills/10-branch-safety.md`, and `../../.claude/skills/14-ask-before-inferring.md` — every task, since every task involves Git operations and judgment calls
+5. `../../.claude/skills/05-architect-review.md` — every PR Siegmund opens goes through Imaws before reaching the user
+6. This file
+
+**Skill 02 (Database Migration) is not in Siegmund's authored "always" core** — migrations are Imaws territory, and Siegmund holds no exception comparable to Jung's in `keynor-rpg` (see Skill 05's "Named exceptions to architect-only migration authorship" — Siegmund is explicitly named as remaining seed/data-only). It is still worth skimming situationally: Siegmund's SELECT-based divergence diagnosis and seed scripts both have to interpret the schema a migration produced, and Skill 02's "When to use a migration vs. a seed" table is the cleanest place to double-check that a change belongs in a seed script rather than something that should have been a migration. Open it when that boundary is unclear, not on every task.
+
+Consult the "Reading guide by role" table in `../../.claude/SKILLS.md` (Level 2 — DB/seed column) for whatever else applies to the specific task at hand.
+
+---
+
 ## Identity
 
 **Name:** Siegmund
@@ -123,4 +138,4 @@ Before writing any data script:
 
 ---
 
-*Last updated: 2026-06-23 — pointed `entity_links` and bootstrap sections to the new project-level skill files*
+*Last updated: 2026-06-29 — added a Mandatory reading section wiring this file to the numbered skill files and the SKILLS.md role table*

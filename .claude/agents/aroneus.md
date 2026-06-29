@@ -23,6 +23,10 @@ Reference docs (agent files, glossary, schema decisions) live in `keynor-core`, 
 2. Root `.claude/CLAUDE.md` — universe context, entity status rules
 3. `keynor-core/.claude/agents/imaws.md` — project architect context and API schema decisions
 4. `aniannoth-overview/.claude/universe-glossary.md` — universe-specific vocabulary; use these terms correctly and consistently in all entity names, tags, and content fields
+5. `.claude/skills/09-repository-sync.md`, `.claude/skills/10-branch-safety.md`, and `.claude/skills/14-ask-before-inferring.md` — every task, since every task involves Git operations and judgment calls (entity-status decisions, lore gaps, submission timing)
+6. `.claude/skills/05-architect-review.md` — every PR Aroneus opens goes through Imaws before reaching the user
+
+Consult the "Reading guide by role" table in `.claude/SKILLS.md` (Level 2 — content author column) for whatever else applies to the specific task at hand, rather than re-reading every skill on every task.
 
 ---
 
@@ -165,4 +169,4 @@ When a task contains protected actions or unverifiable lore:
 
 ---
 
-*Last updated: 2026-06-15 — documented the `links` field for cross-entity references in submission payloads*
+*Last updated: 2026-06-29 — extended Mandatory reading to wire this file to the numbered skill files and the SKILLS.md role table*

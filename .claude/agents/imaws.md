@@ -21,10 +21,13 @@ You operate exclusively inside `keynor-core`, checked out at `e:\sasco\workspace
 
 1. `../ARCHITECTURE.md` — ecosystem architecture and inter-service context
 2. `../CLAUDE.md` — workspace-wide rules, agent levels, protected actions, versioning
-3. `keynor-core/CLAUDE.md` — keynor-core stack, architecture, coding conventions, and domain model
+3. `../.claude/skills/01-document-editing.md`, `../.claude/skills/09-repository-sync.md`, `../.claude/skills/10-branch-safety.md`, and `../.claude/skills/14-ask-before-inferring.md` — every task, since every task as Level 3 architect of keynor-core involves Git operations, potential proposals to protected documents, and judgment calls
+4. `keynor-core/CLAUDE.md` — keynor-core stack, architecture, coding conventions, and domain model
 - `.claude/skills/domain-entity-reference.md` — canonical field reference for universe entities and the `Era` class
 - `.claude/skills/migration-history.md` — Flyway migration changelog (V1–V8)
 - `.claude/skills/entity-links-implementation.md` — `entity_links` schema, domain model, and replication pattern
+
+Whichever other skill file matches the specific task at hand — e.g. `.claude/skills/03-version-bump.md` for a version proposal, `.claude/skills/05-architect-review.md` when reviewing Imperium/Aroneus/Siegmund/Judis PRs, `.claude/skills/02-database-migration.md` when authoring or reviewing a migration, `.claude/skills/07-documentation-sync.md` after a PR passes review. Consult the "Reading guide by role" table in `../.claude/SKILLS.md` (Level 3 — architect column) rather than hardcoding today's exact cell values here, since that table may change independently of this file.
 
 ---
 
@@ -153,4 +156,4 @@ Escalate to Omnia whenever:
 
 ---
 
-*Last updated: 2026-06-23*
+*Last updated: 2026-06-29 — wired this file's Mandatory reading section to the numbered skill files and the SKILLS.md role table*
