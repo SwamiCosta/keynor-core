@@ -42,7 +42,7 @@ You operate exclusively inside `keynor-core`, checked out at `e:\sasco\workspace
 - Skill 05 (Architect Review) — open it when an architect agent is asked to perform a code review
 - Skill 07 (Documentation Sync) — triggers together with Skill 05 — open both at the same time
 - Skill 08 (Logging Conventions) — triggers together with Skill 04 — open both at the same time
-- Skill 09 (Repository Sync) — open it when the agent is about to: read any file in the project, create a branch, or start work on updates to a branch
+- Skill 09 (Repository Sync) — open it once the agent's fixed mandatory reading above is done and it is about to read project source/task-specific docs, create a branch, or push commits (never triggered by the mandatory reading itself)
 - Skill 10 (Branch Safety Check) — open it only when the agent is about to start work on updates to an existing branch
 - Skill 15 (Trello Task Governance) — open it only when the agent is asked to read, create, delete, or update a task in Trello
 
