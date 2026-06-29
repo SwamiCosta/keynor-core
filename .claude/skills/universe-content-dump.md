@@ -55,6 +55,15 @@ If a new table is added to the schema, the agent must evaluate whether it is uni
 
 The file opens with a `TRUNCATE ... CASCADE` block, followed by `INSERT` statements in foreign key dependency order. This ensures the file is a complete replacement — not an additive patch — when applied to an already-seeded database.
 
+Each table — including join/category tables — gets its own contiguous section: a comment divider, then `pg_dump`'s own `--column-inserts` output for that table pasted **verbatim**, one full `INSERT` statement per row.
+
+**Do not**:
+- Consolidate rows into multi-row `INSERT ... VALUES (...), (...), ...;` lists. One statement per row keeps every row diff-local — adding or removing a row never touches a neighboring line's trailing comma/semicolon.
+- Interleave a join table's rows under its parent entity's row (e.g. `character_categories` rows directly after each character). Every table is its own section, full stop — there is no per-table exception.
+- Hand-edit escaping (`E'...'`, quoting) on any row. `pg_dump` already emits correct escaping; retyping it is how mistakes get introduced.
+
+The only hand-authored parts of the file are the header/changelog block and the section divider comments — both are cheap because they don't require touching row data.
+
 ```sql
 -- universe-content.sql
 -- Single source of truth for all universe content data.
@@ -62,6 +71,9 @@ The file opens with a `TRUNCATE ... CASCADE` block, followed by `INSERT` stateme
 -- ⚠ Destructive: TRUNCATE removes all existing universe content before reinserting.
 -- ⚠ Apply only after Flyway migrations are fully up to date.
 -- ⚠ NOT idempotent via re-run — do not apply twice on the same database.
+--
+-- Last updated: ...
+-- Updated by: ... (one-line description of what changed)
 
 TRUNCATE
     universe_entity_images,
@@ -72,9 +84,17 @@ TRUNCATE
     map_eras, eras, maps
 CASCADE;
 
-INSERT INTO maps ...
-INSERT INTO eras ...
--- etc., in dependency order
+-- ============================================================
+-- MAPS
+-- ============================================================
+INSERT INTO maps (...) VALUES (...);
+
+-- ============================================================
+-- ERAS
+-- ============================================================
+INSERT INTO eras (...) VALUES (...);
+INSERT INTO eras (...) VALUES (...);
+-- etc., one INSERT per row, in dependency order
 ```
 
 ---
@@ -84,9 +104,11 @@ INSERT INTO eras ...
 Triggered when: the user asks Siegmund to update the dump after a data change in the local DB.
 
 1. Siegmund runs `pg_dump --data-only --column-inserts -t maps -t eras -t map_eras -t characters -t character_categories -t places -t place_categories -t factions -t faction_categories -t items -t item_categories -t events -t event_categories -t lore -t lore_categories -t universe_entity_images -t entity_links -t archetypes -t signs keynor_core` directly against the already-running local database. If the database is not reachable, Siegmund stops and reports — never starts one to proceed
-2. Siegmund reformats the output into the canonical file format (TRUNCATE block + ordered INSERTs)
-3. Siegmund replaces `db/seed/universe-content.sql` with the new content
-4. Siegmund commits to a `task/*` branch and opens a PR
+2. Siegmund assembles the file: TRUNCATE block (table list carried over from the previous file), then one section per table in dependency order, each containing that table's `pg_dump` output pasted verbatim — see "File format" above for what NOT to hand-rework
+3. Siegmund updates the header's "Last updated" / "Updated by" lines to describe the change
+4. Siegmund verifies the new file against the previous version **by row content per table** (e.g. sort both old and new row sets by primary key before diffing) — not by literal line position. Physical row reordering with identical content (Postgres heap relocation after a past `UPDATE`) is expected and is not a defect
+5. Siegmund replaces `db/seed/universe-content.sql` with the new content
+6. Siegmund commits to a `task/*` branch and opens a PR
 
 ---
 
