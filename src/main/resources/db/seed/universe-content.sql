@@ -18,14 +18,12 @@
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
 -- Last updated: 2026-07-01
--- Updated by:   Siegmund (added the character Aleph and the lore "The War
---               for the Lantern of True Light", per the user's canon
---               submission; updated the lore "The Calling of Twelve Amets"
---               with a new cross-entity link to Aleph, preserving its
---               existing links to Imaws and Ælime; added 3 new entity_links
---               rows; also split character_categories and lore_categories
---               into their own contiguous sections, no longer interleaved
---               under each parent row, per the documented file format)
+-- Updated by:   Siegmund (added 3 new entity_links rows: character-to-lore
+--               back-links from Aleph to "The War for the Lantern of True
+--               Light" and to "The Calling of Twelve Amets", and from
+--               Zςanser to "The War for the Lantern of True Light";
+--               characters, lore, and all other tables unchanged since the
+--               previous dump)
 
 -- ============================================================
 -- TRUNCATE (join tables first, then parents, then root tables)
@@ -182,6 +180,9 @@ INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, cr
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('4687be2d-e8dd-4c9a-b0ac-afc8c5b7d64d', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '3c6dd2ab-b540-41a4-a4ad-2bca5e5f761c', '2026-07-01 08:13:55.791138+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('c777f541-0a90-4174-98d1-0ce04e2f33b0', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '20744386-efc6-474d-aef6-27d7c4b8af33', '2026-07-01 08:13:55.791138+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('39c682a6-1e9b-43cb-9d29-dba3471d62e8', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '17373f6f-78c4-4621-858d-b1c1f1479704', '2026-07-01 08:13:55.791138+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('a134926c-b127-4435-97a3-30aabc3f3b86', 'CHARACTER', '17373f6f-78c4-4621-858d-b1c1f1479704', 'LORE', '86550df5-4d20-4ba8-9bc8-f0b1dfdfe420', '2026-07-01 08:38:45.166304+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('591e2b4b-56fc-4274-9d70-88080d70f605', 'CHARACTER', '17373f6f-78c4-4621-858d-b1c1f1479704', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', '2026-07-01 08:38:45.166304+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('5bae942f-972f-4b5a-93f6-9750a50f0667', 'CHARACTER', 'c3fe20e2-722e-488e-bf4d-185fd024e900', 'LORE', '86550df5-4d20-4ba8-9bc8-f0b1dfdfe420', '2026-07-01 08:38:45.308617+00');
 
 -- ============================================================
 -- IMAGES
