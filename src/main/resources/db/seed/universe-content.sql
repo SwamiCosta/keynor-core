@@ -18,21 +18,23 @@
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
 -- Last updated: 2026-07-02
--- Updated by:   Siegmund (added the character Trios, god of Chaos and
---               Movement; added his DEITY category and images; added
---               entity_links across all 8 characters and the 4 lore
---               entries "We, Three Kings", "The Origin of Twelve",
---               "The Twelve Aelimic Signs", and "The Last Prayer", per the
---               user's canon submission — no pre-existing link content was
---               lost, though several rows were recreated with new ids by
---               the backend's replace-links semantics)
+-- Updated by:   Siegmund (restored the 2 universe_entity_images rows for
+--               Ani (988bdd8a-04a5-4e34-9857-f72918bec3a0) that were
+--               flagged missing from the live database in the previous
+--               update, per explicit user request — reinstated verbatim
+--               from the last dump that had them; on top of the previous
+--               update's changes: character Trios, his DEITY category and
+--               images, and entity_links across all 8 characters and the
+--               4 lore entries "We, Three Kings", "The Origin of Twelve",
+--               "The Twelve Aelimic Signs", and "The Last Prayer")
 --
--- ⚠  FLAGGED, NOT PART OF THIS SUBMISSION: the 2 universe_entity_images
---   rows previously seeded for Ani (988bdd8a-04a5-4e34-9857-f72918bec3a0)
---   are absent from the live database as of this dump. Ani's own character
---   row and all of Ani's entity_links are unaffected. This was not part of
---   the handoff for this round and its cause is unconfirmed — flagged for
---   the user/Aroneus to investigate before assuming it is intentional.
+-- ⚠  KNOWN DIVERGENCE FROM LIVE DB: the 2 Ani image rows above are NOT
+--   present in the live database as of this dump (their disappearance was
+--   never explained/confirmed as intentional) — they were added back into
+--   this file only, at the user's explicit request. Applying this file
+--   will reinsert them. The next `pg_dump`-based regeneration of this file
+--   will report them as "extra" versus the live DB unless the live DB is
+--   independently corrected (or this file is applied to it) first.
 
 -- ============================================================
 -- TRUNCATE (join tables first, then parents, then root tables)
@@ -233,6 +235,8 @@ INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES 
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-6.png', 5);
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-7.png', 6);
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Omnia-8.png', 7);
+INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ani%2C%20the%20Firstborn%20God%20of%20Singularity-1.png', 1);
+INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ani%2C%20the%20Firstborn%20God%20of%20Singularity-2.png', 0);
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('ea292de9-5429-4ecb-b821-7e1e168ffbca', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/lore/13%20Knights%20of%20Singisd%C3%B4nia.png', 0);
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Z%C3%A7anser-1.png', 0);
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('c3fe20e2-722e-488e-bf4d-185fd024e900', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Z%C3%A7anser-2.png', 1);
