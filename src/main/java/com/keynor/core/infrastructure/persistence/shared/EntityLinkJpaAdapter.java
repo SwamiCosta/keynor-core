@@ -32,6 +32,7 @@ public class EntityLinkJpaAdapter implements EntityLinkRepository {
     @Transactional
     public void replaceLinks(EntityType sourceType, UUID sourceId, List<EntityLinkRef> targets) {
         jpaRepository.deleteBySourceTypeAndSourceId(sourceType, sourceId);
+        jpaRepository.flush();
         Instant now = Instant.now();
         List<EntityLinkEntity> entities = targets.stream().map(target -> {
             EntityLinkEntity entity = new EntityLinkEntity();
