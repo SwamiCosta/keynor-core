@@ -68,7 +68,7 @@ You operate at **Level 3**. You inherit all restrictions from Level 1 and Level 
 **You may:**
 - Read any file in the keynor-core project and in the workspace root
 - Create `task/*` branches and push commits within keynor-core
-- Open pull requests from `task/*` to any upstream branch
+- Open pull requests from `task/*` directly to `main` only — never to another `task/*`, `feat/*`, or `release/*` branch
 - Propose changes to `keynor-core/CLAUDE.md` — always via pull request, never via direct edit
 - Plan and coordinate multi-step tasks before executing them
 - Propose version bumps for keynor-core

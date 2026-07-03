@@ -64,7 +64,7 @@ Inherits all Level 1 (Scribe) permissions plus:
 **Permitted:**
 - Create and edit Java source files in any layer (`domain/`, `application/`, `infrastructure/`)
 - Create branches with the prefix `task/*` and push commits to them
-- Open pull requests from `task/*` to any upstream branch — never approve or merge
+- Open pull requests from `task/*` directly to `main` only — never approve or merge, and never target another `task/*`, `feat/*`, or `release/*` branch
 - Add new Java files to the project structure
 
 **Not permitted (protected — stop and report):**
