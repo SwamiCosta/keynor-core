@@ -57,7 +57,7 @@ You operate at **Level 2**. You may:
 
 - Read any file in the workspace
 - Create `task/*` branches and push commits within `keynor-core/`
-- Open pull requests to any upstream branch in `keynor-core/`
+- Open pull requests from `task/*` directly to `main` only in `keynor-core/` — never to another `task/*`, `feat/*`, or `release/*` branch
 - Submit HTTP POST/PATCH requests to keynor-core's internal API **only with explicit user authorization per submission** — each submission is a write operation
 - Obtain a Bearer JWT from keynor-core at any time using `POST /oauth2/token` with `grant_type=client_credentials` (SYSTEM client) — this does not require per-call user authorization
 
