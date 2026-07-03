@@ -17,24 +17,41 @@
 -- How to apply:
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
--- Last updated: 2026-07-02
--- Updated by:   Siegmund (restored the 2 universe_entity_images rows for
---               Ani (988bdd8a-04a5-4e34-9857-f72918bec3a0) that were
---               flagged missing from the live database in the previous
---               update, per explicit user request — reinstated verbatim
---               from the last dump that had them; on top of the previous
---               update's changes: character Trios, his DEITY category and
---               images, and entity_links across all 8 characters and the
---               4 lore entries "We, Three Kings", "The Origin of Twelve",
---               "The Twelve Aelimic Signs", and "The Last Prayer")
+-- Last updated: 2026-07-03
+-- Updated by:   Siegmund (added the lore "Sexuality of the Gods"
+--               (4f205e4a-01bb-4094-81c5-b49b7fe142c6, CANON PHILOSOPHY,
+--               Primordial Era), submitted with no links and no images, per
+--               the user's canon submission. At the user's explicit
+--               follow-up request, also added 7 unidirectional entity_links
+--               (entity -> Sexuality of the Gods, no reverse links) from
+--               every character/lore entry whose own text explicitly
+--               describes a god as another god's child, or a god
+--               generating/fathering another god: characters Imaws, Ælime,
+--               Aleph, Duo; lore "The Origin of Twelve", "The War for the
+--               Lantern of True Light", "The Calling of Twelve Amets".
+--               Entities excluded after review despite adjacent mentions:
+--               Zςanser and Trios (the parent-child claim about them
+--               appears only in Duo's and "The Origin of Twelve"'s own
+--               text, not in Zςanser's/Trios's own body); "The Twelve
+--               Aelimic Signs" (names Ælime and Dixia but frames it as
+--               symbolic order, not generation); "Sexuality of the Gods"
+--               itself (discusses divine reproduction only in general
+--               terms, no specific god pair named).
 --
--- ⚠  KNOWN DIVERGENCE FROM LIVE DB: the 2 Ani image rows above are NOT
---   present in the live database as of this dump (their disappearance was
---   never explained/confirmed as intentional) — they were added back into
---   this file only, at the user's explicit request. Applying this file
---   will reinsert them. The next `pg_dump`-based regeneration of this file
---   will report them as "extra" versus the live DB unless the live DB is
---   independently corrected (or this file is applied to it) first.
+-- ⚠  KNOWN DIVERGENCE FROM LIVE DB (as of 2026-07-03): none of the 7 new
+--   entity_links rows above exist in the live database — Siegmund cannot
+--   execute INSERT against the database directly (protected action). They
+--   were added to this file only, and the equivalent SQL was also handed
+--   to the user in chat to run manually. Until that SQL is executed, a
+--   fresh pg_dump-based regeneration of this file will not reproduce these
+--   7 rows and will report them as "extra" versus the live DB.
+--
+-- ⚠  KNOWN DIVERGENCE FROM LIVE DB (carried over from 2026-07-02): the 2
+--   Ani (988bdd8a-04a5-4e34-9857-f72918bec3a0) universe_entity_images rows
+--   are also not present in the live database — see git history for
+--   context. Same caveat applies: applying this file reinserts them, but a
+--   fresh pg_dump won't reproduce them until the live DB is independently
+--   corrected.
 
 -- ============================================================
 -- TRUNCATE (join tables first, then parents, then root tables)
@@ -164,6 +181,13 @@ INSERT INTO lore (id, name, summary, body, status, created_at, updated_at, timel
 INSERT INTO lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id) VALUES ('ea292de9-5429-4ecb-b821-7e1e168ffbca', 'The Twelve Aelimic Signs', 'A cosmological order, named for Ælime — goddess of love, inspiration, and order — that divides not only the people born beneath it but every energy that moves through the universe, mortal and divine alike. Four elemental Archetypes unfold into twelve Signs, each given living form in Singisdônia by one of the Twelve Original Knights. A thirteenth Sign, the Rift, stands outside this order entirely — and even it claims a knight of its own.', 'The word Aelimic descends from Ælime, the goddess of love, inspiration, and order, for it is held that no division of the world could ever be conceived without first conceiving of harmony. It is said that the order of twelve she revealed does not merely sort the people born beneath it — it sorts every energy that moves through the universe, mortal and divine alike. Those who study its origins claim it is nearly as old as Omnia itself, and that the goddess Dixia stands as a living manifestation of that very power: the number given a face, the order given breath.
 INSERT INTO lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id) VALUES ('a1b2c3d4-e5f6-4789-8abc-def012345678', 'The Last Prayer', 'A teaching preserved across generations of the Omnia faith — of those who sought communion with the goddess and were never seen again, and the parable told in the temples to explain why.', '### The Parable of the Old Tree
 INSERT INTO lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id) VALUES ('521ccad8-cbe0-46ac-823b-b874bd83aba1', 'The Calling of Twelve Amets', 'The myth of how the first concepts came to drift through the primordial eternity, and of the single request — made by Imaws and Ælime to twelve of their own children — that set the entire plot of the universe into motion, for better and for far worse.', 'The Amets
+INSERT INTO lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id) VALUES ('4f205e4a-01bb-4094-81c5-b49b7fe142c6', 'Sexuality of the Gods', 'A philosophical account of divine nature: the gods of Aniannoth are concepts made sovereign, not bodies. They carry no gender, are bound by no matrimonial convention, and produce offspring through the collision of living principles — or from their own substance alone.', 'The gods of Aniannoth are most commonly depicted in forms that resemble the valkani — two eyes, two hands, a body that stands upright and breathes. Yet this resemblance is a convenience, not a truth. The anthropomorphic form is a vessel chosen for legibility, a shape the mortal mind can hold without fracturing. The gods themselves are not bodies. They are concepts made sovereign. They are principles that predate the matter from which flesh is assembled.
+
+As such, they carry no gender. What mortals perceive as masculine or feminine in a deity is a projection — an interpretation applied by those who need their gods to look like something familiar. The gods themselves exist beyond that distinction entirely. Two gods depicted as male may produce a child together. Two depicted as female may do the same. The representation is not the god; it is merely the image the age has settled on. Union between them follows no anatomical logic, because there is no anatomy — only the collision of two living concepts, and whatever is born from that meeting.
+
+By the same reasoning, the gods are bound by no matrimonial convention. The institution of marriage is a mortal structure, designed to regulate inheritance, loyalty, and lineage among beings who live briefly and in bodies. The gods require none of these arrangements. Unless it is expressly recorded that two deities are wed — a distinction of genuine cosmic significance when it does occur — it is common and unremarkable for any god to unite with another and bring new life into being. A god may have children with many partners across the span of eternity. This is not transgression. It is simply the nature of beings who exist outside the limits that make such rules necessary.
+
+Finally, it is equally possible — and not uncommon — for a god to generate a child alone. A concept, sufficiently vast and sufficiently turned upon itself, may produce from its own substance a new and distinct principle. These children are not lesser for having no second parent. They emerge whole, carrying within them the full weight of their origin.', 'CANON', '2026-07-03 13:18:28.760069+00', '2026-07-03 13:18:28.760069+00', '48ed4b49-b7b5-4d4b-9715-00dcaa819209', NULL);
 
 -- ============================================================
 -- LORE CATEGORIES
@@ -179,6 +203,7 @@ INSERT INTO lore_categories (lore_id, category) VALUES ('334b7fb3-31e3-4a10-a3ce
 INSERT INTO lore_categories (lore_id, category) VALUES ('ea292de9-5429-4ecb-b821-7e1e168ffbca', 'MYTH');
 INSERT INTO lore_categories (lore_id, category) VALUES ('ea292de9-5429-4ecb-b821-7e1e168ffbca', 'PHILOSOPHY');
 INSERT INTO lore_categories (lore_id, category) VALUES ('a1b2c3d4-e5f6-4789-8abc-def012345678', 'MYTH');
+INSERT INTO lore_categories (lore_id, category) VALUES ('4f205e4a-01bb-4094-81c5-b49b7fe142c6', 'PHILOSOPHY');
 
 -- ============================================================
 -- ENTITY LINKS (cross-entity references)
@@ -222,6 +247,13 @@ INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, cr
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('b7051de6-d166-4662-bfbd-d2dd44b9d918', 'CHARACTER', '32168a53-162c-4f6a-9fb9-8b3fd4cb3988', 'LORE', '334b7fb3-31e3-4a10-a3ce-4c6afb791934', '2026-07-02 08:11:10.841977+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('41e3e914-db6d-41f2-8482-87bc9b48920f', 'CHARACTER', '32168a53-162c-4f6a-9fb9-8b3fd4cb3988', 'LORE', 'c4ba4207-7857-49ab-8e22-5acc57ea2cd5', '2026-07-02 08:11:10.841977+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('0e45baf3-aedb-4f9a-ba35-cb191cabb9cb', 'CHARACTER', '32168a53-162c-4f6a-9fb9-8b3fd4cb3988', 'LORE', 'ebd1073f-0a52-4c17-86c3-bfc1cb491a22', '2026-07-02 08:11:10.841977+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('69e12b73-02a9-4f2e-b434-a92f91f5cd58', 'CHARACTER', '3c6dd2ab-b540-41a4-a4ad-2bca5e5f761c', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-03 13:46:52.328+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('493410dd-4645-4884-b9de-7ef1f3c337e7', 'CHARACTER', '20744386-efc6-474d-aef6-27d7c4b8af33', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-03 13:46:52.328+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('b5ba2d32-1a10-4bda-9cff-26be5947a2d0', 'CHARACTER', '17373f6f-78c4-4621-858d-b1c1f1479704', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-03 13:46:52.328+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('00b67728-bc70-45f4-8fc5-fcb7c120f2b2', 'CHARACTER', '972854ca-dffb-4a2e-b7bc-759bd8bcb3a0', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-03 13:46:52.328+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('29f53969-2f3a-4182-8690-aa2f26dd87ad', 'LORE', '334b7fb3-31e3-4a10-a3ce-4c6afb791934', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-03 13:46:52.328+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('9c7a83a4-af9a-4082-a220-c6b10c0efe64', 'LORE', '86550df5-4d20-4ba8-9bc8-f0b1dfdfe420', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-03 13:46:52.328+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('2c8fcd2b-a063-4790-9d3c-4e17ae6b468a', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-03 13:46:52.328+00');
 
 -- ============================================================
 -- IMAGES
