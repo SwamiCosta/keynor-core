@@ -327,12 +327,12 @@ INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES 
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('76d64fa7-b226-4fe7-a65c-3db0f683b2c9', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Tetros-2.png', 1);
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('a37320ee-057a-4a33-8fda-82956761ab38', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Pentos.png', 0);
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('e5a5f4d2-ca44-45f1-a9b2-5cce46e69e30', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Hexas.png', 0);
-INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('19c8770d-517e-4bf9-8f52-d14878a71954', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Hepta.png', 0);
+INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('19c8770d-517e-4bf9-8f52-d14878a71954', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Hecta.png', 0);
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('51a8d026-d237-40c1-8190-36d2a19f6b3c', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Octo.png', 0);
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('77db03b6-11a9-43ac-a96b-8a132f934622', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Enea.png', 0);
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('173033ed-fd0d-4c11-8f63-26667ae2e93b', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Deca.png', 0);
-INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('e5c8fc7d-1128-40ea-8da3-eb93ebcd56d5', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Unxia-1.png', 0);
-INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('e5c8fc7d-1128-40ea-8da3-eb93ebcd56d5', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Unxia-2.png', 1);
+INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('e5c8fc7d-1128-40ea-8da3-eb93ebcd56d5', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Unixia-1.png', 0);
+INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('e5c8fc7d-1128-40ea-8da3-eb93ebcd56d5', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Unixia-2.png', 1);
 
 -- ============================================================
 -- ARCHETYPES
