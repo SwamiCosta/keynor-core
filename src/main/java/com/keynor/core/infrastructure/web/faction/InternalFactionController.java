@@ -15,6 +15,7 @@ import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.faction.*;
 import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import com.keynor.core.infrastructure.web.shared.EntityStatusRequestParser;
+import com.keynor.core.infrastructure.web.shared.LanguageRequestParser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,13 +55,14 @@ public class InternalFactionController {
 
     @GetMapping
     public ResponseEntity<PagedResponse<FactionResponse>> findAll(
+            @RequestParam String language,
             @RequestParam(required = false) List<String> statuses,
             @RequestParam(required = false) List<String> categories,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList() : List.of();
-        EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of());
+        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of());
         var result = findAllFactionsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 faction -> FactionResponse.from(faction, findLinkedEntitiesUseCase.findLinks(EntityType.FACTION, faction.getId()))));
@@ -83,7 +85,10 @@ public class InternalFactionController {
         var command = new CreateFactionUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.images() != null ? request.images() : List.of(),
-                categories, timeline, initialStatus, links);
+                categories, timeline, initialStatus,
+                LanguageRequestParser.parse(request.language()),
+                request.translationGroupId(),
+                links);
         var created = createFactionUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(FactionResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.FACTION, created.getId())));
     }

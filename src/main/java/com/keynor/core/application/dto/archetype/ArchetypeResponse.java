@@ -13,7 +13,9 @@ public record ArchetypeResponse(
         String temperament,
         String cognitiveFunction,
         String selfRelation,
-        String description) {
+        String description,
+        String language,
+        UUID translationGroupId) {
 
     public static ArchetypeResponse from(Archetype archetype) {
         return new ArchetypeResponse(
@@ -25,6 +27,8 @@ public record ArchetypeResponse(
                 archetype.getTemperament(),
                 archetype.getCognitiveFunction(),
                 archetype.getSelfRelation(),
-                archetype.getDescription());
+                archetype.getDescription(),
+                archetype.getLanguage().name(),
+                archetype.getTranslationGroupId());
     }
 }

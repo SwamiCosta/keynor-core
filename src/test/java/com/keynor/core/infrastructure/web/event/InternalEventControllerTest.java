@@ -8,6 +8,7 @@ import com.keynor.core.application.dto.shared.PagedResponse;
 import com.keynor.core.domain.model.event.Event;
 import com.keynor.core.domain.model.event.EventCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
@@ -49,7 +50,7 @@ class InternalEventControllerTest {
         Instant now = Instant.now();
         return new Event(id, "The Battle of Kor", "A decisive battle", "Body",
                 List.of(), List.of(EventCategory.BATTLE),
-                EntityStatus.DRAFT, null, now, now);
+                EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
     }
 
     @BeforeEach
@@ -67,7 +68,7 @@ class InternalEventControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateEventRequest("The Battle of Kor", "A decisive battle", "Body",
-                List.of(), List.of("BATTLE"), "era-1", null, null, null);
+                List.of(), List.of("BATTLE"), "era-1", null, null,"en", null, null);
 
         var response = controller.create(request);
 
@@ -84,7 +85,7 @@ class InternalEventControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateEventRequest("The Battle of Kor", null, null,
-                List.of(), List.of("BATTLE"), "era-1", null, null, null);
+                List.of(), List.of("BATTLE"), "era-1", null, null,"en", null, null);
 
         controller.create(request);
 
@@ -102,7 +103,7 @@ class InternalEventControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateEventRequest("The Battle of Kor", null, null,
-                List.of(), List.of("BATTLE"), "era-1", null, null, null);
+                List.of(), List.of("BATTLE"), "era-1", null, null,"en", null, null);
 
         controller.create(request);
 
@@ -117,12 +118,12 @@ class InternalEventControllerTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Event canonEvent = new Event(id, "The Battle of Kor", null, null, List.of(),
-                List.of(EventCategory.BATTLE), EntityStatus.CANON, null, now, now);
+                List.of(EventCategory.BATTLE), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(createEventUseCase.create(any())).thenReturn(canonEvent);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateEventRequest("The Battle of Kor", null, null,
-                List.of(), List.of("BATTLE"), "era-1", null, "CANON", null);
+                List.of(), List.of("BATTLE"), "era-1", null, "CANON","en", null, null);
 
         controller.create(request);
 
@@ -135,7 +136,7 @@ class InternalEventControllerTest {
     @Test
     void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
         var request = new CreateEventRequest("The Battle of Kor", null, null,
-                List.of(), List.of("BATTLE"), "era-1", null, "DEPRECATED", null);
+                List.of(), List.of("BATTLE"), "era-1", null, "DEPRECATED","en", null, null);
 
         assertThatThrownBy(() -> controller.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -187,7 +188,7 @@ class InternalEventControllerTest {
                 .thenReturn(new PageResult<>(List.of(buildEvent(id)), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, null, 0, 20);
+        var response = controller.findAll("en", null, null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<EventResponse> body = response.getBody();
@@ -204,7 +205,7 @@ class InternalEventControllerTest {
         when(findAllEventsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, null, 0, 20);
+        controller.findAll("en", null, null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllEventsUseCase).findAll(filterCaptor.capture(), any());

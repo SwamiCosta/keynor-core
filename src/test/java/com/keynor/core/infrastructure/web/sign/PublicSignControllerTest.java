@@ -2,6 +2,7 @@ package com.keynor.core.infrastructure.web.sign;
 
 import com.keynor.core.application.dto.sign.SignResponse;
 import com.keynor.core.domain.model.sign.Sign;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.port.in.sign.FindAllSignsUseCase;
 import com.keynor.core.domain.port.in.sign.FindSignByIdUseCase;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,14 +45,14 @@ class PublicSignControllerTest {
 
         Sign rift = new Sign(
                 riftId, "The Rift", 1, "Deep Winter", UUID.randomUUID(), null,
-                "The rift summary", "The rift body", NOW, NOW);
+                "The rift summary", "The rift body", NOW, NOW, Language.EN, UUID.randomUUID());
         Sign seeker = new Sign(
                 seekerId, "The Seeker", 2, "Early Spring", UUID.randomUUID(), "The Wanderer",
-                "The seeker summary", "The seeker body", NOW, NOW);
+                "The seeker summary", "The seeker body", NOW, NOW, Language.EN, UUID.randomUUID());
 
-        when(findAllSignsUseCase.findAll()).thenReturn(List.of(rift, seeker));
+        when(findAllSignsUseCase.findAll(Language.EN)).thenReturn(List.of(rift, seeker));
 
-        var response = controller.findAll();
+        var response = controller.findAll("en");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         List<SignResponse> body = response.getBody();
@@ -69,14 +70,14 @@ class PublicSignControllerTest {
         assertThat(secondEntry.signOrder()).isEqualTo(2);
         assertThat(secondEntry.subArchetype()).isEqualTo("The Wanderer");
 
-        verify(findAllSignsUseCase).findAll();
+        verify(findAllSignsUseCase).findAll(Language.EN);
     }
 
     @Test
     void findAll_shouldReturnEmptyList_whenNoEntriesExist() {
-        when(findAllSignsUseCase.findAll()).thenReturn(List.of());
+        when(findAllSignsUseCase.findAll(Language.EN)).thenReturn(List.of());
 
-        var response = controller.findAll();
+        var response = controller.findAll("en");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull().isEmpty();
@@ -87,7 +88,7 @@ class PublicSignControllerTest {
         UUID id = UUID.randomUUID();
         Sign sign = new Sign(
                 id, "The Seeker", 2, "Early Spring", UUID.randomUUID(), "The Wanderer",
-                "The seeker summary", "The seeker body", NOW, NOW);
+                "The seeker summary", "The seeker body", NOW, NOW, Language.EN, UUID.randomUUID());
         when(findSignByIdUseCase.findById(id)).thenReturn(sign);
 
         var response = controller.findById(id);
@@ -105,7 +106,7 @@ class PublicSignControllerTest {
         UUID id = UUID.randomUUID();
         Sign rift = new Sign(
                 id, "The Rift", 1, "Deep Winter", UUID.randomUUID(), null,
-                "The rift summary", "The rift body", NOW, NOW);
+                "The rift summary", "The rift body", NOW, NOW, Language.EN, UUID.randomUUID());
         when(findSignByIdUseCase.findById(id)).thenReturn(rift);
 
         var response = controller.findById(id);

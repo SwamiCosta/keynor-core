@@ -3,6 +3,7 @@ package com.keynor.core.infrastructure.web.sign;
 import com.keynor.core.application.dto.sign.SignResponse;
 import com.keynor.core.domain.port.in.sign.FindAllSignsUseCase;
 import com.keynor.core.domain.port.in.sign.FindSignByIdUseCase;
+import com.keynor.core.infrastructure.web.shared.LanguageRequestParser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +25,9 @@ public class PublicSignController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SignResponse>> findAll() {
+    public ResponseEntity<List<SignResponse>> findAll(@RequestParam String language) {
         return ResponseEntity.ok(
-                findAllSignsUseCase.findAll().stream().map(SignResponse::from).toList());
+                findAllSignsUseCase.findAll(LanguageRequestParser.parse(language)).stream().map(SignResponse::from).toList());
     }
 
     @GetMapping("/{id}")

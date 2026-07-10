@@ -2,6 +2,7 @@ package com.keynor.core.domain.service;
 
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.era.Era;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.era.EraImportance;
 import com.keynor.core.domain.model.era.EraType;
 import com.keynor.core.domain.port.out.EraRepository;
@@ -37,15 +38,15 @@ class EraServiceTest {
     @Test
     void findAll_shouldDelegateToRepositoryAndReturnOrderedList() {
         Era eraInterval = new Era(
-                UUID.randomUUID(), "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW);
+                UUID.randomUUID(), "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW, Language.EN, UUID.randomUUID());
         Era temporalPoint = new Era(
-                UUID.randomUUID(), "The Great Sundering", 2, EraType.POINT, EraImportance.MAJOR, "Cataclysmic event", NOW, NOW);
+                UUID.randomUUID(), "The Great Sundering", 2, EraType.POINT, EraImportance.MAJOR, "Cataclysmic event", NOW, NOW, Language.EN, UUID.randomUUID());
         Era eraInterval2 = new Era(
-                UUID.randomUUID(), "Age of Silence", 3, EraType.ERA, null, "Age of quiet", NOW, NOW);
+                UUID.randomUUID(), "Age of Silence", 3, EraType.ERA, null, "Age of quiet", NOW, NOW, Language.EN, UUID.randomUUID());
 
-        when(eraRepository.findAllOrderedByIndex()).thenReturn(List.of(eraInterval, temporalPoint, eraInterval2));
+        when(eraRepository.findAllOrderedByIndex(Language.EN)).thenReturn(List.of(eraInterval, temporalPoint, eraInterval2));
 
-        List<Era> result = eraService.findAll();
+        List<Era> result = eraService.findAll(Language.EN);
 
         assertThat(result).hasSize(3);
         assertThat(result.get(0).getType()).isEqualTo(EraType.ERA);
@@ -53,23 +54,23 @@ class EraServiceTest {
         assertThat(result.get(1).getType()).isEqualTo(EraType.POINT);
         assertThat(result.get(1).getImportance()).isEqualTo(EraImportance.MAJOR);
         assertThat(result.get(2).getType()).isEqualTo(EraType.ERA);
-        verify(eraRepository).findAllOrderedByIndex();
+        verify(eraRepository).findAllOrderedByIndex(Language.EN);
     }
 
     @Test
     void findAll_shouldReturnEmptyList_whenNoEntriesExist() {
-        when(eraRepository.findAllOrderedByIndex()).thenReturn(List.of());
+        when(eraRepository.findAllOrderedByIndex(Language.EN)).thenReturn(List.of());
 
-        List<Era> result = eraService.findAll();
+        List<Era> result = eraService.findAll(Language.EN);
 
         assertThat(result).isEmpty();
-        verify(eraRepository).findAllOrderedByIndex();
+        verify(eraRepository).findAllOrderedByIndex(Language.EN);
     }
 
     @Test
     void findById_shouldReturnEra_whenFound() {
         UUID id = UUID.randomUUID();
-        Era era = new Era(id, "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW);
+        Era era = new Era(id, "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW, Language.EN, UUID.randomUUID());
         when(eraRepository.findById(id)).thenReturn(Optional.of(era));
 
         Era result = eraService.findById(id);
@@ -83,7 +84,7 @@ class EraServiceTest {
     @Test
     void findById_shouldReturnTemporalPoint_whenFound() {
         UUID id = UUID.randomUUID();
-        Era point = new Era(id, "The Great Sundering", 2, EraType.POINT, EraImportance.MAJOR, "Cataclysmic event", NOW, NOW);
+        Era point = new Era(id, "The Great Sundering", 2, EraType.POINT, EraImportance.MAJOR, "Cataclysmic event", NOW, NOW, Language.EN, UUID.randomUUID());
         when(eraRepository.findById(id)).thenReturn(Optional.of(point));
 
         Era result = eraService.findById(id);
@@ -106,7 +107,7 @@ class EraServiceTest {
     @Test
     void era_constructor_shouldThrow_whenPointHasNullImportance() {
         assertThatThrownBy(() ->
-                new Era(UUID.randomUUID(), "Some Point", 1, EraType.POINT, null, "desc", NOW, NOW))
+                new Era(UUID.randomUUID(), "Some Point", 1, EraType.POINT, null, "desc", NOW, NOW, Language.EN, UUID.randomUUID()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("POINT");
     }
@@ -114,14 +115,14 @@ class EraServiceTest {
     @Test
     void era_constructor_shouldThrow_whenEraHasNonNullImportance() {
         assertThatThrownBy(() ->
-                new Era(UUID.randomUUID(), "Some Era", 1, EraType.ERA, EraImportance.STANDARD, "desc", NOW, NOW))
+                new Era(UUID.randomUUID(), "Some Era", 1, EraType.ERA, EraImportance.STANDARD, "desc", NOW, NOW, Language.EN, UUID.randomUUID()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("ERA");
     }
 
     @Test
     void era_constructor_shouldAccept_pointWithStandardImportance() {
-        Era point = new Era(UUID.randomUUID(), "Minor Event", 1, EraType.POINT, EraImportance.STANDARD, "desc", NOW, NOW);
+        Era point = new Era(UUID.randomUUID(), "Minor Event", 1, EraType.POINT, EraImportance.STANDARD, "desc", NOW, NOW, Language.EN, UUID.randomUUID());
 
         assertThat(point.getType()).isEqualTo(EraType.POINT);
         assertThat(point.getImportance()).isEqualTo(EraImportance.STANDARD);
@@ -129,7 +130,7 @@ class EraServiceTest {
 
     @Test
     void era_constructor_shouldAccept_eraWithNullImportance() {
-        Era era = new Era(UUID.randomUUID(), "Silent Age", 1, EraType.ERA, null, "desc", NOW, NOW);
+        Era era = new Era(UUID.randomUUID(), "Silent Age", 1, EraType.ERA, null, "desc", NOW, NOW, Language.EN, UUID.randomUUID());
 
         assertThat(era.getType()).isEqualTo(EraType.ERA);
         assertThat(era.getImportance()).isNull();

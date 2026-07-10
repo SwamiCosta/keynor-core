@@ -6,6 +6,7 @@ import com.keynor.core.domain.model.event.Event;
 import com.keynor.core.domain.model.event.EventCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.event.FindAllEventsUseCase;
@@ -53,7 +54,7 @@ class PublicEventControllerTest {
         when(findAllEventsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, 0, 20);
+        controller.findAll("en", null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllEventsUseCase).findAll(filterCaptor.capture(), any());
@@ -65,7 +66,7 @@ class PublicEventControllerTest {
         when(findAllEventsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 100, 0));
 
-        controller.findAll(null, 0, 100);
+        controller.findAll("en", null, 0, 100);
 
         ArgumentCaptor<PageRequest> pageCaptor = ArgumentCaptor.forClass(PageRequest.class);
         verify(findAllEventsUseCase).findAll(any(), pageCaptor.capture());
@@ -78,12 +79,12 @@ class PublicEventControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Event event = new Event(id, "The First Sundering", "A cataclysmic event", "Body",
-                List.of(), List.of(EventCategory.BATTLE), EntityStatus.CANON, null, now, now);
+                List.of(), List.of(EventCategory.BATTLE), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(findAllEventsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(event), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, 0, 20);
+        var response = controller.findAll("en", null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<EventResponse> body = response.getBody();
@@ -99,7 +100,7 @@ class PublicEventControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Event event = new Event(id, "The First Sundering", "A cataclysmic event", "Body",
-                List.of(), List.of(EventCategory.DIVINE), EntityStatus.CANON, null, now, now);
+                List.of(), List.of(EventCategory.DIVINE), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(findEventByIdUseCase.findById(id)).thenReturn(event);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 

@@ -18,6 +18,8 @@ public class ArchetypeMapper {
                 entity.getSelfRelation(),
                 entity.getDescription(),
                 entity.getCreatedAt(),
-                entity.getUpdatedAt());
+                entity.getUpdatedAt(),
+                entity.getLanguage(),
+                entity.getTranslationGroupId());
     }
 }

@@ -8,6 +8,7 @@ import com.keynor.core.application.dto.shared.PagedResponse;
 import com.keynor.core.domain.model.character.Character;
 import com.keynor.core.domain.model.character.CharacterCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
@@ -48,7 +49,7 @@ class InternalCharacterControllerTest {
     private Character buildCharacter(UUID id) {
         Instant now = Instant.now();
         return new Character(id, "Araveth", "A hero", "Body",
-                List.of(), List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now);
+                List.of(), List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
     }
 
     @BeforeEach
@@ -67,7 +68,7 @@ class InternalCharacterControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of(), List.of("HERO"), "era-1", null, null, null);
+                List.of(), List.of("HERO"), "era-1", null, null,"en", null, null);
 
         var response = controller.create(request);
 
@@ -84,7 +85,7 @@ class InternalCharacterControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of("img.png"), List.of("HERO"), "era-1", null, null, null);
+                List.of("img.png"), List.of("HERO"), "era-1", null, null,"en", null, null);
 
         controller.create(request);
 
@@ -102,7 +103,7 @@ class InternalCharacterControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of(), List.of("HERO"), "era-1", null, null, null);
+                List.of(), List.of("HERO"), "era-1", null, null,"en", null, null);
 
         controller.create(request);
 
@@ -117,12 +118,12 @@ class InternalCharacterControllerTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Character canonCharacter = new Character(id, "Araveth", null, null, List.of(),
-                List.of(CharacterCategory.HERO), EntityStatus.CANON, null, now, now);
+                List.of(CharacterCategory.HERO), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(createCharacterUseCase.create(any())).thenReturn(canonCharacter);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of(), List.of("HERO"), "era-1", null, "CANON", null);
+                List.of(), List.of("HERO"), "era-1", null, "CANON","en", null, null);
 
         controller.create(request);
 
@@ -135,7 +136,7 @@ class InternalCharacterControllerTest {
     @Test
     void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of(), List.of("HERO"), "era-1", null, "DEPRECATED", null);
+                List.of(), List.of("HERO"), "era-1", null, "DEPRECATED","en", null, null);
 
         assertThatThrownBy(() -> controller.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -190,7 +191,7 @@ class InternalCharacterControllerTest {
                 .thenReturn(new PageResult<>(List.of(character), 1, 10, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, null, 1, 10);
+        var response = controller.findAll("en", null, null, 1, 10);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<CharacterResponse> body = response.getBody();
@@ -207,7 +208,7 @@ class InternalCharacterControllerTest {
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, null, 0, 20);
+        controller.findAll("en", null, null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllCharactersUseCase).findAll(filterCaptor.capture(), any());

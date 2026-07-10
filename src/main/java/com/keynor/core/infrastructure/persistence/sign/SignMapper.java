@@ -17,6 +17,8 @@ public class SignMapper {
                 entity.getSummary(),
                 entity.getBody(),
                 entity.getCreatedAt(),
-                entity.getUpdatedAt());
+                entity.getUpdatedAt(),
+                entity.getLanguage(),
+                entity.getTranslationGroupId());
     }
 }

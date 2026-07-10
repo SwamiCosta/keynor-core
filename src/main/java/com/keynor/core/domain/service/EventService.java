@@ -42,14 +42,16 @@ public class EventService implements
 
     @Override
     public Event create(CreateEventUseCase.Command command) {
-        if (eventRepository.existsByName(command.name())) {
+        if (eventRepository.existsByNameAndLanguage(command.name(), command.language())) {
             throw new DuplicateEntityNameException("Event", command.name());
         }
         validateTimeline(command.timeline());
         Instant now = Instant.now();
         EntityStatus initialStatus = command.status() != null ? command.status() : EntityStatus.DRAFT;
+        UUID newId = UUID.randomUUID();
+        UUID translationGroupId = command.translationGroupId() != null ? command.translationGroupId() : newId;
         Event event = new Event(
-                UUID.randomUUID(),
+                newId,
                 command.name(),
                 command.summary(),
                 command.body(),
@@ -58,7 +60,9 @@ public class EventService implements
                 initialStatus,
                 command.timeline(),
                 now,
-                now);
+                now,
+                command.language(),
+                translationGroupId);
         Event saved = eventRepository.save(event);
         entityLinkRepository.replaceLinks(EntityType.EVENT, saved.getId(), command.links() != null ? command.links() : List.of());
         return saved;

@@ -1,5 +1,6 @@
 package com.keynor.core.infrastructure.persistence.event;
 
+import com.keynor.core.domain.model.shared.Language;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -9,5 +10,5 @@ public interface EventJpaRepository
         extends JpaRepository<EventEntity, UUID>,
                 JpaSpecificationExecutor<EventEntity> {
 
-    boolean existsByName(String name);
+    boolean existsByNameAndLanguage(String name, Language language);
 }

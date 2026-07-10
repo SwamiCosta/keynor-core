@@ -1,6 +1,7 @@
 package com.keynor.core.domain.model.faction;
 
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.model.shared.UniverseEntity;
 
@@ -23,8 +24,10 @@ public class Faction extends UniverseEntity {
             EntityStatus status,
             Timeline timeline,
             Instant createdAt,
-            Instant updatedAt) {
-        super(id, name, summary, body, images, status, timeline, createdAt, updatedAt);
+            Instant updatedAt,
+            Language language,
+            UUID translationGroupId) {
+        super(id, name, summary, body, images, status, timeline, createdAt, updatedAt, language, translationGroupId);
         this.categories = new ArrayList<>(categories);
     }
 

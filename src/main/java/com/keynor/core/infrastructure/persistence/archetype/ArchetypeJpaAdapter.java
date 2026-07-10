@@ -1,6 +1,7 @@
 package com.keynor.core.infrastructure.persistence.archetype;
 
 import com.keynor.core.domain.model.archetype.Archetype;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.port.out.ArchetypeRepository;
 import org.springframework.stereotype.Component;
 
@@ -20,8 +21,8 @@ public class ArchetypeJpaAdapter implements ArchetypeRepository {
     }
 
     @Override
-    public List<Archetype> findAll() {
-        return jpaRepository.findAll()
+    public List<Archetype> findAllByLanguage(Language language) {
+        return jpaRepository.findAllByLanguage(language)
                 .stream()
                 .map(mapper::toDomain)
                 .toList();

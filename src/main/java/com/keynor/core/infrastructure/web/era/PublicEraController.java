@@ -3,6 +3,7 @@ package com.keynor.core.infrastructure.web.era;
 import com.keynor.core.application.dto.era.EraResponse;
 import com.keynor.core.domain.port.in.era.FindAllErasUseCase;
 import com.keynor.core.domain.port.in.era.FindEraByIdUseCase;
+import com.keynor.core.infrastructure.web.shared.LanguageRequestParser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +25,9 @@ public class PublicEraController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EraResponse>> findAll() {
+    public ResponseEntity<List<EraResponse>> findAll(@RequestParam String language) {
         return ResponseEntity.ok(
-                findAllErasUseCase.findAll().stream().map(EraResponse::from).toList());
+                findAllErasUseCase.findAll(LanguageRequestParser.parse(language)).stream().map(EraResponse::from).toList());
     }
 
     @GetMapping("/{id}")

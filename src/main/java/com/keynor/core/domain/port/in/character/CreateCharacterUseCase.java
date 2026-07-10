@@ -4,9 +4,11 @@ import com.keynor.core.domain.model.character.Character;
 import com.keynor.core.domain.model.character.CharacterCategory;
 import com.keynor.core.domain.model.shared.EntityLinkRef;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.Timeline;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface CreateCharacterUseCase {
 
@@ -18,6 +20,8 @@ public interface CreateCharacterUseCase {
             List<CharacterCategory> categories,
             Timeline timeline,
             EntityStatus status,
+            Language language,
+            UUID translationGroupId,
             List<EntityLinkRef> links) {}
 
     Character create(Command command);

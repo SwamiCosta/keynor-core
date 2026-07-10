@@ -16,6 +16,7 @@ import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.place.*;
 import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import com.keynor.core.infrastructure.web.shared.EntityStatusRequestParser;
+import com.keynor.core.infrastructure.web.shared.LanguageRequestParser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +56,7 @@ public class InternalPlaceController {
 
     @GetMapping
     public ResponseEntity<PagedResponse<PlaceResponse>> findAll(
+            @RequestParam String language,
             @RequestParam(required = false) List<String> statuses,
             @RequestParam(required = false) List<String> categories,
             @RequestParam(defaultValue = "0") int page,
@@ -62,7 +64,7 @@ public class InternalPlaceController {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList()
                 : List.of();
-        EntityFilter filter = new EntityFilter(parsedStatuses, categories != null ? categories : List.of());
+        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of());
         var result = findAllPlacesUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 place -> PlaceResponse.from(place, findLinkedEntitiesUseCase.findLinks(EntityType.PLACE, place.getId()))));
@@ -86,7 +88,10 @@ public class InternalPlaceController {
         var command = new CreatePlaceUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.images() != null ? request.images() : List.of(),
-                categories, mapType, timeline, initialStatus, links);
+                categories, mapType, timeline, initialStatus,
+                LanguageRequestParser.parse(request.language()),
+                request.translationGroupId(),
+                links);
         var created = createPlaceUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(PlaceResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.PLACE, created.getId())));
     }

@@ -15,6 +15,7 @@ import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.character.*;
 import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import com.keynor.core.infrastructure.web.shared.EntityStatusRequestParser;
+import com.keynor.core.infrastructure.web.shared.LanguageRequestParser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,11 +55,12 @@ public class InternalCharacterController {
 
     @GetMapping
     public ResponseEntity<PagedResponse<CharacterResponse>> findAll(
+            @RequestParam String language,
             @RequestParam(required = false) List<String> statuses,
             @RequestParam(required = false) List<String> categories,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        EntityFilter filter = buildFilter(statuses, categories);
+        EntityFilter filter = buildFilter(language, statuses, categories);
         var result = findAllCharactersUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 character -> CharacterResponse.from(character, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, character.getId()))));
@@ -82,6 +84,8 @@ public class InternalCharacterController {
                 parseCategories(request.categories()),
                 buildTimeline(request.timelineFoundedEra(), request.timelineDestroyedEra()),
                 initialStatus,
+                LanguageRequestParser.parse(request.language()),
+                request.translationGroupId(),
                 links);
         var created = createCharacterUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -125,11 +129,11 @@ public class InternalCharacterController {
                 .toList();
     }
 
-    private EntityFilter buildFilter(List<String> statuses, List<String> categories) {
+    private EntityFilter buildFilter(String language, List<String> statuses, List<String> categories) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList()
                 : List.of();
-        return new EntityFilter(parsedStatuses, categories != null ? categories : List.of());
+        return new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of());
     }
 
     private List<CharacterCategory> parseCategories(List<String> categories) {

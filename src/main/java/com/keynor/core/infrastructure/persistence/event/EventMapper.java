@@ -37,7 +37,9 @@ public class EventMapper {
                 entity.getStatus(),
                 timeline,
                 entity.getCreatedAt(),
-                entity.getUpdatedAt());
+                entity.getUpdatedAt(),
+                entity.getLanguage(),
+                entity.getTranslationGroupId());
     }
 
     public EventEntity toEntity(Event event) {
@@ -52,6 +54,8 @@ public class EventMapper {
         entity.setTimeline(toEmbeddable(event));
         entity.setCreatedAt(event.getCreatedAt());
         entity.setUpdatedAt(event.getUpdatedAt());
+        entity.setLanguage(event.getLanguage());
+        entity.setTranslationGroupId(event.getTranslationGroupId());
         return entity;
     }
 

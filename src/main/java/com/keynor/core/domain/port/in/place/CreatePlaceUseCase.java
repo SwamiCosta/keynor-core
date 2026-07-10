@@ -5,9 +5,11 @@ import com.keynor.core.domain.model.place.Place;
 import com.keynor.core.domain.model.place.PlaceCategory;
 import com.keynor.core.domain.model.shared.EntityLinkRef;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.Timeline;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface CreatePlaceUseCase {
 
@@ -20,6 +22,8 @@ public interface CreatePlaceUseCase {
             MapType mapType,
             Timeline timeline,
             EntityStatus status,
+            Language language,
+            UUID translationGroupId,
             List<EntityLinkRef> links) {}
 
     Place create(Command command);

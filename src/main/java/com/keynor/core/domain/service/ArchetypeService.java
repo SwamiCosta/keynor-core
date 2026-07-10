@@ -4,6 +4,7 @@ import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.archetype.Archetype;
 import com.keynor.core.domain.port.in.archetype.FindAllArchetypesUseCase;
 import com.keynor.core.domain.port.in.archetype.FindArchetypeByIdUseCase;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.port.out.ArchetypeRepository;
 
 import java.util.List;
@@ -18,8 +19,8 @@ public class ArchetypeService implements FindAllArchetypesUseCase, FindArchetype
     }
 
     @Override
-    public List<Archetype> findAll() {
-        return archetypeRepository.findAll();
+    public List<Archetype> findAll(Language language) {
+        return archetypeRepository.findAllByLanguage(language);
     }
 
     @Override

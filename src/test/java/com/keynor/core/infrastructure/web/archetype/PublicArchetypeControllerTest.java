@@ -2,6 +2,7 @@ package com.keynor.core.infrastructure.web.archetype;
 
 import com.keynor.core.application.dto.archetype.ArchetypeResponse;
 import com.keynor.core.domain.model.archetype.Archetype;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.port.in.archetype.FindAllArchetypesUseCase;
 import com.keynor.core.domain.port.in.archetype.FindArchetypeByIdUseCase;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,14 +44,14 @@ class PublicArchetypeControllerTest {
         UUID seekerId = UUID.randomUUID();
 
         Archetype obsession = new Archetype(
-                obsessionId, "Obsession", null, null, null, null, null, null, "The obsessive archetype", NOW, NOW);
+                obsessionId, "Obsession", null, null, null, null, null, null, "The obsessive archetype", NOW, NOW, Language.EN, UUID.randomUUID());
         Archetype theSeeker = new Archetype(
                 seekerId, "The Seeker", "Air", "Wands", "Explorer", "Choleric", "Intuition", "Outward",
-                "The seeking archetype", NOW, NOW);
+                "The seeking archetype", NOW, NOW, Language.EN, UUID.randomUUID());
 
-        when(findAllArchetypesUseCase.findAll()).thenReturn(List.of(obsession, theSeeker));
+        when(findAllArchetypesUseCase.findAll(Language.EN)).thenReturn(List.of(obsession, theSeeker));
 
-        var response = controller.findAll();
+        var response = controller.findAll("en");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         List<ArchetypeResponse> body = response.getBody();
@@ -68,14 +69,14 @@ class PublicArchetypeControllerTest {
         assertThat(secondEntry.element()).isEqualTo("Air");
         assertThat(secondEntry.suit()).isEqualTo("Wands");
 
-        verify(findAllArchetypesUseCase).findAll();
+        verify(findAllArchetypesUseCase).findAll(Language.EN);
     }
 
     @Test
     void findAll_shouldReturnEmptyList_whenNoEntriesExist() {
-        when(findAllArchetypesUseCase.findAll()).thenReturn(List.of());
+        when(findAllArchetypesUseCase.findAll(Language.EN)).thenReturn(List.of());
 
-        var response = controller.findAll();
+        var response = controller.findAll("en");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull().isEmpty();
@@ -86,7 +87,7 @@ class PublicArchetypeControllerTest {
         UUID id = UUID.randomUUID();
         Archetype archetype = new Archetype(
                 id, "The Seeker", "Air", "Wands", "Explorer", "Choleric", "Intuition", "Outward",
-                "The seeking archetype", NOW, NOW);
+                "The seeking archetype", NOW, NOW, Language.EN, UUID.randomUUID());
         when(findArchetypeByIdUseCase.findById(id)).thenReturn(archetype);
 
         var response = controller.findById(id);

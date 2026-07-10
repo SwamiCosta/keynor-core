@@ -2,6 +2,7 @@ package com.keynor.core.infrastructure.persistence.character;
 
 import com.keynor.core.domain.model.character.CharacterCategory;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.infrastructure.persistence.shared.TimelineEmbeddable;
 import jakarta.persistence.*;
 
@@ -42,6 +43,13 @@ public class CharacterEntity {
     @Column(nullable = false)
     private EntityStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 2)
+    private Language language;
+
+    @Column(nullable = false)
+    private UUID translationGroupId;
+
     @Embedded
     private TimelineEmbeddable timeline;
 
@@ -65,6 +73,10 @@ public class CharacterEntity {
     public void setCategories(List<CharacterCategory> categories) { this.categories = categories; }
     public EntityStatus getStatus() { return status; }
     public void setStatus(EntityStatus status) { this.status = status; }
+    public Language getLanguage() { return language; }
+    public void setLanguage(Language language) { this.language = language; }
+    public UUID getTranslationGroupId() { return translationGroupId; }
+    public void setTranslationGroupId(UUID translationGroupId) { this.translationGroupId = translationGroupId; }
     public TimelineEmbeddable getTimeline() { return timeline; }
     public void setTimeline(TimelineEmbeddable timeline) { this.timeline = timeline; }
     public Instant getCreatedAt() { return createdAt; }

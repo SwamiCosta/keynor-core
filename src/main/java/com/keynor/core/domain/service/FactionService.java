@@ -42,14 +42,16 @@ public class FactionService implements
 
     @Override
     public Faction create(CreateFactionUseCase.Command command) {
-        if (factionRepository.existsByName(command.name())) {
+        if (factionRepository.existsByNameAndLanguage(command.name(), command.language())) {
             throw new DuplicateEntityNameException("Faction", command.name());
         }
         validateTimeline(command.timeline());
         Instant now = Instant.now();
         EntityStatus initialStatus = command.status() != null ? command.status() : EntityStatus.DRAFT;
+        UUID newId = UUID.randomUUID();
+        UUID translationGroupId = command.translationGroupId() != null ? command.translationGroupId() : newId;
         Faction faction = new Faction(
-                UUID.randomUUID(),
+                newId,
                 command.name(),
                 command.summary(),
                 command.body(),
@@ -58,7 +60,9 @@ public class FactionService implements
                 initialStatus,
                 command.timeline(),
                 now,
-                now);
+                now,
+                command.language(),
+                translationGroupId);
         Faction saved = factionRepository.save(faction);
         entityLinkRepository.replaceLinks(EntityType.FACTION, saved.getId(), command.links() != null ? command.links() : List.of());
         return saved;

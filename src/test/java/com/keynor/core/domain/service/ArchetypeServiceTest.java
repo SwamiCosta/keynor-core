@@ -2,6 +2,7 @@ package com.keynor.core.domain.service;
 
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.archetype.Archetype;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.port.out.ArchetypeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,14 +36,14 @@ class ArchetypeServiceTest {
     @Test
     void findAll_shouldDelegateToRepositoryAndReturnListAsIs() {
         Archetype obsession = new Archetype(
-                UUID.randomUUID(), "Obsession", null, null, null, null, null, null, "The obsessive archetype", NOW, NOW);
+                UUID.randomUUID(), "Obsession", null, null, null, null, null, null, "The obsessive archetype", NOW, NOW, Language.EN, UUID.randomUUID());
         Archetype theSeeker = new Archetype(
                 UUID.randomUUID(), "The Seeker", "Air", "Wands", "Explorer", "Choleric", "Intuition", "Outward",
-                "The seeking archetype", NOW, NOW);
+                "The seeking archetype", NOW, NOW, Language.EN, UUID.randomUUID());
 
-        when(archetypeRepository.findAll()).thenReturn(List.of(obsession, theSeeker));
+        when(archetypeRepository.findAllByLanguage(Language.EN)).thenReturn(List.of(obsession, theSeeker));
 
-        List<Archetype> result = archetypeService.findAll();
+        List<Archetype> result = archetypeService.findAll(Language.EN);
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getName()).isEqualTo("Obsession");
@@ -59,17 +60,17 @@ class ArchetypeServiceTest {
         assertThat(result.get(1).getTemperament()).isEqualTo("Choleric");
         assertThat(result.get(1).getCognitiveFunction()).isEqualTo("Intuition");
         assertThat(result.get(1).getSelfRelation()).isEqualTo("Outward");
-        verify(archetypeRepository).findAll();
+        verify(archetypeRepository).findAllByLanguage(Language.EN);
     }
 
     @Test
     void findAll_shouldReturnEmptyList_whenNoEntriesExist() {
-        when(archetypeRepository.findAll()).thenReturn(List.of());
+        when(archetypeRepository.findAllByLanguage(Language.EN)).thenReturn(List.of());
 
-        List<Archetype> result = archetypeService.findAll();
+        List<Archetype> result = archetypeService.findAll(Language.EN);
 
         assertThat(result).isEmpty();
-        verify(archetypeRepository).findAll();
+        verify(archetypeRepository).findAllByLanguage(Language.EN);
     }
 
     @Test
@@ -77,7 +78,7 @@ class ArchetypeServiceTest {
         UUID id = UUID.randomUUID();
         Archetype archetype = new Archetype(
                 id, "The Seeker", "Air", "Wands", "Explorer", "Choleric", "Intuition", "Outward",
-                "The seeking archetype", NOW, NOW);
+                "The seeking archetype", NOW, NOW, Language.EN, UUID.randomUUID());
         when(archetypeRepository.findById(id)).thenReturn(Optional.of(archetype));
 
         Archetype result = archetypeService.findById(id);

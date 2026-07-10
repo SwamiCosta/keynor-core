@@ -1,5 +1,7 @@
 package com.keynor.core.domain.model.sign;
 
+import com.keynor.core.domain.model.shared.Language;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -15,6 +17,8 @@ public class Sign {
     private final String body;
     private final Instant createdAt;
     private final Instant updatedAt;
+    private final Language language;
+    private final UUID translationGroupId;
 
     public Sign(
             UUID id,
@@ -26,7 +30,9 @@ public class Sign {
             String summary,
             String body,
             Instant createdAt,
-            Instant updatedAt) {
+            Instant updatedAt,
+            Language language,
+            UUID translationGroupId) {
         this.id = id;
         this.name = name;
         this.signOrder = signOrder;
@@ -37,6 +43,8 @@ public class Sign {
         this.body = body;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.language = language;
+        this.translationGroupId = translationGroupId;
     }
 
     public UUID getId() { return id; }
@@ -49,4 +57,6 @@ public class Sign {
     public String getBody() { return body; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
+    public Language getLanguage() { return language; }
+    public UUID getTranslationGroupId() { return translationGroupId; }
 }

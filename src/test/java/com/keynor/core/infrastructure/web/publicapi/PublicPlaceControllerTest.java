@@ -6,6 +6,7 @@ import com.keynor.core.domain.model.place.Place;
 import com.keynor.core.domain.model.place.PlaceCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.place.FindAllPlacesUseCase;
@@ -53,7 +54,7 @@ class PublicPlaceControllerTest {
         when(findAllPlacesUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, 0, 20);
+        controller.findAll("en", null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllPlacesUseCase).findAll(filterCaptor.capture(), any());
@@ -65,7 +66,7 @@ class PublicPlaceControllerTest {
         when(findAllPlacesUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 2, 50, 0));
 
-        controller.findAll(null, 2, 50);
+        controller.findAll("en", null, 2, 50);
 
         ArgumentCaptor<PageRequest> pageCaptor = ArgumentCaptor.forClass(PageRequest.class);
         verify(findAllPlacesUseCase).findAll(any(), pageCaptor.capture());
@@ -78,12 +79,12 @@ class PublicPlaceControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Place place = new Place(id, "Erevan", "A city", "Body",
-                List.of(), List.of(PlaceCategory.CITY), null, EntityStatus.CANON, null, now, now);
+                List.of(), List.of(PlaceCategory.CITY), null, EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(findAllPlacesUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(place), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, 0, 20);
+        var response = controller.findAll("en", null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<PlaceResponse> body = response.getBody();
@@ -99,7 +100,7 @@ class PublicPlaceControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Place place = new Place(id, "Erevan", "A city", "Body",
-                List.of(), List.of(PlaceCategory.REGION), null, EntityStatus.CANON, null, now, now);
+                List.of(), List.of(PlaceCategory.REGION), null, EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(findPlaceByIdUseCase.findById(id)).thenReturn(place);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 

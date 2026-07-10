@@ -9,6 +9,7 @@ import com.keynor.core.domain.model.place.MapType;
 import com.keynor.core.domain.model.place.Place;
 import com.keynor.core.domain.model.place.PlaceCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
@@ -50,7 +51,7 @@ class InternalPlaceControllerTest {
         Instant now = Instant.now();
         return new Place(id, "Thornvale", "A city", "Body",
                 List.of(), List.of(PlaceCategory.CITY), MapType.NAVIGABLE,
-                EntityStatus.DRAFT, null, now, now);
+                EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
     }
 
     @BeforeEach
@@ -68,7 +69,7 @@ class InternalPlaceControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreatePlaceRequest("Thornvale", "A city", "Body",
-                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null, null);
+                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null,"en", null, null);
 
         var response = controller.create(request);
 
@@ -85,7 +86,7 @@ class InternalPlaceControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreatePlaceRequest("Thornvale", null, null,
-                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null, null);
+                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null,"en", null, null);
 
         controller.create(request);
 
@@ -102,7 +103,7 @@ class InternalPlaceControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreatePlaceRequest("Thornvale", null, null,
-                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null, null);
+                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null,"en", null, null);
 
         controller.create(request);
 
@@ -117,12 +118,12 @@ class InternalPlaceControllerTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Place canonPlace = new Place(id, "Thornvale", null, null, List.of(),
-                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.CANON, null, now, now);
+                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(createPlaceUseCase.create(any())).thenReturn(canonPlace);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreatePlaceRequest("Thornvale", null, null,
-                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, "CANON", null);
+                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, "CANON","en", null, null);
 
         controller.create(request);
 
@@ -135,7 +136,7 @@ class InternalPlaceControllerTest {
     @Test
     void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
         var request = new CreatePlaceRequest("Thornvale", null, null,
-                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, "DEPRECATED", null);
+                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, "DEPRECATED","en", null, null);
 
         assertThatThrownBy(() -> controller.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -187,7 +188,7 @@ class InternalPlaceControllerTest {
                 .thenReturn(new PageResult<>(List.of(buildPlace(id)), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, null, 0, 20);
+        var response = controller.findAll("en", null, null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<PlaceResponse> body = response.getBody();
@@ -204,7 +205,7 @@ class InternalPlaceControllerTest {
         when(findAllPlacesUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, null, 0, 20);
+        controller.findAll("en", null, null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllPlacesUseCase).findAll(filterCaptor.capture(), any());

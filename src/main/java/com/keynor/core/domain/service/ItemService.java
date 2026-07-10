@@ -42,14 +42,16 @@ public class ItemService implements
 
     @Override
     public Item create(CreateItemUseCase.Command command) {
-        if (itemRepository.existsByName(command.name())) {
+        if (itemRepository.existsByNameAndLanguage(command.name(), command.language())) {
             throw new DuplicateEntityNameException("Item", command.name());
         }
         validateTimeline(command.timeline());
         Instant now = Instant.now();
         EntityStatus initialStatus = command.status() != null ? command.status() : EntityStatus.DRAFT;
+        UUID newId = UUID.randomUUID();
+        UUID translationGroupId = command.translationGroupId() != null ? command.translationGroupId() : newId;
         Item item = new Item(
-                UUID.randomUUID(),
+                newId,
                 command.name(),
                 command.summary(),
                 command.body(),
@@ -58,7 +60,9 @@ public class ItemService implements
                 initialStatus,
                 command.timeline(),
                 now,
-                now);
+                now,
+                command.language(),
+                translationGroupId);
         Item saved = itemRepository.save(item);
         entityLinkRepository.replaceLinks(EntityType.ITEM, saved.getId(), command.links() != null ? command.links() : List.of());
         return saved;

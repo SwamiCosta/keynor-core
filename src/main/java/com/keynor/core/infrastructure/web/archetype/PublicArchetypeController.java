@@ -3,6 +3,7 @@ package com.keynor.core.infrastructure.web.archetype;
 import com.keynor.core.application.dto.archetype.ArchetypeResponse;
 import com.keynor.core.domain.port.in.archetype.FindAllArchetypesUseCase;
 import com.keynor.core.domain.port.in.archetype.FindArchetypeByIdUseCase;
+import com.keynor.core.infrastructure.web.shared.LanguageRequestParser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +25,9 @@ public class PublicArchetypeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ArchetypeResponse>> findAll() {
+    public ResponseEntity<List<ArchetypeResponse>> findAll(@RequestParam String language) {
         return ResponseEntity.ok(
-                findAllArchetypesUseCase.findAll().stream().map(ArchetypeResponse::from).toList());
+                findAllArchetypesUseCase.findAll(LanguageRequestParser.parse(language)).stream().map(ArchetypeResponse::from).toList());
     }
 
     @GetMapping("/{id}")
