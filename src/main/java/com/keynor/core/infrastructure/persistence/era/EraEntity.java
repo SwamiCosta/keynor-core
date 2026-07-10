@@ -32,7 +32,6 @@ public class EraEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 2)
     private Language language;
 

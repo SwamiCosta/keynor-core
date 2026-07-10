@@ -34,7 +34,6 @@ public class SignEntity {
     @Column(columnDefinition = "TEXT")
     private String body;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 2)
     private Language language;
 

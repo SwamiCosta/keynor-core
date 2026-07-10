@@ -47,7 +47,6 @@ public class PlaceEntity {
     @Column(nullable = false)
     private EntityStatus status;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 2)
     private Language language;
 
