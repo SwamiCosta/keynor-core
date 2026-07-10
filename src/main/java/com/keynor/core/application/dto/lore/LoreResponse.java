@@ -20,6 +20,8 @@ public record LoreResponse(
         String timelineDestroyedEra,
         Instant createdAt,
         Instant updatedAt,
+        String language,
+        UUID translationGroupId,
         List<LinkedEntityResponse> links) {
 
     public static LoreResponse from(Lore lore, List<EntityLinkSummary> links) {
@@ -35,6 +37,8 @@ public record LoreResponse(
                 lore.getTimeline() != null ? lore.getTimeline().destroyed() : null,
                 lore.getCreatedAt(),
                 lore.getUpdatedAt(),
+                lore.getLanguage().name(),
+                lore.getTranslationGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList());
     }
 }

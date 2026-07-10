@@ -20,6 +20,8 @@ public record CharacterResponse(
         String timelineDestroyedEra,
         Instant createdAt,
         Instant updatedAt,
+        String language,
+        UUID translationGroupId,
         List<LinkedEntityResponse> links) {
 
     public static CharacterResponse from(Character character, List<EntityLinkSummary> links) {
@@ -35,6 +37,8 @@ public record CharacterResponse(
                 character.getTimeline() != null ? character.getTimeline().destroyed() : null,
                 character.getCreatedAt(),
                 character.getUpdatedAt(),
+                character.getLanguage().name(),
+                character.getTranslationGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList());
     }
 }

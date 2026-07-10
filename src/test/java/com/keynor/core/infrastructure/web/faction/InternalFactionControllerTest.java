@@ -8,6 +8,7 @@ import com.keynor.core.application.dto.shared.PagedResponse;
 import com.keynor.core.domain.model.faction.Faction;
 import com.keynor.core.domain.model.faction.FactionCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
@@ -48,7 +49,7 @@ class InternalFactionControllerTest {
     private Faction buildFaction(UUID id) {
         Instant now = Instant.now();
         return new Faction(id, "The Silver Order", "A guild", "Body",
-                List.of(), List.of(FactionCategory.ORDER), EntityStatus.DRAFT, null, now, now);
+                List.of(), List.of(FactionCategory.ORDER), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
     }
 
     @BeforeEach
@@ -66,7 +67,7 @@ class InternalFactionControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateFactionRequest("The Silver Order", "A guild", "Body",
-                List.of(), List.of("ORDER"), "era-1", null, null, null);
+                List.of(), List.of("ORDER"), "era-1", null, null,"en", null, null);
 
         var response = controller.create(request);
 
@@ -83,7 +84,7 @@ class InternalFactionControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateFactionRequest("The Silver Order", null, null,
-                List.of(), List.of("ORDER"), "era-1", null, null, null);
+                List.of(), List.of("ORDER"), "era-1", null, null,"en", null, null);
 
         controller.create(request);
 
@@ -101,7 +102,7 @@ class InternalFactionControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateFactionRequest("The Silver Order", null, null,
-                List.of(), List.of("ORDER"), "era-1", null, null, null);
+                List.of(), List.of("ORDER"), "era-1", null, null,"en", null, null);
 
         controller.create(request);
 
@@ -116,12 +117,12 @@ class InternalFactionControllerTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Faction canonFaction = new Faction(id, "The Silver Order", null, null, List.of(),
-                List.of(FactionCategory.ORDER), EntityStatus.CANON, null, now, now);
+                List.of(FactionCategory.ORDER), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(createFactionUseCase.create(any())).thenReturn(canonFaction);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateFactionRequest("The Silver Order", null, null,
-                List.of(), List.of("ORDER"), "era-1", null, "CANON", null);
+                List.of(), List.of("ORDER"), "era-1", null, "CANON","en", null, null);
 
         controller.create(request);
 
@@ -134,7 +135,7 @@ class InternalFactionControllerTest {
     @Test
     void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
         var request = new CreateFactionRequest("The Silver Order", null, null,
-                List.of(), List.of("ORDER"), "era-1", null, "DEPRECATED", null);
+                List.of(), List.of("ORDER"), "era-1", null, "DEPRECATED","en", null, null);
 
         assertThatThrownBy(() -> controller.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -186,7 +187,7 @@ class InternalFactionControllerTest {
                 .thenReturn(new PageResult<>(List.of(buildFaction(id)), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, null, 0, 20);
+        var response = controller.findAll("en", null, null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<FactionResponse> body = response.getBody();
@@ -203,7 +204,7 @@ class InternalFactionControllerTest {
         when(findAllFactionsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, null, 0, 20);
+        controller.findAll("en", null, null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllFactionsUseCase).findAll(filterCaptor.capture(), any());

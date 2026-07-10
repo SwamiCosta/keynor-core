@@ -2,6 +2,7 @@ package com.keynor.core.domain.service;
 
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.era.Era;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.port.in.era.CreateEraUseCase;
 import com.keynor.core.domain.port.in.era.FindAllErasUseCase;
 import com.keynor.core.domain.port.in.era.FindEraByIdUseCase;
@@ -20,8 +21,8 @@ public class EraService implements FindAllErasUseCase, FindEraByIdUseCase, Creat
     }
 
     @Override
-    public List<Era> findAll() {
-        return eraRepository.findAllOrderedByIndex();
+    public List<Era> findAll(Language language) {
+        return eraRepository.findAllOrderedByIndex(language);
     }
 
     @Override
@@ -33,15 +34,19 @@ public class EraService implements FindAllErasUseCase, FindEraByIdUseCase, Creat
     @Override
     public Era create(Command command) {
         Instant now = Instant.now();
+        UUID newId = UUID.randomUUID();
+        UUID translationGroupId = command.translationGroupId() != null ? command.translationGroupId() : newId;
         Era era = new Era(
-                UUID.randomUUID(),
+                newId,
                 command.name(),
                 command.orderIndex(),
                 command.type(),
                 command.importance(),
                 command.description(),
                 now,
-                now);
+                now,
+                command.language(),
+                translationGroupId);
         return eraRepository.save(era);
     }
 }

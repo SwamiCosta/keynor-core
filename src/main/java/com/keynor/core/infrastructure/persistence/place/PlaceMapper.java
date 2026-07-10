@@ -38,7 +38,9 @@ public class PlaceMapper {
                 entity.getStatus(),
                 timeline,
                 entity.getCreatedAt(),
-                entity.getUpdatedAt());
+                entity.getUpdatedAt(),
+                entity.getLanguage(),
+                entity.getTranslationGroupId());
     }
 
     public PlaceEntity toEntity(Place place) {
@@ -54,6 +56,8 @@ public class PlaceMapper {
         entity.setTimeline(toEmbeddable(place));
         entity.setCreatedAt(place.getCreatedAt());
         entity.setUpdatedAt(place.getUpdatedAt());
+        entity.setLanguage(place.getLanguage());
+        entity.setTranslationGroupId(place.getTranslationGroupId());
         return entity;
     }
 

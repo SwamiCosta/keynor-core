@@ -6,6 +6,7 @@ import com.keynor.core.domain.model.lore.Lore;
 import com.keynor.core.domain.model.lore.LoreCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.lore.FindAllLoreUseCase;
@@ -53,7 +54,7 @@ class PublicLoreControllerTest {
         when(findAllLoreUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, 0, 20);
+        controller.findAll("en", null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllLoreUseCase).findAll(filterCaptor.capture(), any());
@@ -65,7 +66,7 @@ class PublicLoreControllerTest {
         when(findAllLoreUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 3, 15, 0));
 
-        controller.findAll(null, 3, 15);
+        controller.findAll("en", null, 3, 15);
 
         ArgumentCaptor<PageRequest> pageCaptor = ArgumentCaptor.forClass(PageRequest.class);
         verify(findAllLoreUseCase).findAll(any(), pageCaptor.capture());
@@ -79,11 +80,11 @@ class PublicLoreControllerTest {
         UUID id = UUID.randomUUID();
         Lore lore = new Lore(id, "The Great Myth", "A summary", "Body text",
                 List.of(), List.of(LoreCategory.MYTH),
-                EntityStatus.CANON, null, now, now);
+                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(findAllLoreUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(lore), 0, 20, 1));
 
-        var response = controller.findAll(null, 0, 20);
+        var response = controller.findAll("en", null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<LoreResponse> body = response.getBody();
@@ -100,7 +101,7 @@ class PublicLoreControllerTest {
         UUID id = UUID.randomUUID();
         Lore lore = new Lore(id, "The Great Myth", "A summary", "Body text",
                 List.of(), List.of(LoreCategory.HISTORY),
-                EntityStatus.CANON, null, now, now);
+                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(findLoreByIdUseCase.findById(id)).thenReturn(lore);
 
         var response = controller.findById(id);

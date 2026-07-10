@@ -21,6 +21,8 @@ public record PlaceResponse(
         String timelineDestroyedEra,
         Instant createdAt,
         Instant updatedAt,
+        String language,
+        UUID translationGroupId,
         List<LinkedEntityResponse> links) {
 
     public static PlaceResponse from(Place place, List<EntityLinkSummary> links) {
@@ -37,6 +39,8 @@ public record PlaceResponse(
                 place.getTimeline() != null ? place.getTimeline().destroyed() : null,
                 place.getCreatedAt(),
                 place.getUpdatedAt(),
+                place.getLanguage().name(),
+                place.getTranslationGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList());
     }
 }

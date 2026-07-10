@@ -1,6 +1,7 @@
 package com.keynor.core.infrastructure.persistence.item;
 
 import com.keynor.core.domain.model.item.Item;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.out.ItemRepository;
@@ -36,7 +37,7 @@ public class ItemJpaAdapter implements ItemRepository {
     public boolean existsById(UUID id) { return jpaRepository.existsById(id); }
 
     @Override
-    public boolean existsByName(String name) { return jpaRepository.existsByName(name); }
+    public boolean existsByNameAndLanguage(String name, Language language) { return jpaRepository.existsByNameAndLanguage(name, language); }
 
     @Override
     public void deleteById(UUID id) { jpaRepository.deleteById(id); }

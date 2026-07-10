@@ -5,6 +5,7 @@ import com.keynor.core.application.dto.era.EraResponse;
 import com.keynor.core.domain.model.era.EraImportance;
 import com.keynor.core.domain.model.era.EraType;
 import com.keynor.core.domain.port.in.era.CreateEraUseCase;
+import com.keynor.core.infrastructure.web.shared.LanguageRequestParser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,9 @@ public class InternalEraController {
                 request.orderIndex(),
                 type,
                 importance,
-                request.description());
+                request.description(),
+                LanguageRequestParser.parse(request.language()),
+                request.translationGroupId());
         var created = createEraUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(EraResponse.from(created));
     }

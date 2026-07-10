@@ -37,7 +37,9 @@ public class FactionMapper {
                 entity.getStatus(),
                 timeline,
                 entity.getCreatedAt(),
-                entity.getUpdatedAt());
+                entity.getUpdatedAt(),
+                entity.getLanguage(),
+                entity.getTranslationGroupId());
     }
 
     public FactionEntity toEntity(Faction faction) {
@@ -52,6 +54,8 @@ public class FactionMapper {
         entity.setTimeline(toEmbeddable(faction));
         entity.setCreatedAt(faction.getCreatedAt());
         entity.setUpdatedAt(faction.getUpdatedAt());
+        entity.setLanguage(faction.getLanguage());
+        entity.setTranslationGroupId(faction.getTranslationGroupId());
         return entity;
     }
 

@@ -1,6 +1,7 @@
 package com.keynor.core.infrastructure.persistence.character;
 
 import com.keynor.core.domain.model.character.Character;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.out.CharacterRepository;
@@ -39,8 +40,8 @@ public class CharacterJpaAdapter implements CharacterRepository {
     }
 
     @Override
-    public boolean existsByName(String name) {
-        return jpaRepository.existsByName(name);
+    public boolean existsByNameAndLanguage(String name, Language language) {
+        return jpaRepository.existsByNameAndLanguage(name, language);
     }
 
     @Override

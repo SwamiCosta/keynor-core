@@ -4,9 +4,11 @@ import com.keynor.core.domain.model.faction.Faction;
 import com.keynor.core.domain.model.faction.FactionCategory;
 import com.keynor.core.domain.model.shared.EntityLinkRef;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.Timeline;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface CreateFactionUseCase {
 
@@ -18,6 +20,8 @@ public interface CreateFactionUseCase {
             List<FactionCategory> categories,
             Timeline timeline,
             EntityStatus status,
+            Language language,
+            UUID translationGroupId,
             List<EntityLinkRef> links) {}
 
     Faction create(Command command);

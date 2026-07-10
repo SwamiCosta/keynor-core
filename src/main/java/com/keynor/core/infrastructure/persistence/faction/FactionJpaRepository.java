@@ -1,5 +1,6 @@
 package com.keynor.core.infrastructure.persistence.faction;
 
+import com.keynor.core.domain.model.shared.Language;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -9,5 +10,5 @@ public interface FactionJpaRepository
         extends JpaRepository<FactionEntity, UUID>,
                 JpaSpecificationExecutor<FactionEntity> {
 
-    boolean existsByName(String name);
+    boolean existsByNameAndLanguage(String name, Language language);
 }

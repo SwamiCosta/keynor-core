@@ -37,7 +37,9 @@ public class CharacterMapper {
                 entity.getStatus(),
                 timeline,
                 entity.getCreatedAt(),
-                entity.getUpdatedAt());
+                entity.getUpdatedAt(),
+                entity.getLanguage(),
+                entity.getTranslationGroupId());
     }
 
     public CharacterEntity toEntity(Character character) {
@@ -52,6 +54,8 @@ public class CharacterMapper {
         entity.setTimeline(toEmbeddable(character));
         entity.setCreatedAt(character.getCreatedAt());
         entity.setUpdatedAt(character.getUpdatedAt());
+        entity.setLanguage(character.getLanguage());
+        entity.setTranslationGroupId(character.getTranslationGroupId());
         return entity;
     }
 

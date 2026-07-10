@@ -4,9 +4,11 @@ import com.keynor.core.domain.model.item.Item;
 import com.keynor.core.domain.model.item.ItemCategory;
 import com.keynor.core.domain.model.shared.EntityLinkRef;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.Timeline;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface CreateItemUseCase {
 
@@ -18,6 +20,8 @@ public interface CreateItemUseCase {
             List<ItemCategory> categories,
             Timeline timeline,
             EntityStatus status,
+            Language language,
+            UUID translationGroupId,
             List<EntityLinkRef> links) {}
 
     Item create(Command command);

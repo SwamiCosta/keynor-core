@@ -4,6 +4,7 @@ import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.sign.Sign;
 import com.keynor.core.domain.port.in.sign.FindAllSignsUseCase;
 import com.keynor.core.domain.port.in.sign.FindSignByIdUseCase;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.port.out.SignRepository;
 
 import java.util.List;
@@ -18,8 +19,8 @@ public class SignService implements FindAllSignsUseCase, FindSignByIdUseCase {
     }
 
     @Override
-    public List<Sign> findAll() {
-        return signRepository.findAllOrderedBySignOrder();
+    public List<Sign> findAll(Language language) {
+        return signRepository.findAllOrderedBySignOrder(language);
     }
 
     @Override

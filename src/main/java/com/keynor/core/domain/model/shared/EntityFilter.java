@@ -3,13 +3,10 @@ package com.keynor.core.domain.model.shared;
 import java.util.List;
 
 public record EntityFilter(
+        Language language,
         List<EntityStatus> statuses,
         List<String> categories
 ) {
-
-    public static EntityFilter empty() {
-        return new EntityFilter(List.of(), List.of());
-    }
 
     public boolean hasStatusFilter() {
         return statuses != null && !statuses.isEmpty();

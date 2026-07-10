@@ -1,5 +1,6 @@
 package com.keynor.core.infrastructure.persistence.sign;
 
+import com.keynor.core.domain.model.shared.Language;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -33,6 +34,13 @@ public class SignEntity {
     @Column(columnDefinition = "TEXT")
     private String body;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 2)
+    private Language language;
+
+    @Column(nullable = false)
+    private UUID translationGroupId;
+
     @Column(nullable = false)
     private Instant createdAt;
 
@@ -55,6 +63,10 @@ public class SignEntity {
     public void setSummary(String summary) { this.summary = summary; }
     public String getBody() { return body; }
     public void setBody(String body) { this.body = body; }
+    public Language getLanguage() { return language; }
+    public void setLanguage(Language language) { this.language = language; }
+    public UUID getTranslationGroupId() { return translationGroupId; }
+    public void setTranslationGroupId(UUID translationGroupId) { this.translationGroupId = translationGroupId; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }

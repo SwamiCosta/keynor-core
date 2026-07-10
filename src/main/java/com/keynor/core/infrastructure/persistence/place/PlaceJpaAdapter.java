@@ -1,6 +1,7 @@
 package com.keynor.core.infrastructure.persistence.place;
 
 import com.keynor.core.domain.model.place.Place;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.out.PlaceRepository;
@@ -39,8 +40,8 @@ public class PlaceJpaAdapter implements PlaceRepository {
     }
 
     @Override
-    public boolean existsByName(String name) {
-        return jpaRepository.existsByName(name);
+    public boolean existsByNameAndLanguage(String name, Language language) {
+        return jpaRepository.existsByNameAndLanguage(name, language);
     }
 
     @Override

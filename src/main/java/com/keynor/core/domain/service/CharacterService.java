@@ -42,14 +42,16 @@ public class CharacterService implements
 
     @Override
     public Character create(CreateCharacterUseCase.Command command) {
-        if (characterRepository.existsByName(command.name())) {
+        if (characterRepository.existsByNameAndLanguage(command.name(), command.language())) {
             throw new DuplicateEntityNameException("Character", command.name());
         }
         validateTimeline(command.timeline());
         Instant now = Instant.now();
         EntityStatus initialStatus = command.status() != null ? command.status() : EntityStatus.DRAFT;
+        UUID newId = UUID.randomUUID();
+        UUID translationGroupId = command.translationGroupId() != null ? command.translationGroupId() : newId;
         Character character = new Character(
-                UUID.randomUUID(),
+                newId,
                 command.name(),
                 command.summary(),
                 command.body(),
@@ -58,7 +60,9 @@ public class CharacterService implements
                 initialStatus,
                 command.timeline(),
                 now,
-                now);
+                now,
+                command.language(),
+                translationGroupId);
         Character saved = characterRepository.save(character);
         entityLinkRepository.replaceLinks(EntityType.CHARACTER, saved.getId(), command.links() != null ? command.links() : List.of());
         return saved;

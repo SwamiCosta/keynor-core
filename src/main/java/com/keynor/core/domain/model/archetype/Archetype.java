@@ -1,5 +1,7 @@
 package com.keynor.core.domain.model.archetype;
 
+import com.keynor.core.domain.model.shared.Language;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -16,6 +18,8 @@ public class Archetype {
     private final String description;
     private final Instant createdAt;
     private final Instant updatedAt;
+    private final Language language;
+    private final UUID translationGroupId;
 
     public Archetype(
             UUID id,
@@ -28,7 +32,9 @@ public class Archetype {
             String selfRelation,
             String description,
             Instant createdAt,
-            Instant updatedAt) {
+            Instant updatedAt,
+            Language language,
+            UUID translationGroupId) {
         this.id = id;
         this.name = name;
         this.element = element;
@@ -40,6 +46,8 @@ public class Archetype {
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.language = language;
+        this.translationGroupId = translationGroupId;
     }
 
     public UUID getId() { return id; }
@@ -53,4 +61,6 @@ public class Archetype {
     public String getDescription() { return description; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
+    public Language getLanguage() { return language; }
+    public UUID getTranslationGroupId() { return translationGroupId; }
 }

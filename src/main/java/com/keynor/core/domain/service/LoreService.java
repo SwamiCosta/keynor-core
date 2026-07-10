@@ -42,14 +42,16 @@ public class LoreService implements
 
     @Override
     public Lore create(CreateLoreUseCase.Command command) {
-        if (loreRepository.existsByName(command.name())) {
+        if (loreRepository.existsByNameAndLanguage(command.name(), command.language())) {
             throw new DuplicateEntityNameException("Lore", command.name());
         }
         validateTimeline(command.timeline());
         Instant now = Instant.now();
         EntityStatus initialStatus = command.status() != null ? command.status() : EntityStatus.DRAFT;
+        UUID newId = UUID.randomUUID();
+        UUID translationGroupId = command.translationGroupId() != null ? command.translationGroupId() : newId;
         Lore lore = new Lore(
-                UUID.randomUUID(),
+                newId,
                 command.name(),
                 command.summary(),
                 command.body(),
@@ -58,7 +60,9 @@ public class LoreService implements
                 initialStatus,
                 command.timeline(),
                 now,
-                now);
+                now,
+                command.language(),
+                translationGroupId);
         Lore saved = loreRepository.save(lore);
         entityLinkRepository.replaceLinks(EntityType.LORE, saved.getId(), command.links() != null ? command.links() : List.of());
         return saved;

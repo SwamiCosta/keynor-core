@@ -20,6 +20,8 @@ public record EventResponse(
         String timelineDestroyedEra,
         Instant createdAt,
         Instant updatedAt,
+        String language,
+        UUID translationGroupId,
         List<LinkedEntityResponse> links) {
 
     public static EventResponse from(Event event, List<EntityLinkSummary> links) {
@@ -35,6 +37,8 @@ public record EventResponse(
                 event.getTimeline() != null ? event.getTimeline().destroyed() : null,
                 event.getCreatedAt(),
                 event.getUpdatedAt(),
+                event.getLanguage().name(),
+                event.getTranslationGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList());
     }
 }

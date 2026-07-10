@@ -10,7 +10,9 @@ public record EraResponse(
         int order,
         String type,
         String importance,
-        String description) {
+        String description,
+        String language,
+        UUID translationGroupId) {
 
     public static EraResponse from(Era era) {
         return new EraResponse(
@@ -19,6 +21,8 @@ public record EraResponse(
                 era.getOrderIndex(),
                 era.getType().name(),
                 era.getImportance() != null ? era.getImportance().name() : null,
-                era.getDescription());
+                era.getDescription(),
+                era.getLanguage().name(),
+                era.getTranslationGroupId());
     }
 }

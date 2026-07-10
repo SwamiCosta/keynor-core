@@ -15,7 +15,9 @@ public class EraMapper {
                 entity.getImportance(),
                 entity.getDescription(),
                 entity.getCreatedAt(),
-                entity.getUpdatedAt());
+                entity.getUpdatedAt(),
+                entity.getLanguage(),
+                entity.getTranslationGroupId());
     }
 
     public EraEntity toEntity(Era era) {
@@ -28,6 +30,8 @@ public class EraMapper {
         entity.setDescription(era.getDescription());
         entity.setCreatedAt(era.getCreatedAt());
         entity.setUpdatedAt(era.getUpdatedAt());
+        entity.setLanguage(era.getLanguage());
+        entity.setTranslationGroupId(era.getTranslationGroupId());
         return entity;
     }
 }

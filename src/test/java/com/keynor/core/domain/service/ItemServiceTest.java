@@ -7,6 +7,7 @@ import com.keynor.core.domain.exception.UnknownEraNameException;
 import com.keynor.core.domain.model.item.Item;
 import com.keynor.core.domain.model.item.ItemCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
@@ -57,9 +58,9 @@ class ItemServiceTest {
                 List.of(),
                 List.of(ItemCategory.WEAPON),
                 null,
-                null,
+                null, Language.EN, null,
                 null);
-        when(itemRepository.existsByName("Shadowblade")).thenReturn(false);
+        when(itemRepository.existsByNameAndLanguage("Shadowblade", Language.EN)).thenReturn(false);
         when(itemRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Item result = itemService.create(command);
@@ -77,9 +78,9 @@ class ItemServiceTest {
                 List.of(),
                 List.of(ItemCategory.WEAPON),
                 null,
-                EntityStatus.CANON,
+                EntityStatus.CANON, Language.EN, null,
                 null);
-        when(itemRepository.existsByName("Shadowblade")).thenReturn(false);
+        when(itemRepository.existsByNameAndLanguage("Shadowblade", Language.EN)).thenReturn(false);
         when(itemRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Item result = itemService.create(command);
@@ -92,8 +93,8 @@ class ItemServiceTest {
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateItemUseCase.Command(
                 "Shadowblade", null, null, List.of(),
-                List.of(ItemCategory.ARTIFACT), null, null, null);
-        when(itemRepository.existsByName("Shadowblade")).thenReturn(true);
+                List.of(ItemCategory.ARTIFACT), null, null, Language.EN, null, null);
+        when(itemRepository.existsByNameAndLanguage("Shadowblade", Language.EN)).thenReturn(true);
 
         assertThatThrownBy(() -> itemService.create(command))
                 .isInstanceOf(DuplicateEntityNameException.class)
@@ -105,8 +106,8 @@ class ItemServiceTest {
     void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
         var command = new CreateItemUseCase.Command(
                 "Shadowblade", null, null, List.of(), List.of(ItemCategory.WEAPON),
-                new Timeline("Nonexistent Era", null), null, null);
-        when(itemRepository.existsByName("Shadowblade")).thenReturn(false);
+                new Timeline("Nonexistent Era", null), null, Language.EN, null, null);
+        when(itemRepository.existsByNameAndLanguage("Shadowblade", Language.EN)).thenReturn(false);
         when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> itemService.create(command))
@@ -120,7 +121,7 @@ class ItemServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Item item = new Item(id, "Shadowblade", null, null, List.of(),
-                List.of(ItemCategory.WEAPON), EntityStatus.DRAFT, null, now, now);
+                List.of(ItemCategory.WEAPON), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
         when(itemRepository.findById(id)).thenReturn(Optional.of(item));
 
         Item result = itemService.findById(id);
@@ -139,7 +140,7 @@ class ItemServiceTest {
 
     @Test
     void findAll_shouldDelegateToRepository() {
-        EntityFilter filter = EntityFilter.empty();
+        EntityFilter filter = new EntityFilter(Language.EN, List.of(), List.of());
         PageRequest pageRequest = new PageRequest(0, 10);
         when(itemRepository.findAll(filter, pageRequest))
                 .thenReturn(new PageResult<>(List.of(), 0, 10, 0));
@@ -155,7 +156,7 @@ class ItemServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Item item = new Item(id, "Shadowblade", null, null, List.of(),
-                List.of(ItemCategory.WEAPON), EntityStatus.DRAFT, null, now, now);
+                List.of(ItemCategory.WEAPON), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
         when(itemRepository.findById(id)).thenReturn(Optional.of(item));
         when(itemRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -169,7 +170,7 @@ class ItemServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Item item = new Item(id, "Shadowblade", null, null, List.of(),
-                List.of(ItemCategory.WEAPON), EntityStatus.DEPRECATED, null, now, now);
+                List.of(ItemCategory.WEAPON), EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID());
         when(itemRepository.findById(id)).thenReturn(Optional.of(item));
 
         assertThatThrownBy(() -> itemService.changeStatus(id, EntityStatus.CANON))
@@ -200,7 +201,7 @@ class ItemServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Item item = new Item(id, "Old Name", null, null, List.of(),
-                List.of(ItemCategory.TOOL), EntityStatus.DRAFT, null, now, now);
+                List.of(ItemCategory.TOOL), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
         when(itemRepository.findById(id)).thenReturn(Optional.of(item));
         when(itemRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 

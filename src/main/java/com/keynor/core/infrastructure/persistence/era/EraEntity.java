@@ -2,6 +2,7 @@ package com.keynor.core.infrastructure.persistence.era;
 
 import com.keynor.core.domain.model.era.EraImportance;
 import com.keynor.core.domain.model.era.EraType;
+import com.keynor.core.domain.model.shared.Language;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -31,6 +32,13 @@ public class EraEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 2)
+    private Language language;
+
+    @Column(nullable = false)
+    private UUID translationGroupId;
+
     @Column(nullable = false)
     private Instant createdAt;
 
@@ -49,6 +57,10 @@ public class EraEntity {
     public void setImportance(EraImportance importance) { this.importance = importance; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public Language getLanguage() { return language; }
+    public void setLanguage(Language language) { this.language = language; }
+    public UUID getTranslationGroupId() { return translationGroupId; }
+    public void setTranslationGroupId(UUID translationGroupId) { this.translationGroupId = translationGroupId; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }

@@ -3,6 +3,9 @@ package com.keynor.core.domain.port.in.era;
 import com.keynor.core.domain.model.era.Era;
 import com.keynor.core.domain.model.era.EraImportance;
 import com.keynor.core.domain.model.era.EraType;
+import com.keynor.core.domain.model.shared.Language;
+
+import java.util.UUID;
 
 public interface CreateEraUseCase {
 
@@ -11,7 +14,9 @@ public interface CreateEraUseCase {
             int orderIndex,
             EraType type,
             EraImportance importance,
-            String description) {}
+            String description,
+            Language language,
+            UUID translationGroupId) {}
 
     Era create(Command command);
 }

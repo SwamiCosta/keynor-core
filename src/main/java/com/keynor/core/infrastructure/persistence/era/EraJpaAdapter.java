@@ -1,6 +1,7 @@
 package com.keynor.core.infrastructure.persistence.era;
 
 import com.keynor.core.domain.model.era.Era;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.port.out.EraRepository;
 import org.springframework.stereotype.Component;
 
@@ -20,8 +21,8 @@ public class EraJpaAdapter implements EraRepository {
     }
 
     @Override
-    public List<Era> findAllOrderedByIndex() {
-        return jpaRepository.findAllByOrderByOrderIndexAsc()
+    public List<Era> findAllOrderedByIndex(Language language) {
+        return jpaRepository.findAllByLanguageOrderByOrderIndexAsc(language)
                 .stream()
                 .map(mapper::toDomain)
                 .toList();

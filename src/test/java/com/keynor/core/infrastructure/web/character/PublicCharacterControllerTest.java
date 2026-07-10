@@ -5,6 +5,7 @@ import com.keynor.core.application.dto.shared.PagedResponse;
 import com.keynor.core.domain.model.character.Character;
 import com.keynor.core.domain.model.character.CharacterCategory;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.character.FindAllCharactersUseCase;
 import com.keynor.core.domain.port.in.character.FindCharacterByIdUseCase;
@@ -53,12 +54,12 @@ class PublicCharacterControllerTest {
                 id, "Araveth", "A wandering hero", "Body",
                 images,
                 List.of(CharacterCategory.HERO),
-                EntityStatus.CANON, null, now, now);
+                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(character), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, 0, 20);
+        var response = controller.findAll("en", null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<CharacterResponse> body = response.getBody();
@@ -78,7 +79,7 @@ class PublicCharacterControllerTest {
                 id, "Araveth", "A wandering hero", "Body",
                 images,
                 List.of(CharacterCategory.HERO),
-                EntityStatus.CANON, null, now, now);
+                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(findCharacterByIdUseCase.findById(id)).thenReturn(character);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
@@ -99,12 +100,12 @@ class PublicCharacterControllerTest {
                 id, "Araveth", null, null,
                 List.of(),
                 List.of(CharacterCategory.NPC),
-                EntityStatus.CANON, null, now, now);
+                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(character), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, 0, 20);
+        var response = controller.findAll("en", null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();

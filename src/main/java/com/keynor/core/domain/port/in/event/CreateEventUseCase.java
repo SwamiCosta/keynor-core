@@ -4,9 +4,11 @@ import com.keynor.core.domain.model.event.Event;
 import com.keynor.core.domain.model.event.EventCategory;
 import com.keynor.core.domain.model.shared.EntityLinkRef;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.Timeline;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface CreateEventUseCase {
 
@@ -18,6 +20,8 @@ public interface CreateEventUseCase {
             List<EventCategory> categories,
             Timeline timeline,
             EntityStatus status,
+            Language language,
+            UUID translationGroupId,
             List<EntityLinkRef> links) {}
 
     Event create(Command command);

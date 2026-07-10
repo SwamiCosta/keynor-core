@@ -1,5 +1,7 @@
 package com.keynor.core.domain.model.era;
 
+import com.keynor.core.domain.model.shared.Language;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -13,6 +15,8 @@ public class Era {
     private final String description;
     private final Instant createdAt;
     private final Instant updatedAt;
+    private final Language language;
+    private final UUID translationGroupId;
 
     public Era(
             UUID id,
@@ -22,7 +26,9 @@ public class Era {
             EraImportance importance,
             String description,
             Instant createdAt,
-            Instant updatedAt) {
+            Instant updatedAt,
+            Language language,
+            UUID translationGroupId) {
         validateTypeImportanceInvariant(type, importance);
         this.id = id;
         this.name = name;
@@ -32,6 +38,8 @@ public class Era {
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.language = language;
+        this.translationGroupId = translationGroupId;
     }
 
     private static void validateTypeImportanceInvariant(EraType type, EraImportance importance) {
@@ -53,4 +61,6 @@ public class Era {
     public String getDescription() { return description; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
+    public Language getLanguage() { return language; }
+    public UUID getTranslationGroupId() { return translationGroupId; }
 }

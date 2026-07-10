@@ -20,6 +20,8 @@ public record FactionResponse(
         String timelineDestroyedEra,
         Instant createdAt,
         Instant updatedAt,
+        String language,
+        UUID translationGroupId,
         List<LinkedEntityResponse> links) {
 
     public static FactionResponse from(Faction faction, List<EntityLinkSummary> links) {
@@ -35,6 +37,8 @@ public record FactionResponse(
                 faction.getTimeline() != null ? faction.getTimeline().destroyed() : null,
                 faction.getCreatedAt(),
                 faction.getUpdatedAt(),
+                faction.getLanguage().name(),
+                faction.getTranslationGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList());
     }
 }

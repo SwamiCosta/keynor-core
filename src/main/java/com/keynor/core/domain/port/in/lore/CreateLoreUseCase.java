@@ -4,9 +4,11 @@ import com.keynor.core.domain.model.lore.Lore;
 import com.keynor.core.domain.model.lore.LoreCategory;
 import com.keynor.core.domain.model.shared.EntityLinkRef;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.Timeline;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface CreateLoreUseCase {
 
@@ -18,6 +20,8 @@ public interface CreateLoreUseCase {
             List<LoreCategory> categories,
             Timeline timeline,
             EntityStatus status,
+            Language language,
+            UUID translationGroupId,
             List<EntityLinkRef> links) {}
 
     Lore create(Command command);

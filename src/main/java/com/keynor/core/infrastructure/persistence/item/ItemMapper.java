@@ -37,7 +37,9 @@ public class ItemMapper {
                 entity.getStatus(),
                 timeline,
                 entity.getCreatedAt(),
-                entity.getUpdatedAt());
+                entity.getUpdatedAt(),
+                entity.getLanguage(),
+                entity.getTranslationGroupId());
     }
 
     public ItemEntity toEntity(Item item) {
@@ -52,6 +54,8 @@ public class ItemMapper {
         entity.setTimeline(toEmbeddable(item));
         entity.setCreatedAt(item.getCreatedAt());
         entity.setUpdatedAt(item.getUpdatedAt());
+        entity.setLanguage(item.getLanguage());
+        entity.setTranslationGroupId(item.getTranslationGroupId());
         return entity;
     }
 

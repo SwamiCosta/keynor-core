@@ -12,7 +12,9 @@ public record SignResponse(
         UUID archetypeId,
         String subArchetype,
         String summary,
-        String body) {
+        String body,
+        String language,
+        UUID translationGroupId) {
 
     public static SignResponse from(Sign sign) {
         return new SignResponse(
@@ -23,6 +25,8 @@ public record SignResponse(
                 sign.getArchetypeId(),
                 sign.getSubArchetype(),
                 sign.getSummary(),
-                sign.getBody());
+                sign.getBody(),
+                sign.getLanguage().name(),
+                sign.getTranslationGroupId());
     }
 }

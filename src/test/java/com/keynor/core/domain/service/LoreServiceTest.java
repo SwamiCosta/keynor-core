@@ -7,6 +7,7 @@ import com.keynor.core.domain.exception.UnknownEraNameException;
 import com.keynor.core.domain.model.lore.Lore;
 import com.keynor.core.domain.model.lore.LoreCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
@@ -56,8 +57,8 @@ class LoreServiceTest {
                 "The Age of Silence", "A period of stillness", "Long description...",
                 List.of(),
                 List.of(LoreCategory.HISTORY),
-                null, null, List.of());
-        when(loreRepository.existsByName("The Age of Silence")).thenReturn(false);
+                null, null, Language.EN, null, List.of());
+        when(loreRepository.existsByNameAndLanguage("The Age of Silence", Language.EN)).thenReturn(false);
         when(loreRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Lore result = loreService.create(command);
@@ -74,8 +75,8 @@ class LoreServiceTest {
                 "The Age of Silence", "A period of stillness", "Long description...",
                 List.of(),
                 List.of(LoreCategory.HISTORY),
-                null, EntityStatus.CANON, List.of());
-        when(loreRepository.existsByName("The Age of Silence")).thenReturn(false);
+                null, EntityStatus.CANON, Language.EN, null, List.of());
+        when(loreRepository.existsByNameAndLanguage("The Age of Silence", Language.EN)).thenReturn(false);
         when(loreRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Lore result = loreService.create(command);
@@ -88,8 +89,8 @@ class LoreServiceTest {
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateLoreUseCase.Command(
                 "The Age of Silence", null, null, List.of(),
-                List.of(LoreCategory.MYTH), null, null, List.of());
-        when(loreRepository.existsByName("The Age of Silence")).thenReturn(true);
+                List.of(LoreCategory.MYTH), null, null, Language.EN, null, List.of());
+        when(loreRepository.existsByNameAndLanguage("The Age of Silence", Language.EN)).thenReturn(true);
 
         assertThatThrownBy(() -> loreService.create(command))
                 .isInstanceOf(DuplicateEntityNameException.class)
@@ -101,8 +102,8 @@ class LoreServiceTest {
     void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
         var command = new CreateLoreUseCase.Command(
                 "The Age of Silence", null, null, List.of(), List.of(LoreCategory.HISTORY),
-                new Timeline("Nonexistent Era", null), null, List.of());
-        when(loreRepository.existsByName("The Age of Silence")).thenReturn(false);
+                new Timeline("Nonexistent Era", null), null, Language.EN, null, List.of());
+        when(loreRepository.existsByNameAndLanguage("The Age of Silence", Language.EN)).thenReturn(false);
         when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> loreService.create(command))
@@ -116,7 +117,7 @@ class LoreServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Lore lore = new Lore(id, "The Age of Silence", null, null, List.of(),
-                List.of(LoreCategory.HISTORY), EntityStatus.DRAFT, null, now, now);
+                List.of(LoreCategory.HISTORY), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
         when(loreRepository.findById(id)).thenReturn(Optional.of(lore));
 
         Lore result = loreService.findById(id);
@@ -135,7 +136,7 @@ class LoreServiceTest {
 
     @Test
     void findAll_shouldDelegateToRepository() {
-        EntityFilter filter = EntityFilter.empty();
+        EntityFilter filter = new EntityFilter(Language.EN, List.of(), List.of());
         PageRequest pageRequest = new PageRequest(0, 10);
         when(loreRepository.findAll(filter, pageRequest))
                 .thenReturn(new PageResult<>(List.of(), 0, 10, 0));
@@ -151,7 +152,7 @@ class LoreServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Lore lore = new Lore(id, "The Age of Silence", null, null, List.of(),
-                List.of(LoreCategory.HISTORY), EntityStatus.DRAFT, null, now, now);
+                List.of(LoreCategory.HISTORY), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
         when(loreRepository.findById(id)).thenReturn(Optional.of(lore));
         when(loreRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -165,7 +166,7 @@ class LoreServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Lore lore = new Lore(id, "The Age of Silence", null, null, List.of(),
-                List.of(LoreCategory.HISTORY), EntityStatus.DEPRECATED, null, now, now);
+                List.of(LoreCategory.HISTORY), EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID());
         when(loreRepository.findById(id)).thenReturn(Optional.of(lore));
 
         assertThatThrownBy(() -> loreService.changeStatus(id, EntityStatus.CANON))
@@ -196,7 +197,7 @@ class LoreServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Lore lore = new Lore(id, "Old Name", null, null, List.of(),
-                List.of(LoreCategory.MYTH), EntityStatus.DRAFT, null, now, now);
+                List.of(LoreCategory.MYTH), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
         when(loreRepository.findById(id)).thenReturn(Optional.of(lore));
         when(loreRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 

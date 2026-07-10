@@ -6,6 +6,7 @@ import com.keynor.core.domain.model.faction.Faction;
 import com.keynor.core.domain.model.faction.FactionCategory;
 import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.faction.FindAllFactionsUseCase;
@@ -53,7 +54,7 @@ class PublicFactionControllerTest {
         when(findAllFactionsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
 
-        controller.findAll(null, 0, 20);
+        controller.findAll("en", null, 0, 20);
 
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllFactionsUseCase).findAll(filterCaptor.capture(), any());
@@ -65,7 +66,7 @@ class PublicFactionControllerTest {
         when(findAllFactionsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(), 1, 30, 0));
 
-        controller.findAll(null, 1, 30);
+        controller.findAll("en", null, 1, 30);
 
         ArgumentCaptor<PageRequest> pageCaptor = ArgumentCaptor.forClass(PageRequest.class);
         verify(findAllFactionsUseCase).findAll(any(), pageCaptor.capture());
@@ -78,12 +79,12 @@ class PublicFactionControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Faction faction = new Faction(id, "The Iron Order", "A guild", "Body",
-                List.of(), List.of(FactionCategory.ORDER), EntityStatus.CANON, null, now, now);
+                List.of(), List.of(FactionCategory.ORDER), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(findAllFactionsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(faction), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
-        var response = controller.findAll(null, 0, 20);
+        var response = controller.findAll("en", null, 0, 20);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         PagedResponse<FactionResponse> body = response.getBody();
@@ -99,7 +100,7 @@ class PublicFactionControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Faction faction = new Faction(id, "The Iron Order", "A guild", "Body",
-                List.of(), List.of(FactionCategory.GUILD), EntityStatus.CANON, null, now, now);
+                List.of(), List.of(FactionCategory.GUILD), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
         when(findFactionByIdUseCase.findById(id)).thenReturn(faction);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 

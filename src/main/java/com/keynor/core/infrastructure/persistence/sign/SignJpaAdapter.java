@@ -1,6 +1,7 @@
 package com.keynor.core.infrastructure.persistence.sign;
 
 import com.keynor.core.domain.model.sign.Sign;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.port.out.SignRepository;
 import org.springframework.stereotype.Component;
 
@@ -20,8 +21,8 @@ public class SignJpaAdapter implements SignRepository {
     }
 
     @Override
-    public List<Sign> findAllOrderedBySignOrder() {
-        return jpaRepository.findAllByOrderBySignOrderAsc()
+    public List<Sign> findAllOrderedBySignOrder(Language language) {
+        return jpaRepository.findAllByLanguageOrderBySignOrderAsc(language)
                 .stream()
                 .map(mapper::toDomain)
                 .toList();

@@ -2,6 +2,7 @@ package com.keynor.core.infrastructure.web.era;
 
 import com.keynor.core.application.dto.era.EraResponse;
 import com.keynor.core.domain.model.era.Era;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.era.EraImportance;
 import com.keynor.core.domain.model.era.EraType;
 import com.keynor.core.domain.port.in.era.FindAllErasUseCase;
@@ -45,13 +46,13 @@ class PublicEraControllerTest {
         UUID pointId = UUID.randomUUID();
         UUID era2Id = UUID.randomUUID();
 
-        Era eraInterval = new Era(eraId, "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW);
-        Era temporalPoint = new Era(pointId, "The Great Sundering", 2, EraType.POINT, EraImportance.MAJOR, "Cataclysmic event", NOW, NOW);
-        Era eraInterval2 = new Era(era2Id, "Age of Silence", 3, EraType.ERA, null, "Age of quiet", NOW, NOW);
+        Era eraInterval = new Era(eraId, "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW, Language.EN, UUID.randomUUID());
+        Era temporalPoint = new Era(pointId, "The Great Sundering", 2, EraType.POINT, EraImportance.MAJOR, "Cataclysmic event", NOW, NOW, Language.EN, UUID.randomUUID());
+        Era eraInterval2 = new Era(era2Id, "Age of Silence", 3, EraType.ERA, null, "Age of quiet", NOW, NOW, Language.EN, UUID.randomUUID());
 
-        when(findAllErasUseCase.findAll()).thenReturn(List.of(eraInterval, temporalPoint, eraInterval2));
+        when(findAllErasUseCase.findAll(Language.EN)).thenReturn(List.of(eraInterval, temporalPoint, eraInterval2));
 
-        var response = controller.findAll();
+        var response = controller.findAll("en");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         List<EraResponse> body = response.getBody();
@@ -75,14 +76,14 @@ class PublicEraControllerTest {
         assertThat(thirdEntry.importance()).isNull();
         assertThat(thirdEntry.order()).isEqualTo(3);
 
-        verify(findAllErasUseCase).findAll();
+        verify(findAllErasUseCase).findAll(Language.EN);
     }
 
     @Test
     void findAll_shouldReturnEmptyList_whenNoEntriesExist() {
-        when(findAllErasUseCase.findAll()).thenReturn(List.of());
+        when(findAllErasUseCase.findAll(Language.EN)).thenReturn(List.of());
 
-        var response = controller.findAll();
+        var response = controller.findAll("en");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull().isEmpty();
@@ -90,10 +91,10 @@ class PublicEraControllerTest {
 
     @Test
     void findAll_shouldSetImportanceToNull_forEraTypeEntries() {
-        Era era = new Era(UUID.randomUUID(), "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW);
-        when(findAllErasUseCase.findAll()).thenReturn(List.of(era));
+        Era era = new Era(UUID.randomUUID(), "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW, Language.EN, UUID.randomUUID());
+        when(findAllErasUseCase.findAll(Language.EN)).thenReturn(List.of(era));
 
-        var response = controller.findAll();
+        var response = controller.findAll("en");
 
         assertThat(response.getBody()).isNotNull().hasSize(1);
         assertThat(response.getBody().get(0).importance()).isNull();
@@ -101,10 +102,10 @@ class PublicEraControllerTest {
 
     @Test
     void findAll_shouldSetImportance_forPointTypeEntries() {
-        Era point = new Era(UUID.randomUUID(), "Minor Event", 1, EraType.POINT, EraImportance.STANDARD, "A minor event", NOW, NOW);
-        when(findAllErasUseCase.findAll()).thenReturn(List.of(point));
+        Era point = new Era(UUID.randomUUID(), "Minor Event", 1, EraType.POINT, EraImportance.STANDARD, "A minor event", NOW, NOW, Language.EN, UUID.randomUUID());
+        when(findAllErasUseCase.findAll(Language.EN)).thenReturn(List.of(point));
 
-        var response = controller.findAll();
+        var response = controller.findAll("en");
 
         assertThat(response.getBody()).isNotNull().hasSize(1);
         assertThat(response.getBody().get(0).importance()).isEqualTo("STANDARD");
@@ -113,7 +114,7 @@ class PublicEraControllerTest {
     @Test
     void findById_shouldReturnEra_whenFound() {
         UUID id = UUID.randomUUID();
-        Era era = new Era(id, "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW);
+        Era era = new Era(id, "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW, Language.EN, UUID.randomUUID());
         when(findEraByIdUseCase.findById(id)).thenReturn(era);
 
         var response = controller.findById(id);
@@ -129,7 +130,7 @@ class PublicEraControllerTest {
     @Test
     void findById_shouldReturnTemporalPoint_whenFound() {
         UUID id = UUID.randomUUID();
-        Era point = new Era(id, "The Great Sundering", 2, EraType.POINT, EraImportance.MAJOR, "Cataclysmic event", NOW, NOW);
+        Era point = new Era(id, "The Great Sundering", 2, EraType.POINT, EraImportance.MAJOR, "Cataclysmic event", NOW, NOW, Language.EN, UUID.randomUUID());
         when(findEraByIdUseCase.findById(id)).thenReturn(point);
 
         var response = controller.findById(id);

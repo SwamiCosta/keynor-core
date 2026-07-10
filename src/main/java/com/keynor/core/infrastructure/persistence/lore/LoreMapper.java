@@ -37,7 +37,9 @@ public class LoreMapper {
                 entity.getStatus(),
                 timeline,
                 entity.getCreatedAt(),
-                entity.getUpdatedAt());
+                entity.getUpdatedAt(),
+                entity.getLanguage(),
+                entity.getTranslationGroupId());
     }
 
     public LoreEntity toEntity(Lore lore) {
@@ -52,6 +54,8 @@ public class LoreMapper {
         entity.setTimeline(toEmbeddable(lore));
         entity.setCreatedAt(lore.getCreatedAt());
         entity.setUpdatedAt(lore.getUpdatedAt());
+        entity.setLanguage(lore.getLanguage());
+        entity.setTranslationGroupId(lore.getTranslationGroupId());
         return entity;
     }
 

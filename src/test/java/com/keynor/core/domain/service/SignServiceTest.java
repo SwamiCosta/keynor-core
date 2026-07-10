@@ -2,6 +2,7 @@ package com.keynor.core.domain.service;
 
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.sign.Sign;
+import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.port.out.SignRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,31 +37,31 @@ class SignServiceTest {
     void findAll_shouldDelegateToFindAllOrderedBySignOrderAndPreserveOrder() {
         Sign first = new Sign(
                 UUID.randomUUID(), "The Rift", 1, "Deep Winter", UUID.randomUUID(), null,
-                "The rift summary", "The rift body", NOW, NOW);
+                "The rift summary", "The rift body", NOW, NOW, Language.EN, UUID.randomUUID());
         Sign second = new Sign(
                 UUID.randomUUID(), "The Seeker", 2, "Early Spring", UUID.randomUUID(), "The Wanderer",
-                "The seeker summary", "The seeker body", NOW, NOW);
+                "The seeker summary", "The seeker body", NOW, NOW, Language.EN, UUID.randomUUID());
 
-        when(signRepository.findAllOrderedBySignOrder()).thenReturn(List.of(first, second));
+        when(signRepository.findAllOrderedBySignOrder(Language.EN)).thenReturn(List.of(first, second));
 
-        List<Sign> result = signService.findAll();
+        List<Sign> result = signService.findAll(Language.EN);
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getName()).isEqualTo("The Rift");
         assertThat(result.get(0).getSignOrder()).isEqualTo(1);
         assertThat(result.get(1).getName()).isEqualTo("The Seeker");
         assertThat(result.get(1).getSignOrder()).isEqualTo(2);
-        verify(signRepository).findAllOrderedBySignOrder();
+        verify(signRepository).findAllOrderedBySignOrder(Language.EN);
     }
 
     @Test
     void findAll_shouldReturnEmptyList_whenNoEntriesExist() {
-        when(signRepository.findAllOrderedBySignOrder()).thenReturn(List.of());
+        when(signRepository.findAllOrderedBySignOrder(Language.EN)).thenReturn(List.of());
 
-        List<Sign> result = signService.findAll();
+        List<Sign> result = signService.findAll(Language.EN);
 
         assertThat(result).isEmpty();
-        verify(signRepository).findAllOrderedBySignOrder();
+        verify(signRepository).findAllOrderedBySignOrder(Language.EN);
     }
 
     @Test
@@ -68,7 +69,7 @@ class SignServiceTest {
         UUID id = UUID.randomUUID();
         Sign sign = new Sign(
                 id, "The Seeker", 2, "Early Spring", UUID.randomUUID(), "The Wanderer",
-                "The seeker summary", "The seeker body", NOW, NOW);
+                "The seeker summary", "The seeker body", NOW, NOW, Language.EN, UUID.randomUUID());
         when(signRepository.findById(id)).thenReturn(Optional.of(sign));
 
         Sign result = signService.findById(id);
@@ -83,7 +84,7 @@ class SignServiceTest {
         UUID id = UUID.randomUUID();
         Sign rift = new Sign(
                 id, "The Rift", 1, "Deep Winter", UUID.randomUUID(), null,
-                "The rift summary", "The rift body", NOW, NOW);
+                "The rift summary", "The rift body", NOW, NOW, Language.EN, UUID.randomUUID());
         when(signRepository.findById(id)).thenReturn(Optional.of(rift));
 
         Sign result = signService.findById(id);
