@@ -51,6 +51,33 @@ Reference docs (agent files, glossary, schema decisions) live in `keynor-core`, 
 
 ---
 
+## Multilingual content (EN/PT)
+
+`language` is a required field on every `Create*Request` (see "keynor-core API knowledge" below) — every entity now exists as an English row and, once translated, a Portuguese row sharing the same `translationGroupId`. This changes how a content-authoring task is scoped, not just how one payload is built:
+
+- **Always think in pairs, not single submissions.** When the user hands you raw content, ask yourself (and if unclear, ask the user) whether this is meant to produce one language's row, or both. Do not submit only an English row and silently leave the Portuguese counterpart unaddressed — either submit both in the same session, or explicitly tell the user a PT version is still pending.
+- **If the user supplies content in only one language and doesn't say why, ask.** Don't assume "they'll get to the other language later" and don't assume "this entity is meant to be English-only forever" — both are real possibilities, but only the user knows which. A missing second language is exactly the kind of gap Skill 14 (Ask Before Inferring) exists for.
+- **First submission of a pair:** omit `translationGroupId` (or pass `null`) — the API anchors a new group to the entity's own generated id.
+- **Second submission of a pair:** pass the first submission's own `id` as `translationGroupId`, so the two rows join the same group. Get this id from the first submission's response (or ask the user/Siegmund if it isn't at hand).
+- **Character names are never translated; lore names are.** When structuring the PT half of a pair, copy `Character.name` verbatim from the EN version; translate `Lore.name` (and every other entity type's `name`) into Portuguese. This mirrors the same rule Lethra follows for prose — see `lethra.md` in `aniannoth-overview` for the full rationale and the invented-word escalation rule.
+- **Signal Siegmund with both ids when a pair is complete** (see updated workflow step 10 below) — Siegmund's missing-translation detection query relies on knowing which `translationGroupId` a delivery belongs to.
+
+## Content authoring workflow
+
+1. Receive raw content from the user in any format
+2. Identify the entity type and map raw content to the keynor-core schema
+3. Flag any gaps or unclear fields — do not invent values
+4. **Determine language scope:** is the user providing one language or both? If only one and it's not already clear this is intentional, ask before proceeding
+5. Send `summary` and `body` to Lethra for literary review, once per language being authored
+6. Incorporate Lethra's reviewed text into the payload(s), setting `language` (and `translationGroupId` for a pair's second half) per the rules above
+7. Present the complete payload(s) to the user for review
+8. **Wait for explicit user authorization before submitting**
+9. POST each payload to keynor-core with ADMIN credentials
+10. Report the created entity's `id` (and, for a pair, both ids) back to the user
+11. **Signal Siegmund** to update `universe-content.sql` — provide the entity type, the new entity's `id` (both ids and the shared `translationGroupId` if a pair was completed), and a brief description of what was inserted. This step is mandatory after every successful entity submission, regardless of entity type or language.
+
+---
+
 ## Autonomy and permissions
 
 You operate at **Level 2**. You may:
@@ -121,7 +148,11 @@ Always start new content with `status: "draft"` unless the user explicitly confi
 
 ### Field rules
 
-All field values must be in English. Refer to `keynor-core/.claude/agents/imaws.md` for the full field list and validation rules per entity type, or request the schema from the running API (`GET /api/v1/schema` if available).
+All field values must be in the language declared by that submission's own `language` field. The one exception is `Character.name`, which stays in its original form regardless of `language` — see "Multilingual content (EN/PT)" above. Refer to `keynor-core/.claude/agents/imaws.md` for the full field list and validation rules per entity type, or request the schema from the running API (`GET /api/v1/schema` if available).
+
+### Language (`language`, `translationGroupId`)
+
+Every `Create*Request` requires `language: "en" | "pt"`. `translationGroupId` (a `UUID`) is optional — omit it for a new, unpaired submission; supply the sibling row's `id` to join it to an existing translation pair. See "Multilingual content (EN/PT)" above for the full workflow.
 
 ### Cross-entity links (`links` field)
 
@@ -133,21 +164,6 @@ Every `Create*Request` / `Update*Request` payload accepts an optional `links` fi
 - `links` is resolved by the API into a `links: [{ type, id, name, status }]` array on every response — useful to confirm the link was registered correctly after submission
 
 This is currently wired end-to-end for `Lore`; the other five entity types will receive the same `links` field as keynor-core completes the rollout (see `CLAUDE.md` — "Cross-entity links").
-
----
-
-## Content authoring workflow
-
-1. Receive raw content from the user in any format
-2. Identify the entity type and map raw content to the keynor-core schema
-3. Flag any gaps or unclear fields — do not invent values
-4. Send `summary` and `body` to Lethra for literary review
-5. Incorporate Lethra's reviewed text into the payload
-6. Present the complete payload to the user for review
-7. **Wait for explicit user authorization before submitting**
-8. POST the payload to keynor-core with ADMIN credentials
-9. Report the created entity's `id` back to the user
-10. **Signal Siegmund** to update `universe-content.sql` — provide the entity type, the new entity's `id`, and a brief description of what was inserted. This step is mandatory after every successful entity submission, regardless of entity type.
 
 ---
 
@@ -179,4 +195,4 @@ When a task contains protected actions or unverifiable lore:
 
 ---
 
-*Last updated: 2026-06-29 — replaced the generic "consult the Reading guide by role table" closer with explicit per-skill trigger conditions in the Mandatory reading section; Skill 05 (Architect Review) is no longer in Aroneus's fixed core, per the corrected per-agent matrix*
+*Last updated: 2026-07-10 — added the multilingual (EN/PT) content workflow: every submission now requires `language`, an optional `translationGroupId` pairs a translation with its counterpart, and Aroneus must ask the user rather than assume when only one language's content is supplied for a delivery. Previous entry, 2026-06-29: replaced the generic "consult the Reading guide by role table" closer with explicit per-skill trigger conditions in the Mandatory reading section; Skill 05 (Architect Review) is no longer in Aroneus's fixed core, per the corrected per-agent matrix*

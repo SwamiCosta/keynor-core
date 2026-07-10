@@ -113,6 +113,15 @@ Siegmund will generate these seed scripts on request, with BCrypt hashes compute
 
 ---
 
+## Multilingual content (`language`, `translation_group_id`)
+
+Every content table (`characters`/`places`/`factions`/`items`/`events`/`lore`, plus `eras`/`archetypes`/`signs`) carries `language` (`'en'`/`'pt'`) and `translation_group_id` — a symmetric group id shared by a translation pair, not a one-directional "points to the English row" FK. A row with no translation yet has `translation_group_id = id` (its own id anchors a group of one).
+
+- **Detecting a missing translation:** `SELECT translation_group_id, COUNT(DISTINCT language) FROM <table> GROUP BY translation_group_id HAVING COUNT(DISTINCT language) < 2` finds every group with only one language present. Run this whenever the user asks you to check data completeness, and report any incomplete pairs found — don't silently ignore them.
+- **Duplicating an entity into its other language** (whether for the one-time historical backfill or an ad-hoc later correction) means generating a new `id`, copying every non-text field, translating `summary`/`body`/`name` per the workspace's translation rules (character names stay as-is; lore and other entity names are translated — flag any invented/ambiguous term to the user rather than guessing), setting `language` to the target language, and setting `translation_group_id` to the **source row's own id** (joining its group) — never a new random id, or the pair breaks.
+- **`universe_entity_images` and `entity_links` must be duplicated alongside a duplicated entity**, remapped to point at the new row's id instead of the source row's id. A duplicated entity that mentions another entity via `entity_links` should only get a remapped link if that other entity *also* has a translation in the target language yet — otherwise flag the gap instead of linking across languages or silently dropping the link.
+- **`db/seed/universe-content.sql` regeneration must preserve `language`/`translation_group_id`** for every row exactly as they exist in the live database — these are not derived/computed columns, they're part of the row's real state.
+
 ## Cross-entity links (`entity_links` table)
 
 `entity_links` (added in migration V7) is a polymorphic join table holding cross-entity references — e.g. a `Lore` row that mentions two `Character` rows. Columns: `id`, `source_type`, `source_id`, `target_type`, `target_id`, `created_at`. `source_type`/`target_type` are one of `CHARACTER`, `PLACE`, `FACTION`, `ITEM`, `EVENT`, `LORE`. See `.claude/skills/entity-links-implementation.md` for the full schema, domain model, and the Lore reference implementation.
@@ -143,8 +152,8 @@ Before writing any data script:
 - **Imaws (Level 3):** escalate when a task requires schema changes or new migrations. Schema is Imaws territory.
 - **Imperium (Level 2):** coordinate when new entity types require seed data.
 - **Judis (Level 2):** provide seed data scripts for test fixtures if Judis requests them for integration tests.
-- **Aroneus (Level 2):** after every successful entity submission to the keynor-core API, Aroneus signals Siegmund with the entity type, id, and a brief description. Siegmund must then update `db/seed/universe-content.sql` to reflect the new state and open a PR. See `.claude/skills/universe-content-dump.md` for the full procedure.
+- **Aroneus (Level 2):** after every successful entity submission to the keynor-core API, Aroneus signals Siegmund with the entity type, id(s), and a brief description — including, for a translation pair, both ids and the shared `translation_group_id`. Siegmund must then update `db/seed/universe-content.sql` to reflect the new state and open a PR. See `.claude/skills/universe-content-dump.md` for the full procedure. **If a handoff only mentions one language's id for an entity that doesn't already have a translation on record, ask Aroneus/the user whether the other language is coming before treating the delivery as complete** — don't assume a single-language delivery is intentional.
 
 ---
 
-*Last updated: 2026-06-29 — replaced the generic "consult the Reading guide by role table" closer with explicit per-skill trigger conditions in the Mandatory reading section; Skill 05 (Architect Review) is no longer in Siegmund's fixed core, per the corrected per-agent matrix*
+*Last updated: 2026-07-10 — added the multilingual (EN/PT) data model: `language`/`translation_group_id` on every content table, the missing-translation detection query, the duplication procedure (including `universe_entity_images`/`entity_links` remapping), and the rule to ask rather than assume when a handoff only covers one language. Previous entry, 2026-06-29: replaced the generic "consult the Reading guide by role table" closer with explicit per-skill trigger conditions in the Mandatory reading section; Skill 05 (Architect Review) is no longer in Siegmund's fixed core, per the corrected per-agent matrix*
