@@ -18,6 +18,7 @@ public interface CreateFactionUseCase {
             String body,
             List<String> images,
             List<FactionCategory> categories,
+            List<UUID> members,
             Timeline timeline,
             EntityStatus status,
             Language language,

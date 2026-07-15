@@ -13,6 +13,7 @@ public record CreateFactionRequest(
         String body,
         List<String> images,
         @NotNull List<String> categories,
+        List<UUID> members,
         @NotBlank String timelineFoundedEra,
         String timelineDestroyedEra,
         String status,

@@ -35,6 +35,8 @@ Entity types and their category enums:
 
 `Place` additionally has `mapType: MapType` (NAVIGABLE or ABSTRACT).
 
+`Faction` additionally has `members: List<UUID>` — the ids of `Character` entities belonging to the faction. Optional on create/update (defaults to empty), order-preserving, exposed on both `InternalFactionController` and `PublicFactionController` responses. Persisted via a dedicated `faction_members` join table (V15) rather than the polymorphic `entity_links` table (V7) — see `migration-history.md` for why: membership is order-preserving and strongly typed to a single entity pair, unlike `entity_links`'s unordered any-to-any references.
+
 ### Request DTO field names
 
 The domain model uses a `Timeline` value object with `founded` and `destroyed` fields. In the JSON body of API requests, these fields are **flattened** into the DTO with the following names:

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
+import java.util.UUID;
 
 public record UpdateFactionRequest(
         @NotBlank String name,
@@ -12,6 +13,7 @@ public record UpdateFactionRequest(
         String body,
         List<String> images,
         @NotNull List<String> categories,
+        List<UUID> members,
         @NotBlank String timelineFoundedEra,
         String timelineDestroyedEra,
         List<EntityLinkRequest> links) {

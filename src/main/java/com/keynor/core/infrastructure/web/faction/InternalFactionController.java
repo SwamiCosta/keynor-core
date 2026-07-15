@@ -85,7 +85,9 @@ public class InternalFactionController {
         var command = new CreateFactionUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.images() != null ? request.images() : List.of(),
-                categories, timeline, initialStatus,
+                categories,
+                request.members() != null ? request.members() : List.of(),
+                timeline, initialStatus,
                 LanguageRequestParser.parse(request.language()),
                 request.translationGroupId(),
                 links);
@@ -103,7 +105,9 @@ public class InternalFactionController {
         var command = new UpdateFactionUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.images() != null ? request.images() : List.of(),
-                categories, timeline, links);
+                categories,
+                request.members() != null ? request.members() : List.of(),
+                timeline, links);
         var updated = updateFactionUseCase.update(id, command);
         return ResponseEntity.ok(FactionResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.FACTION, updated.getId())));
     }
