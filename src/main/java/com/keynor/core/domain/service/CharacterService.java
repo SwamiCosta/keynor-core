@@ -25,7 +25,8 @@ public class CharacterService implements
         ChangeCharacterStatusUseCase,
         DeleteCharacterUseCase,
         FindCharacterByIdUseCase,
-        FindAllCharactersUseCase {
+        FindAllCharactersUseCase,
+        FindCharactersByIdsUseCase {
 
     private final CharacterRepository characterRepository;
     private final EntityLinkRepository entityLinkRepository;
@@ -105,6 +106,11 @@ public class CharacterService implements
     @Override
     public PageResult<Character> findAll(EntityFilter filter, PageRequest pageRequest) {
         return characterRepository.findAll(filter, pageRequest);
+    }
+
+    @Override
+    public List<Character> findByIds(List<UUID> ids) {
+        return characterRepository.findAllByIds(ids);
     }
 
     private void validateTimeline(Timeline timeline) {

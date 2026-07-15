@@ -1,14 +1,17 @@
 package com.keynor.core.infrastructure.web.character;
 
 import com.keynor.core.application.dto.character.CharacterResponse;
+import com.keynor.core.application.dto.shared.LinkedEntityResponse;
 import com.keynor.core.application.dto.shared.PagedResponse;
 import com.keynor.core.domain.model.shared.EntityFilter;
+import com.keynor.core.domain.model.shared.EntityLinkSummary;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.infrastructure.web.shared.LanguageRequestParser;
 import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.port.in.character.FindAllCharactersUseCase;
 import com.keynor.core.domain.port.in.character.FindCharacterByIdUseCase;
+import com.keynor.core.domain.port.in.character.FindCharactersByIdsUseCase;
 import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,14 +25,17 @@ public class PublicCharacterController {
 
     private final FindAllCharactersUseCase findAllCharactersUseCase;
     private final FindCharacterByIdUseCase findCharacterByIdUseCase;
+    private final FindCharactersByIdsUseCase findCharactersByIdsUseCase;
     private final FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     public PublicCharacterController(
             FindAllCharactersUseCase findAllCharactersUseCase,
             FindCharacterByIdUseCase findCharacterByIdUseCase,
+            FindCharactersByIdsUseCase findCharactersByIdsUseCase,
             FindLinkedEntitiesUseCase findLinkedEntitiesUseCase) {
         this.findAllCharactersUseCase = findAllCharactersUseCase;
         this.findCharacterByIdUseCase = findCharacterByIdUseCase;
+        this.findCharactersByIdsUseCase = findCharactersByIdsUseCase;
         this.findLinkedEntitiesUseCase = findLinkedEntitiesUseCase;
     }
 
@@ -52,5 +58,15 @@ public class PublicCharacterController {
     public ResponseEntity<CharacterResponse> findById(@PathVariable UUID id) {
         var character = findCharacterByIdUseCase.findById(id);
         return ResponseEntity.ok(CharacterResponse.from(character, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, character.getId())));
+    }
+
+    @GetMapping("/batch")
+    public ResponseEntity<List<LinkedEntityResponse>> findByIds(@RequestParam List<UUID> ids) {
+        var characters = findCharactersByIdsUseCase.findByIds(ids);
+        var response = characters.stream()
+                .map(character -> LinkedEntityResponse.from(
+                        new EntityLinkSummary(EntityType.CHARACTER, character.getId(), character.getName(), character.getStatus())))
+                .toList();
+        return ResponseEntity.ok(response);
     }
 }

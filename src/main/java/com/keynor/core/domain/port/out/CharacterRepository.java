@@ -6,12 +6,14 @@ import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface CharacterRepository {
     Character save(Character character);
     Optional<Character> findById(UUID id);
+    List<Character> findAllByIds(List<UUID> ids);
     boolean existsById(UUID id);
     boolean existsByNameAndLanguage(String name, Language language);
     void deleteById(UUID id);

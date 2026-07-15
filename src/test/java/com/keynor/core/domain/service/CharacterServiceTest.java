@@ -196,6 +196,19 @@ class CharacterServiceTest {
     }
 
     @Test
+    void findByIds_shouldDelegateToRepository() {
+        UUID id = UUID.randomUUID();
+        Instant now = Instant.now();
+        Character character = new Character(id, "Araveth", null, null, List.of(),
+                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+        when(characterRepository.findAllByIds(List.of(id))).thenReturn(List.of(character));
+
+        List<Character> result = characterService.findByIds(List.of(id));
+
+        assertThat(result).containsExactly(character);
+    }
+
+    @Test
     void create_shouldReturnCharacterWithImages_whenImagesProvided() {
         var command = new CreateCharacterUseCase.Command(
                 "Araveth", null, null,
