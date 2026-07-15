@@ -39,6 +39,12 @@ public class FactionEntity {
     @Column(name = "category")
     private List<FactionCategory> categories = new ArrayList<>();
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "faction_members", joinColumns = @JoinColumn(name = "faction_id"))
+    @Column(name = "character_id")
+    @OrderColumn(name = "display_order")
+    private List<UUID> members = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EntityStatus status;
@@ -70,6 +76,8 @@ public class FactionEntity {
     public void setImages(List<String> images) { this.images = images; }
     public List<FactionCategory> getCategories() { return categories; }
     public void setCategories(List<FactionCategory> categories) { this.categories = categories; }
+    public List<UUID> getMembers() { return members; }
+    public void setMembers(List<UUID> members) { this.members = members; }
     public EntityStatus getStatus() { return status; }
     public void setStatus(EntityStatus status) { this.status = status; }
     public Language getLanguage() { return language; }

@@ -13,6 +13,7 @@ import java.util.UUID;
 public class Faction extends UniverseEntity {
 
     private List<FactionCategory> categories;
+    private List<UUID> members;
 
     public Faction(
             UUID id,
@@ -21,6 +22,7 @@ public class Faction extends UniverseEntity {
             String body,
             List<String> images,
             List<FactionCategory> categories,
+            List<UUID> members,
             EntityStatus status,
             Timeline timeline,
             Instant createdAt,
@@ -29,12 +31,15 @@ public class Faction extends UniverseEntity {
             UUID translationGroupId) {
         super(id, name, summary, body, images, status, timeline, createdAt, updatedAt, language, translationGroupId);
         this.categories = new ArrayList<>(categories);
+        this.members = new ArrayList<>(members);
     }
 
-    public void update(String name, String summary, String body, List<String> images, List<FactionCategory> categories, Timeline timeline) {
+    public void update(String name, String summary, String body, List<String> images, List<FactionCategory> categories, List<UUID> members, Timeline timeline) {
         updateBaseFields(name, summary, body, images, timeline);
         this.categories = new ArrayList<>(categories);
+        this.members = new ArrayList<>(members);
     }
 
     public List<FactionCategory> getCategories() { return List.copyOf(categories); }
+    public List<UUID> getMembers() { return List.copyOf(members); }
 }

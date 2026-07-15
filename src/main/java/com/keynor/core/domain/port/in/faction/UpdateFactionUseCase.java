@@ -16,6 +16,7 @@ public interface UpdateFactionUseCase {
             String body,
             List<String> images,
             List<FactionCategory> categories,
+            List<UUID> members,
             Timeline timeline,
             List<EntityLinkRef> links) {}
 
