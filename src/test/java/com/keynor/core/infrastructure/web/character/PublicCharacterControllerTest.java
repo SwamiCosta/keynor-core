@@ -9,6 +9,7 @@ import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.port.in.character.FindAllCharactersUseCase;
 import com.keynor.core.domain.port.in.character.FindCharacterByIdUseCase;
+import com.keynor.core.domain.port.in.character.FindCharactersByIdsUseCase;
 import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,6 +37,9 @@ class PublicCharacterControllerTest {
     private FindCharacterByIdUseCase findCharacterByIdUseCase;
 
     @Mock
+    private FindCharactersByIdsUseCase findCharactersByIdsUseCase;
+
+    @Mock
     private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     private PublicCharacterController controller;
@@ -42,7 +47,7 @@ class PublicCharacterControllerTest {
     @BeforeEach
     void setUp() {
         controller = new PublicCharacterController(
-                findAllCharactersUseCase, findCharacterByIdUseCase, findLinkedEntitiesUseCase);
+                findAllCharactersUseCase, findCharacterByIdUseCase, findCharactersByIdsUseCase, findLinkedEntitiesUseCase);
     }
 
     @Test
@@ -110,5 +115,38 @@ class PublicCharacterControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().content().get(0).images()).isEmpty();
+    }
+
+    @Test
+    void findByIds_shouldDelegateToUseCaseWithProvidedIds() {
+        UUID id = UUID.randomUUID();
+        when(findCharactersByIdsUseCase.findByIds(List.of(id))).thenReturn(List.of());
+
+        var response = controller.findByIds(List.of(id));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(findCharactersByIdsUseCase).findByIds(List.of(id));
+    }
+
+    @Test
+    void findByIds_shouldReturnMappedResponseIncludingNonCanonEntities() {
+        Instant now = Instant.now();
+        UUID canonId = UUID.randomUUID();
+        UUID draftId = UUID.randomUUID();
+        Character canonCharacter = new Character(canonId, "Araveth", null, null, List.of(),
+                List.of(CharacterCategory.HERO), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
+        Character draftCharacter = new Character(draftId, "Unfinished One", null, null, List.of(),
+                List.of(CharacterCategory.NPC), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+        when(findCharactersByIdsUseCase.findByIds(List.of(canonId, draftId)))
+                .thenReturn(List.of(canonCharacter, draftCharacter));
+
+        var response = controller.findByIds(List.of(canonId, draftId));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).hasSize(2);
+        assertThat(response.getBody().get(0).status()).isEqualTo("CANON");
+        assertThat(response.getBody().get(1).status()).isEqualTo("DRAFT");
+        assertThat(response.getBody().get(1).name()).isEqualTo("Unfinished One");
     }
 }
