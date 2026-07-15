@@ -112,11 +112,13 @@ Endpoints under `/api/public/v1/` require no authentication and are consumed by 
 
 **Exception — closed reference/lookup sets:** `Era`, `Archetype`, and `Sign` are not `UniverseEntity` subclasses. They have no `status` field (so the CANON-only filter does not apply) and are fixed, non-paginated sets, so their list endpoints return a plain JSON array of all entries instead of `PagedResponse<T>`, and accept no query parameters. See `.claude/skills/domain-entity-reference.md`.
 
+**Exception — batch id lookup:** `GET /api/public/v1/characters/batch?ids=uuid1,uuid2,...` (added to resolve `Faction.members` ids into displayable name/status on the frontend) deliberately does not filter by CANON either — it returns every requested id that exists, whatever its status, so the frontend can gray out non-canon members instead of silently losing them. This mirrors the pre-existing, unfiltered behavior of `entity_links` resolution (`UniverseEntityLookupJpaAdapter.findSummary`, used to populate the `links` field on every public response), not a new departure. Response is a bare array of `LinkedEntityResponse` (`type`, `id`, `name`, `status`) — no pagination, no `language` param (each id already pins a specific language row).
+
 ### Available endpoints
 
 | Controller | Endpoints |
 |------------|-----------|
-| `PublicCharacterController` | `GET /api/public/v1/characters`, `GET /api/public/v1/characters/{id}` |
+| `PublicCharacterController` | `GET /api/public/v1/characters`, `GET /api/public/v1/characters/{id}`, `GET /api/public/v1/characters/batch?ids=...` |
 | `PublicPlaceController` | `GET /api/public/v1/places`, `GET /api/public/v1/places/{id}` |
 | `PublicFactionController` | `GET /api/public/v1/factions`, `GET /api/public/v1/factions/{id}` |
 | `PublicItemController` | `GET /api/public/v1/items`, `GET /api/public/v1/items/{id}` |
@@ -325,4 +327,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-06-27*
+*Last updated: 2026-07-15 (documented the `GET /api/public/v1/characters/batch` endpoint as the second exception to the CANON-only public API invariant, alongside the pre-existing Era/Archetype/Sign closed-set exception — see keynor-core PR #71)*
