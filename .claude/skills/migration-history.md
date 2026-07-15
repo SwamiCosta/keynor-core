@@ -20,6 +20,8 @@
 | V10 | Drop legacy `timeline_founded` / `timeline_destroyed` VARCHAR columns from all 6 entity tables, now superseded by the V9 `*_era_id` columns |
 | V11 | `archetypes` and `signs` tables — closed reference/lookup sets for the Aelimic cosmology (5 archetypes, 13 signs including the Rift); `signs.archetype_id` is a `NOT NULL` FK to `archetypes.id` |
 | V12 | Drop the tags concept — removes the 6 `*_tags` join tables (`character_tags`, `place_tags`, `faction_tags`, `item_tags`, `event_tags`, `lore_tags`) introduced in V2; the feature never grew beyond a free-text label list with no filtering UI in any consuming client |
+| V13 | Add multilingual support (EN/PT) to the 6 `UniverseEntity` tables — `language VARCHAR(2) NOT NULL DEFAULT 'en'` (`CHECK IN ('en','pt')`) and `translation_group_id UUID NOT NULL`, added nullable then backfilled (`translation_group_id = id` for all pre-existing rows) then tightened to `NOT NULL`, per the Skill 02 non-destructive path |
+| V14 | Same multilingual support (EN/PT) added in V13, extended to `eras`, `archetypes`, and `signs` — same `language` / `translation_group_id` columns and backfill sequence; separate migration because these three are not `UniverseEntity` subclasses. `eras.name`'s pre-existing `UNIQUE` constraint (V4/V8) is deliberately not widened to `UNIQUE(name, language)` — a PT era's name is itself translated text, so it never literally collides with its EN counterpart |
 
 For the full procedure (authorization gate, destructive-operations rules, Flyway-merge-is-execution warning), see the workspace `SKILLS.md` — Skill 02.
 

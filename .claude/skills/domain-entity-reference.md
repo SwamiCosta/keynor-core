@@ -19,6 +19,8 @@ All universe entities extend `UniverseEntity` (abstract base class):
 | `timeline` | Timeline | Value object with `founded` and `destroyed` (era strings, nullable) |
 | `createdAt` | Instant | Set at construction, immutable |
 | `updatedAt` | Instant | Updated on every mutation |
+| `language` | Language | `EN` or `PT` — which language this row's text is written in |
+| `translationGroupId` | UUID | Links this row to its counterpart(s) in other languages; not a one-directional "original" FK — a shared group id |
 
 Entity types and their category enums:
 
@@ -46,6 +48,17 @@ This mapping applies uniformly to all `Create*Request` and `Update*Request` DTOs
 `CreateCharacterRequest`, `UpdateCharacterRequest`, `CreatePlaceRequest`, `UpdatePlaceRequest`, `CreateFactionRequest`, `UpdateFactionRequest`, `CreateItemRequest`, `UpdateItemRequest`, `CreateEventRequest`, `UpdateEventRequest`, `CreateLoreRequest`, `UpdateLoreRequest`.
 
 > Do **not** use `timeline.founded` or `timeline.destroyed` in the JSON body — these will produce a `400 Bad Request`.
+
+### Multilingual fields (`language` / `translationGroupId`)
+
+Every `Create*Request` DTO carries `@NotBlank String language` (parsed via `LanguageRequestParser.parse()`, case-insensitive, only `EN`/`PT` allowed — any other value throws `IllegalArgumentException`) and an optional `UUID translationGroupId`, positioned after `status` and before `links`.
+
+| `translationGroupId` in request body | Result |
+|---------------------------------------|--------|
+| absent / `null` | the new entity becomes its own group anchor — `translationGroupId` defaults to the entity's own newly generated `id` |
+| a UUID of an existing row's group | the new entity joins that translation group (e.g. submitting the PT counterpart of an existing EN entity) |
+
+This is the mechanism Aroneus uses to submit a translation pair, and the same one Siegmund/Lethra rely on to detect an entity with no translation yet (its group has fewer distinct `language` values than the 2 supported).
 
 ### Optional `status` field on creation
 
@@ -95,6 +108,10 @@ Universe entities (lore/story data) support **hard delete**. User data (`users` 
 | `description` | String | Optional descriptive text |
 | `createdAt` | Instant | Set at construction, immutable |
 | `updatedAt` | Instant | Updated on every mutation |
+| `language` | Language | `EN` or `PT` — same multilingual mechanism as `UniverseEntity` (see above) |
+| `translationGroupId` | UUID | Same shared-group semantics as `UniverseEntity` |
+
+`eras.name` keeps its pre-existing `UNIQUE` constraint (not widened to `UNIQUE(name, language)`) — a PT era's name is itself translated text, so it never literally collides with its EN counterpart's name.
 
 ### Domain invariant
 
@@ -135,6 +152,8 @@ Like `Era`, `Archetype` and `Sign` are **not** `UniverseEntity` subclasses — n
 | `selfRelation` | String | Nullable — null only for `Obsession` |
 | `description` | String | Descriptive text |
 | `createdAt` / `updatedAt` | Instant | Set at construction / updated on mutation |
+| `language` | Language | `EN` or `PT` — same multilingual mechanism as `UniverseEntity` (see above) |
+| `translationGroupId` | UUID | Same shared-group semantics as `UniverseEntity` |
 
 ### Sign fields
 
@@ -149,6 +168,8 @@ Like `Era`, `Archetype` and `Sign` are **not** `UniverseEntity` subclasses — n
 | `summary` | String | Short one-line description |
 | `body` | String | Full descriptive text |
 | `createdAt` / `updatedAt` | Instant | Set at construction / updated on mutation |
+| `language` | Language | `EN` or `PT` — same multilingual mechanism as `UniverseEntity` (see above) |
+| `translationGroupId` | UUID | Same shared-group semantics as `UniverseEntity` |
 
 `SignResponse.archetypeId` is a plain `UUID`, not a nested `Archetype` object — callers that need archetype details make a second call to `GET /api/public/v1/archetypes/{id}`.
 
