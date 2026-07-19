@@ -18,7 +18,7 @@ The dump covers all universe content tables — entities and their join tables:
 maps, map_eras, eras,
 characters, character_categories,
 places, place_categories,
-factions, faction_categories,
+factions, faction_categories, faction_members,
 items, item_categories,
 events, event_categories,
 lore, lore_categories,
@@ -103,7 +103,7 @@ INSERT INTO eras (...) VALUES (...);
 
 Triggered when: the user asks Siegmund to update the dump after a data change in the local DB.
 
-1. Siegmund runs `pg_dump --data-only --column-inserts -t maps -t eras -t map_eras -t characters -t character_categories -t places -t place_categories -t factions -t faction_categories -t items -t item_categories -t events -t event_categories -t lore -t lore_categories -t universe_entity_images -t entity_links -t archetypes -t signs keynor_core` directly against the already-running local database. If the database is not reachable, Siegmund stops and reports — never starts one to proceed
+1. Siegmund runs `pg_dump --data-only --column-inserts -t maps -t eras -t map_eras -t characters -t character_categories -t places -t place_categories -t factions -t faction_categories -t faction_members -t items -t item_categories -t events -t event_categories -t lore -t lore_categories -t universe_entity_images -t entity_links -t archetypes -t signs keynor_core` directly against the already-running local database. If the database is not reachable, Siegmund stops and reports — never starts one to proceed
 2. Siegmund assembles the file: TRUNCATE block (table list carried over from the previous file), then one section per table in dependency order, each containing that table's `pg_dump` output pasted verbatim — see "File format" above for what NOT to hand-rework
 3. Siegmund updates the header's "Last updated" / "Updated by" lines to describe the change
 4. Siegmund verifies the new file against the previous version **by row content per table** (e.g. sort both old and new row sets by primary key before diffing) — not by literal line position. Physical row reordering with identical content (Postgres heap relocation after a past `UPDATE`) is expected and is not a defect
