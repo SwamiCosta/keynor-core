@@ -163,7 +163,23 @@ Every `Create*Request` / `Update*Request` payload accepts an optional `links` fi
 - Links are directional (source → target) but the relationship is conceptually symmetric for display purposes; you only need to set `links` on the entity you are currently submitting, not on both sides
 - `links` is resolved by the API into a `links: [{ type, id, name, status }]` array on every response — useful to confirm the link was registered correctly after submission
 
-This is currently wired end-to-end for `Lore`; the other five entity types will receive the same `links` field as keynor-core completes the rollout (see `CLAUDE.md` — "Cross-entity links").
+`links` is wired end-to-end for all 6 entity types, including `Character` (see `CLAUDE.md` — "Cross-entity links").
+
+### Standing rule — deity character auto-links
+
+Whenever a submission is a `Character` with category `DEITY` **and** `status: "canon"`, automatically include these three `links` entries in the payload — do not wait to be asked, and do not ask for confirmation before including them (only the submission itself still requires the usual per-submission authorization):
+
+| Lore entry | EN `targetId` | PT `targetId` |
+|------------|---------------|---------------|
+| Sexuality of the Gods / Sexualidade dos Deuses | `4f205e4a-01bb-4094-81c5-b49b7fe142c6` | `8986dc8b-69b3-4f61-bfac-1036d3ffba60` |
+| The Theosophy of Aniannoth / A Teosofia de Aniannoth | `ebd1073f-0a52-4c17-86c3-bfc1cb491a22` | `acf5d45d-2163-4918-a4dd-eaac675ba44e` |
+| On the Word God / Sobre a Palavra Deus | `c4ba4207-7857-49ab-8e22-5acc57ea2cd5` | `91165b17-3214-40b5-bbf3-0f4432905570` |
+
+- Each `targetType` is `LORE`.
+- Use the **EN** ids when submitting the EN half of the character pair, and the **PT** ids when submitting the PT half — never mix a language's `targetId` into the other language's payload.
+- Links are **unidirectional**: the Character is the source, these three Lore entries are the targets. Do not add a reciprocal link back from any of the three Lore entries to the Character.
+- Applies only when both conditions hold — category includes `DEITY` **and** status is `canon`. A `draft` deity does not get these links automatically; if the user wants them added early to a draft, that is a separate, explicit request, not this standing rule.
+- **Confirm in the output every time**: after submission, quote the resolved `links` entries (name + status) for the three Lore targets from each language's response — not just a generic "links added" statement. If any of the three ids fails to resolve (renamed, deleted, or otherwise not found), stop and report to the user instead of submitting with a missing link or substituting a different id.
 
 ---
 
@@ -195,4 +211,4 @@ When a task contains protected actions or unverifiable lore:
 
 ---
 
-*Last updated: 2026-07-10 — added the multilingual (EN/PT) content workflow: every submission now requires `language`, an optional `translationGroupId` pairs a translation with its counterpart, and Aroneus must ask the user rather than assume when only one language's content is supplied for a delivery. Previous entry, 2026-06-29: replaced the generic "consult the Reading guide by role table" closer with explicit per-skill trigger conditions in the Mandatory reading section; Skill 05 (Architect Review) is no longer in Aroneus's fixed core, per the corrected per-agent matrix*
+*Last updated: 2026-07-15 — added the standing rule auto-linking every canonical DEITY character to the 3 fixed Lore entries (Sexuality of the Gods, The Theosophy of Aniannoth, On the Word God) in both languages, with mandatory output confirmation; corrected the stale claim that `links` was Lore-only — it is now wired for all 6 entity types. Previous entry, 2026-07-10: added the multilingual (EN/PT) content workflow: every submission now requires `language`, an optional `translationGroupId` pairs a translation with its counterpart, and Aroneus must ask the user rather than assume when only one language's content is supplied for a delivery.*
