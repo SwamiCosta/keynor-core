@@ -11,42 +11,30 @@
 -- Excluded: users, oauth2_* (environment-specific, never in scope)
 --
 -- ⚠  Destructive: TRUNCATE removes all existing universe content before reinserting.
--- ⚠  Apply only after Flyway migrations are fully up to date (V1–V15 at minimum,
---   including V15 which adds faction_members — this file will fail to apply
---   against a database still on V14 or earlier).
+-- ⚠  Apply only after Flyway migrations are fully up to date (V1–V15 at minimum).
 -- ⚠  NOT idempotent — do not apply twice on the same database.
 -- ⚠  Requires user authorization before execution. Agents never run this directly.
 --
 -- How to apply:
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
--- Last updated: 2026-07-16
+-- Last updated: 2026-07-19
 -- Updated by:   Siegmund (regenerated fresh from the live database). Per
---               Aroneus's handoff: INSERT the first Faction, "The Numeric
---               Gods" (EN c964a915-17e2-4bb6-949e-50b2cfdc20d1) / "Os
---               Deuses Numéricos" (PT 186e1df4-226c-4a0c-b0ab-3520aad3f91f),
---               CANON DIVINE, with an image, 14 faction_members per
---               language (Zςanser, Ani, Duo, Trios, Tetros, Pentos,
---               Hexas, Hecta, Octo, Enea, Deca, Unixia, Dixia, Trixia —
---               verified id-for-id and in display order against the
---               handoff), and 8 unidirectional entity_links per language
---               to Ælime/Imaws/Oon/Alveolar/Ξottum and 3 lore entries.
---               Each of the 14 members also got the reverse
---               CHARACTER -> FACTION entity_link (28 rows, both
---               languages). All 44 new entity_links and 2 new images
---               verified directly against the live dump before
---               regenerating -- purely additive, zero rows lost.
---
---               NEW TABLE IN SCOPE: faction_members (migration V15) --
---               an ordered Faction -> Character roster with real FKs,
---               distinct from the polymorphic entity_links table. Added
---               to this file's TRUNCATE/table list. FLAGGED FOR IMAWS:
---               .claude/skills/universe-content-dump.md's "Scope of
---               tables" list has not been updated to include it --
---               editing that skill file is outside Siegmund's authority
---               (Level 3 territory per workspace CLAUDE.md); the table
---               is included in this actual regeneration regardless,
---               since that's data work, not a doc edit.
+--               Aroneus's handoff: INSERT character Aggraxæmon (EN
+--               59c17b35-81e0-4584-9f98-4a0d3c8a8cbb / PT
+--               f1563a48-7f54-4836-bc4b-561aa68bc879), CANON DEITY, with
+--               4 images per language; the usual 3-lore auto-link set
+--               (Sexuality of the Gods, On the Word God, The Theosophy
+--               of Aniannoth) plus a new bidirectional entity_link with
+--               The Calling of Twelve Amets, both directions, both
+--               languages (10 new entity_links total). Verified "The
+--               Calling of Twelve Amets" / "O Chamado dos Doze Amets"
+--               now has exactly 9 outgoing links per language (Imaws,
+--               Ælime, Aleph, Sexuality of the Gods, Alveolar, Zςanser,
+--               Oon, Ξottum, Aggraxæmon) — matches the handoff exactly.
+--               All 10 new entity_links and 8 new images verified
+--               directly against the live dump before regenerating --
+--               purely additive, zero rows lost.
 
 -- ============================================================
 -- TRUNCATE (join tables first, then parents, then root tables)
@@ -506,6 +494,20 @@ Ela desafia a própria premissa. A perfeição, argumenta, não é apenas inatin
 A seus devotos, ela diz algo mais fácil e mais perigoso: olhe para o que você tem. Encontre o contentamento que vive no particular, no imperfeito, na coisa que é sua e não uma imitação de algo melhor. Dance com o mundo como ele é. Abrace o que sua natureza lhe diz, não o que o horizonte exige de você. Ela instiga o desmantelamento de toda estrutura que busca ordenar e conter os povos do mundo — toda lei que governa não por necessidade, mas por medo do que os valkani poderiam fazer se deixados por conta própria.
 
 E, no entanto, apesar de toda a sua oposição à irmã, uma observação estranha persiste entre aqueles que estudam ambas. O devoto de Dixia caminha pela estrada rumo a algo melhor do que aquilo que é. O devoto de Trixia rejeita o que lhe dizem para ser e se move rumo àquilo que verdadeiramente é. Ambos caminham. Ambos rejeitam onde estão. Ambos se estendem. Em seu esforço incansável para contradizer Dixia, Trixia talvez tenha se tornado nada mais que a outra face da mesma moeda — diferente em direção, idêntica em movimento. Duas deusas, uma só inquietação.', 'CANON', '2026-07-10 19:24:28.564058+00', '2026-07-16 03:17:38.111103+00', '36d5e2a5-be00-456b-bf11-113c0b737904', NULL, 'pt', '62ded67a-3f6b-4671-a138-2b9beb4c5f07');
+INSERT INTO characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id) VALUES ('59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 'Aggraxæmon', 'Aggraxæmon is called the Father of All Monsters — the source of every abomination, ghost, demon, and nameless creature that inhabits the deep, dark places of existence. His presence is felt as dread before anything else, and his cultists seek not to defeat that terror but to cross through it, believing liberation lies on its far side. Yet Aggraxæmon himself pursues no ruin — his conflicts arise not from his actions, but from an appearance the eye refuses to accept.', 'Aggraxæmon is called the Father of All Monsters. The name is not a metaphor. From him come the abominations that move through the deep places of the world, the ghosts that linger at the edge of the living, the demons that inhabit the spaces between things, and the creatures that have no name in any tongue the valkani have invented. He is the source of everything that frightens. He is the entity that fear itself recognizes as its origin.
+
+He inhabits the darkest corners of existence — not the darkness that a fire can dispel, but the darkness that exists regardless, in the places where light has never been and was never meant to go. His presence is felt as dread before it is felt as anything else. His appearance, to those few who have encountered it and survived the encounter with their minds intact, is described only in negations: not anything that resembles what should exist, not assembled according to any principle the eye expects to find. Repulsion precedes comprehension. Fear arrives before thought.
+
+His cultists are regarded by the wider world as mad. They do not dispute this characterization so much as consider it beside the point. To worship Aggraxæmon is to attempt something very specific: the liberation from fear through full immersion in it. His followers believe that the terror he represents is not an enemy to be defeated but a limit to be crossed — that on the other side of fear lies a range of truth that ordinary existence, with its aesthetic conventions and its moral frameworks, deliberately seals away. In their meditations, they do not seek comfort. They seek transformation. Body and mind undergo changes that cannot always be undone, and those who emerge from the deepest practices emerge as something other than what they were — altered, expanded, and in possession of a power that has no equivalent in the common world.
+
+And yet Aggraxæmon himself does not align with the role his followers are persecuted for venerating. He does not hunger for destruction. He does not pursue the ruin of the world, or of the valkani, or of anything in particular. His appetites and his rages are no larger and no more malicious than those of other gods — they are simply dressed in shapes that the eye refuses to accept. His nature is as valid as any other. He does not go out of his way to cause harm. The conflicts that surround him — the fear, the violence, the centuries of enmity — arise not from his actions, but from what he looks like, and from what the valkani cannot help but feel in his presence. He is, in this sense, among the most misunderstood of all divine beings: a creature whose appearance guarantees a conflict he does not seek, and whose reputation for evil has been written entirely by those too frightened to look at him clearly.', 'CANON', '2026-07-19 23:45:09.553904+00', '2026-07-19 23:45:09.553904+00', '48ed4b49-b7b5-4d4b-9715-00dcaa819209', NULL, 'en', '59c17b35-81e0-4584-9f98-4a0d3c8a8cbb');
+INSERT INTO characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id) VALUES ('f1563a48-7f54-4836-bc4b-561aa68bc879', 'Aggraxæmon', 'Aggraxæmon é chamado o Pai de Todos os Monstros — a fonte de toda abominação, fantasma, demônio e criatura sem nome que habita os lugares mais fundos e escuros da existência. A sua presença é sentida como pavor antes de qualquer outra coisa, e os seus cultistas buscam não derrotar esse terror, mas atravessá-lo, acreditando que a libertação está do outro lado. E, no entanto, o próprio Aggraxæmon não persegue ruína alguma — os seus conflitos não nascem das suas ações, mas de uma aparência que o olho se recusa a aceitar.', 'Aggraxæmon é chamado o Pai de Todos os Monstros. O nome não é uma metáfora. Dele vêm as abominações que se movem pelos lugares mais fundos do mundo, os fantasmas que persistem nas bordas do mundo dos vivos, os demônios que habitam os espaços entre as coisas, e as criaturas que não têm nome em nenhuma língua que os valkani tenham inventado. Ele é a fonte de tudo aquilo que aterroriza. É a entidade que o próprio medo reconhece como sua origem.
+
+Ele habita os cantos mais escuros da existência — não a escuridão que uma chama pode dissipar, mas a escuridão que existe independentemente, nos lugares onde a luz nunca esteve e nunca deveria estar. A sua presença se faz sentir como pavor antes de se fazer sentir como qualquer outra coisa. A sua aparência, para os poucos que a encontraram e sobreviveram ao encontro com a mente intacta, é descrita apenas por negações: nada que se assemelhe ao que deveria existir, nada montado segundo qualquer princípio que o olho espera encontrar. A repulsa precede a compreensão. O medo chega antes do pensamento.
+
+Os seus cultistas são vistos pelo resto do mundo como loucos. Eles não contestam essa caracterização tanto quanto a consideram irrelevante. Cultuar Aggraxæmon é tentar algo muito específico: a libertação do medo pela imersão total nele. Os seus seguidores acreditam que o terror que ele representa não é um inimigo a ser derrotado, mas um limite a ser atravessado — que do outro lado do medo existe uma gama de verdades que a existência comum, com as suas convenções estéticas e os seus quadros morais, deliberadamente veda. Em suas meditações, não buscam conforto. Buscam transformação. Corpo e mente sofrem mudanças que nem sempre podem ser desfeitas, e aqueles que emergem das práticas mais profundas emergem como algo diferente do que eram — alterados, expandidos, e na posse de um poder que não tem equivalente no mundo comum.
+
+E ainda assim, o próprio Aggraxæmon não corresponde ao papel pelo qual os seus seguidores são perseguidos. Ele não tem fome de destruição. Não persegue a ruína do mundo, dos valkani, nem de nada em particular. Os seus apetites e as suas iras não são maiores nem mais maliciosos do que os de outros deuses — estão apenas vestidos em formas que o olho recusa aceitar. A sua natureza é tão válida quanto qualquer outra. Ele não sai do seu caminho para causar dano. Os conflitos que o rodeiam — o medo, a violência, os séculos de inimizade — não surgem das suas ações, mas da sua aparência, e daquilo que os valkani não conseguem evitar sentir na sua presença. Ele é, nesse sentido, um dos seres divinos mais incompreendidos de todos: uma criatura cuja aparência garante um conflito que não procura, e cuja reputação de malevolência foi escrita inteiramente por aqueles demasiado aterrorizados para olhá-lo com clareza.', 'CANON', '2026-07-19 23:45:56.1587+00', '2026-07-19 23:45:56.1587+00', '36d5e2a5-be00-456b-bf11-113c0b737904', NULL, 'pt', '59c17b35-81e0-4584-9f98-4a0d3c8a8cbb');
 
 -- ============================================================
 -- CHARACTER CATEGORIES
@@ -553,6 +555,8 @@ INSERT INTO character_categories (character_id, category) VALUES ('bac8cd6d-5515
 INSERT INTO character_categories (character_id, category) VALUES ('9c5d0b20-7fcd-45a9-99f2-e3d926426979', 'DEITY');
 INSERT INTO character_categories (character_id, category) VALUES ('9107120d-9a87-42c0-bd4a-9fd85b7d7d27', 'DEITY');
 INSERT INTO character_categories (character_id, category) VALUES ('aa6e8cb3-d753-4c2c-a4d5-af895620affe', 'DEITY');
+INSERT INTO character_categories (character_id, category) VALUES ('59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 'DEITY');
+INSERT INTO character_categories (character_id, category) VALUES ('f1563a48-7f54-4836-bc4b-561aa68bc879', 'DEITY');
 
 -- ============================================================
 -- FACTIONS
@@ -823,20 +827,6 @@ It is said that no valkani is bound to a single Sign. The Sign one is born benea
 In the sacred city of Singisdônia, each of the twelve Signs found a living vessel: a knight, one for every Sign, the Twelve Original Knights. They are not gods, and yet they are granted the same reverence one would offer a god, for it is said they carry the very power of the divine within their forms, and stand as true representatives of valor itself. To the valkani, they are not myth but model — the furthest point to which a mortal life might climb, the pinnacle of what one might aspire to become.
 
 But the year does not divide evenly into seasons, and a handful of days remain each cycle, belonging to no season at all. It is from these leftover days that the thirteenth Sign is born: the Rift, ruled not by element or suit but by Obsession alone, and by the emptiness Obsession is forever trying, and forever failing, to fill. And as with the twelve, so with the Rift — for even it claims a champion among the Knights. He alone bears no name, no color of life, no triumph carved into his armor. He stands as proof that not everything born into the world is born into its order — and that some emptiness can produce both ruin and greatness, in equal and terrible measure.', 'CANON', '2026-06-25 05:16:10.685861+00', '2026-07-02 08:09:35.803347+00', '48ed4b49-b7b5-4d4b-9715-00dcaa819209', NULL, 'en', 'ea292de9-5429-4ecb-b821-7e1e168ffbca');
-INSERT INTO lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id) VALUES ('521ccad8-cbe0-46ac-823b-b874bd83aba1', 'The Calling of Twelve Amets', 'The myth of how the first concepts came to drift through the primordial eternity, and of the single request — made by Imaws and Ælime to twelve of their own children — that set the entire plot of the universe into motion, for better and for far worse.', 'The Amets
-Before there was a world to hold anything, there was the union of Imaws and Ælime — the architect and the impulse, the law and the want, working as the two halves of a single, undivided will. From that union came the Amets: the first concepts ever to exist, born not into a world but into the eternity that came before a world was possible. They had no ground to stand on and no sky to be measured against. They simply drifted, numberless and formless yet utterly real, through the primordial dark — concepts before there was anything for a concept to describe.
-
-The Calling of the Twelve
-It is said that, in time, the divine couple gathered their countless children together and asked something of them. Not all of them — only twelve. Twelve, out of all the Amets adrift in that first eternity, were called forward and offered their parents'' gifts: the means, at last, to set the plot of the universe into motion.
-
-Only time would tell what those gifts were, we know only that twelve were chosen, and that the twelve accepted.
-
-What Came After
-Everything that followed traces back to that one request. Every wonder the world has ever produced — its kindest legends, its most luminous stories, the very beauty that makes existence worth narrating — descends from what those twelve set in motion. So, too, does everything the world would rather forget: its most harrowing wars, its cruelest and most violent sufferings, griefs with no end and no easy telling.
-
-Why would the gods of the Amets have asked for such a thing? Why summon twelve of their own and hand them the keys to a story that would hold, in equal measure, paradise and ruin?
-
-No one will ever know. Imaws and Ælime have never answered, and the twelve who said yes have never explained themselves. But if there is anyone left to even ask the question — if there is a single voice anywhere capable of wondering why the world exists at all — then that voice owes its wondering to them. We are the ones who get to ask. That, if nothing else, is a debt worth remembering.', 'CANON', '2026-06-28 11:30:10.270666+00', '2026-07-16 02:44:03.146693+00', '48ed4b49-b7b5-4d4b-9715-00dcaa819209', NULL, 'en', '521ccad8-cbe0-46ac-823b-b874bd83aba1');
 INSERT INTO lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id) VALUES ('4f205e4a-01bb-4094-81c5-b49b7fe142c6', 'Sexuality of the Gods', 'A philosophical account of divine nature: the gods of Aniannoth are concepts made sovereign, not bodies. They carry no gender, are bound by no matrimonial convention, and produce offspring through the collision of living principles — or from their own substance alone.', 'The gods of Aniannoth are most commonly depicted in forms that resemble the valkani — two eyes, two hands, a body that stands upright and breathes. Yet this resemblance is a convenience, not a truth. The anthropomorphic form is a vessel chosen for legibility, a shape the mortal mind can hold without fracturing. The gods themselves are not bodies. They are concepts made sovereign. They are principles that predate the matter from which flesh is assembled.
 
 As such, they carry no gender. What mortals perceive as masculine or feminine in a deity is a projection — an interpretation applied by those who need their gods to look like something familiar. The gods themselves exist beyond that distinction entirely. Two gods depicted as male may produce a child together. Two depicted as female may do the same. The representation is not the god; it is merely the image the age has settled on. Union between them follows no anatomical logic, because there is no anatomy — only the collision of two living concepts, and whatever is born from that meeting.
@@ -1085,6 +1075,20 @@ O segundo sustenta que a dissolução de quem reza é uma punição — uma corr
 O terceiro relato não oferece nenhuma moral e não pede nenhuma: talvez seja simplesmente o que acontece quando algo finito toca algo infinito. Talvez não haja intenção alguma por trás disso — nenhum abraço, nenhuma punição, apenas consequência. Uma mariposa não ofende a chama.
 
 Ninguém que deu o salto de fé retornou para nos dizer qual dessas é a verdadeira. Esta é, talvez, a coisa mais honesta sobre Omnia: a pergunta que ela mais claramente levanta é aquela que jamais permitirá que se responda.', 'CANON', '2026-07-10 19:24:29.331894+00', '2026-07-16 02:44:04.139394+00', '36d5e2a5-be00-456b-bf11-113c0b737904', NULL, 'pt', 'a1b2c3d4-e5f6-4789-8abc-def012345678');
+INSERT INTO lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id) VALUES ('521ccad8-cbe0-46ac-823b-b874bd83aba1', 'The Calling of Twelve Amets', 'The myth of how the first concepts came to drift through the primordial eternity, and of the single request — made by Imaws and Ælime to twelve of their own children — that set the entire plot of the universe into motion, for better and for far worse.', 'The Amets
+Before there was a world to hold anything, there was the union of Imaws and Ælime — the architect and the impulse, the law and the want, working as the two halves of a single, undivided will. From that union came the Amets: the first concepts ever to exist, born not into a world but into the eternity that came before a world was possible. They had no ground to stand on and no sky to be measured against. They simply drifted, numberless and formless yet utterly real, through the primordial dark — concepts before there was anything for a concept to describe.
+
+The Calling of the Twelve
+It is said that, in time, the divine couple gathered their countless children together and asked something of them. Not all of them — only twelve. Twelve, out of all the Amets adrift in that first eternity, were called forward and offered their parents'' gifts: the means, at last, to set the plot of the universe into motion.
+
+Only time would tell what those gifts were, we know only that twelve were chosen, and that the twelve accepted.
+
+What Came After
+Everything that followed traces back to that one request. Every wonder the world has ever produced — its kindest legends, its most luminous stories, the very beauty that makes existence worth narrating — descends from what those twelve set in motion. So, too, does everything the world would rather forget: its most harrowing wars, its cruelest and most violent sufferings, griefs with no end and no easy telling.
+
+Why would the gods of the Amets have asked for such a thing? Why summon twelve of their own and hand them the keys to a story that would hold, in equal measure, paradise and ruin?
+
+No one will ever know. Imaws and Ælime have never answered, and the twelve who said yes have never explained themselves. But if there is anyone left to even ask the question — if there is a single voice anywhere capable of wondering why the world exists at all — then that voice owes its wondering to them. We are the ones who get to ask. That, if nothing else, is a debt worth remembering.', 'CANON', '2026-06-28 11:30:10.270666+00', '2026-07-19 23:46:50.607714+00', '48ed4b49-b7b5-4d4b-9715-00dcaa819209', NULL, 'en', '521ccad8-cbe0-46ac-823b-b874bd83aba1');
 INSERT INTO lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id) VALUES ('27ddff92-0140-42eb-889e-a0310f12ac92', 'O Chamado dos Doze Amets', 'O mito de como os primeiros conceitos vieram a vagar pela eternidade primordial, e do único pedido — feito por Imaws e Ælime a doze de seus próprios filhos — que colocou toda a trama do universo em movimento, para o bem e para um mal muito maior.', 'Os Amets
 
 Antes de existir um mundo para conter qualquer coisa, houve a união de Imaws e Ælime — o arquiteto e o impulso, a lei e o desejo, atuando como as duas metades de uma única vontade indivisa. Dessa união vieram os Amets: os primeiros conceitos a jamais existir, nascidos não num mundo, mas na eternidade que veio antes de um mundo ser possível. Não tinham chão sobre o qual se firmar nem céu contra o qual se medir. Simplesmente vagavam, incontáveis e sem forma, e ainda assim absolutamente reais, através da escuridão primordial — conceitos antes que houvesse algo para um conceito descrever.
@@ -1101,7 +1105,7 @@ Tudo o que se seguiu remonta àquele único pedido. Toda maravilha que o mundo j
 
 Por que os deuses dos Amets teriam pedido tal coisa? Por que convocar doze dos seus e entregar-lhes as chaves de uma história que conteria, em igual medida, paraíso e ruína?
 
-Ninguém jamais saberá. Imaws e Ælime nunca responderam, e os doze que disseram sim jamais se explicaram. Mas se ainda resta alguém para sequer fazer a pergunta — se existe uma única voz em qualquer lugar capaz de se perguntar por que o mundo existe — então essa voz deve seu questionamento a eles. Somos nós que temos a chance de perguntar. Essa, se nada mais, é uma dívida que vale a pena lembrar.', 'CANON', '2026-07-10 19:24:29.364193+00', '2026-07-16 02:44:03.482891+00', '36d5e2a5-be00-456b-bf11-113c0b737904', NULL, 'pt', '521ccad8-cbe0-46ac-823b-b874bd83aba1');
+Ninguém jamais saberá. Imaws e Ælime nunca responderam, e os doze que disseram sim jamais se explicaram. Mas se ainda resta alguém para sequer fazer a pergunta — se existe uma única voz em qualquer lugar capaz de se perguntar por que o mundo existe — então essa voz deve seu questionamento a eles. Somos nós que temos a chance de perguntar. Essa, se nada mais, é uma dívida que vale a pena lembrar.', 'CANON', '2026-07-10 19:24:29.364193+00', '2026-07-19 23:46:51.136833+00', '36d5e2a5-be00-456b-bf11-113c0b737904', NULL, 'pt', '521ccad8-cbe0-46ac-823b-b874bd83aba1');
 
 -- ============================================================
 -- LORE CATEGORIES
@@ -1121,19 +1125,23 @@ INSERT INTO lore_categories (lore_id, category) VALUES ('a8032617-5a1b-4ff9-8f65
 INSERT INTO lore_categories (lore_id, category) VALUES ('a8032617-5a1b-4ff9-8f65-83f08333888f', 'PHILOSOPHY');
 INSERT INTO lore_categories (lore_id, category) VALUES ('8986dc8b-69b3-4f61-bfac-1036d3ffba60', 'PHILOSOPHY');
 INSERT INTO lore_categories (lore_id, category) VALUES ('7bbaa3f3-0029-4679-9ba7-4f1df291c98b', 'MYTH');
-INSERT INTO lore_categories (lore_id, category) VALUES ('521ccad8-cbe0-46ac-823b-b874bd83aba1', 'MYTH');
-INSERT INTO lore_categories (lore_id, category) VALUES ('27ddff92-0140-42eb-889e-a0310f12ac92', 'MYTH');
 INSERT INTO lore_categories (lore_id, category) VALUES ('47ecb08d-8306-498f-ab69-57b0e1660af1', 'MYTH');
 INSERT INTO lore_categories (lore_id, category) VALUES ('47ecb08d-8306-498f-ab69-57b0e1660af1', 'LAW');
 INSERT INTO lore_categories (lore_id, category) VALUES ('1c1ec59c-99f8-4184-acc2-3a1725545080', 'MYTH');
 INSERT INTO lore_categories (lore_id, category) VALUES ('1c1ec59c-99f8-4184-acc2-3a1725545080', 'LAW');
 INSERT INTO lore_categories (lore_id, category) VALUES ('a1b2c3d4-e5f6-4789-8abc-def012345678', 'MYTH');
 INSERT INTO lore_categories (lore_id, category) VALUES ('a4a55c04-a097-4350-82d2-b7b309c4d35a', 'MYTH');
+INSERT INTO lore_categories (lore_id, category) VALUES ('521ccad8-cbe0-46ac-823b-b874bd83aba1', 'MYTH');
+INSERT INTO lore_categories (lore_id, category) VALUES ('27ddff92-0140-42eb-889e-a0310f12ac92', 'MYTH');
 
 -- ============================================================
 -- ENTITY LINKS (cross-entity references)
 -- ============================================================
 
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('00cb34c4-e2bb-43ab-8c01-383fc73a3fda', 'CHARACTER', '59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-19 23:45:09.832678+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('a53ddb4d-3963-4497-b37e-570cd3eac969', 'CHARACTER', '59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 'LORE', 'ebd1073f-0a52-4c17-86c3-bfc1cb491a22', '2026-07-19 23:45:09.832678+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('a92287e5-b137-424a-a6a7-08eaff07a048', 'CHARACTER', '59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 'LORE', 'c4ba4207-7857-49ab-8e22-5acc57ea2cd5', '2026-07-19 23:45:09.832678+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('47722005-03ba-4f0a-ac01-5208cda50e62', 'CHARACTER', '59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', '2026-07-19 23:45:09.832678+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('d12bfebd-523e-4d99-907e-40b323c45cbe', 'LORE', '86550df5-4d20-4ba8-9bc8-f0b1dfdfe420', 'CHARACTER', '17373f6f-78c4-4621-858d-b1c1f1479704', '2026-07-01 08:12:10.113257+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('f725f872-9b29-4c1b-84ad-afce225723e5', 'LORE', '86550df5-4d20-4ba8-9bc8-f0b1dfdfe420', 'CHARACTER', 'c3fe20e2-722e-488e-bf4d-185fd024e900', '2026-07-01 08:12:10.113257+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('512706c4-40ba-4472-a3dd-459886d54e0b', 'CHARACTER', '3c6dd2ab-b540-41a4-a4ad-2bca5e5f761c', 'CHARACTER', '20744386-efc6-474d-aef6-27d7c4b8af33', '2026-07-02 08:09:35.271778+00');
@@ -1155,6 +1163,19 @@ INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, cr
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('493410dd-4645-4884-b9de-7ef1f3c337e7', 'CHARACTER', '20744386-efc6-474d-aef6-27d7c4b8af33', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-03 13:46:52.328+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('b5ba2d32-1a10-4bda-9cff-26be5947a2d0', 'CHARACTER', '17373f6f-78c4-4621-858d-b1c1f1479704', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-03 13:46:52.328+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('9c7a83a4-af9a-4082-a220-c6b10c0efe64', 'LORE', '86550df5-4d20-4ba8-9bc8-f0b1dfdfe420', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-03 13:46:52.328+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('888ce154-167d-4c50-be64-94db7f2216f2', 'CHARACTER', 'f1563a48-7f54-4836-bc4b-561aa68bc879', 'LORE', '8986dc8b-69b3-4f61-bfac-1036d3ffba60', '2026-07-19 23:45:56.225814+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('5b969925-a644-46b6-aae5-fd3e6da1518d', 'CHARACTER', 'f1563a48-7f54-4836-bc4b-561aa68bc879', 'LORE', 'acf5d45d-2163-4918-a4dd-eaac675ba44e', '2026-07-19 23:45:56.225814+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('83862d95-14c9-474c-8fb6-29dc90d0df03', 'CHARACTER', 'f1563a48-7f54-4836-bc4b-561aa68bc879', 'LORE', '91165b17-3214-40b5-bbf3-0f4432905570', '2026-07-19 23:45:56.225814+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('4b3641b5-d487-41fa-af56-af4d258fc7f8', 'CHARACTER', 'f1563a48-7f54-4836-bc4b-561aa68bc879', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', '2026-07-19 23:45:56.225814+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('0497db74-fa0b-42e9-8127-b98013b620ff', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '3c6dd2ab-b540-41a4-a4ad-2bca5e5f761c', '2026-07-19 23:46:50.778649+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('15093881-7b34-4f91-b476-8bf04eb902f6', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '20744386-efc6-474d-aef6-27d7c4b8af33', '2026-07-19 23:46:50.778649+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('6a05061e-61de-46b6-bb44-0f25ad76d702', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '17373f6f-78c4-4621-858d-b1c1f1479704', '2026-07-19 23:46:50.778649+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('9cfbf3b7-e379-408f-85f4-e97ae448f3e2', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-19 23:46:50.778649+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('9507242d-2027-453b-91c2-ed5469aca9ed', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '4b7d2e2c-82cb-4dfe-ab5e-67767a3bc653', '2026-07-19 23:46:50.778649+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('f6c10e80-1b25-4f3b-8799-83a5fb415779', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', 'c3fe20e2-722e-488e-bf4d-185fd024e900', '2026-07-19 23:46:50.778649+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('1b030863-2124-4548-9275-3c176dc79cf8', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '4603fa7a-52a7-4c36-87f4-828cfe9c986e', '2026-07-19 23:46:50.778649+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('276d10a2-20b3-4eed-8bc6-e9e5ed2f84ca', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '5e856f4d-05d8-4158-b71f-cb1ed557178e', '2026-07-19 23:46:50.778649+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('1921788c-84e8-4992-b710-7c632b849d44', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', '2026-07-19 23:46:50.778649+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('cbbc2d20-2c18-4ccb-a84a-875fd320561d', 'LORE', '334b7fb3-31e3-4a10-a3ce-4c6afb791934', 'CHARACTER', '988bdd8a-04a5-4e34-9857-f72918bec3a0', '2026-07-08 17:32:35.055559+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('b486fd45-bbf1-431c-be01-b6caefb8c30a', 'LORE', '334b7fb3-31e3-4a10-a3ce-4c6afb791934', 'CHARACTER', '32168a53-162c-4f6a-9fb9-8b3fd4cb3988', '2026-07-08 17:32:35.055559+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('f3fa0adc-b19e-4a48-ad3f-a582b79c8fdd', 'LORE', '334b7fb3-31e3-4a10-a3ce-4c6afb791934', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-08 17:32:35.055559+00');
@@ -1182,6 +1203,15 @@ INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, cr
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('89b331d4-be81-48f9-8b9d-789a3fd37469', 'CHARACTER', 'e1ba55b5-5606-41dd-9532-f88875300e97', 'LORE', '8986dc8b-69b3-4f61-bfac-1036d3ffba60', '2026-07-10 19:24:31.797339+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('010f4ca6-9ccf-45fb-a174-6af9a5dec8e1', 'CHARACTER', '9f55b0ea-59fb-4ed9-b567-5ef28cdc5896', 'LORE', '8986dc8b-69b3-4f61-bfac-1036d3ffba60', '2026-07-10 19:24:31.822683+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('435a994a-0cca-4d46-a740-a78d1d9040ac', 'LORE', 'a96e56ee-3b1e-46dd-90f0-2818379e3531', 'LORE', '8986dc8b-69b3-4f61-bfac-1036d3ffba60', '2026-07-10 19:24:31.872718+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('ba522825-64fc-4e79-9884-c5fe33ef2ac3', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', '428801e6-e0be-485b-bc3d-ba2a87efcf3d', '2026-07-19 23:46:51.207404+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('57f8edd1-9166-434d-90ca-13e7377b9e6f', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', 'e1ba55b5-5606-41dd-9532-f88875300e97', '2026-07-19 23:46:51.207404+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('df22f3e5-bcf6-4967-bf91-5babb043ed7e', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', '9f55b0ea-59fb-4ed9-b567-5ef28cdc5896', '2026-07-19 23:46:51.207404+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('04b40162-f6bd-4311-9954-2656aa5e56ba', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'LORE', '8986dc8b-69b3-4f61-bfac-1036d3ffba60', '2026-07-19 23:46:51.207404+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('755a0335-9369-46af-b6e5-2bd068eee2f3', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', 'b62042e9-bd1e-4090-ac28-7c61ff646c3d', '2026-07-19 23:46:51.207404+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('f941fbc1-1142-46e7-9ff2-11743211d67e', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', '6aae628c-6e9c-4f02-9a4b-7b4ddbe120d7', '2026-07-19 23:46:51.207404+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('38c2d3f8-a38b-4ce1-878d-3d9a6473f1c1', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', '3e480b7d-1931-4247-a2c7-cab2c90411da', '2026-07-19 23:46:51.207404+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('c46f7829-4358-4927-ac6f-ae801f7e80a1', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', '73370eec-b3a9-41eb-b822-02d8a80c02e3', '2026-07-19 23:46:51.207404+00');
+INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('26f0a1e9-ac40-48e8-af56-a6ed6cb80c36', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', 'f1563a48-7f54-4836-bc4b-561aa68bc879', '2026-07-19 23:46:51.207404+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('e75622ba-210c-4db1-a9b5-4f27d3df9642', 'LORE', '7bbaa3f3-0029-4679-9ba7-4f1df291c98b', 'CHARACTER', '7e783887-2849-4b5c-a820-37ba88ab0370', '2026-07-10 19:24:33.164855+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('236d7e7d-0a62-461d-ad00-200181a6cf30', 'LORE', '7bbaa3f3-0029-4679-9ba7-4f1df291c98b', 'CHARACTER', '38d1f0de-6024-4c54-a049-5923d15c9176', '2026-07-10 19:24:33.188796+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('c1b0bfc8-cc13-4343-9967-9929610f8e0e', 'LORE', '7bbaa3f3-0029-4679-9ba7-4f1df291c98b', 'LORE', '8986dc8b-69b3-4f61-bfac-1036d3ffba60', '2026-07-10 19:24:33.214034+00');
@@ -1212,22 +1242,6 @@ INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, cr
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('5242e059-af0f-43cf-bb44-d4dc95c45199', 'CHARACTER', '73370eec-b3a9-41eb-b822-02d8a80c02e3', 'LORE', '91165b17-3214-40b5-bbf3-0f4432905570', '2026-07-16 02:41:20.954808+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('2cec2ead-85a9-4d06-9c6d-a3601502cfa6', 'CHARACTER', '73370eec-b3a9-41eb-b822-02d8a80c02e3', 'LORE', '8986dc8b-69b3-4f61-bfac-1036d3ffba60', '2026-07-16 02:41:20.954808+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('4e235492-3cd3-4890-8527-56c02d4c2eb0', 'CHARACTER', '73370eec-b3a9-41eb-b822-02d8a80c02e3', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', '2026-07-16 02:41:20.954808+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('c5e0f9f8-3b42-42c8-b1fe-dcd7e3d558a9', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '3c6dd2ab-b540-41a4-a4ad-2bca5e5f761c', '2026-07-16 02:44:03.304861+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('e31ab378-f26d-4854-8895-1923c3ff1f08', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '20744386-efc6-474d-aef6-27d7c4b8af33', '2026-07-16 02:44:03.304861+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('aaa5ea17-b83c-4a2d-b6b4-2b00de939921', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '17373f6f-78c4-4621-858d-b1c1f1479704', '2026-07-16 02:44:03.304861+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('8c901290-978b-4d8e-b44c-c8b591575442', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-16 02:44:03.304861+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('f12afff9-2b8f-4881-bdb0-3941ab7979c7', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '4b7d2e2c-82cb-4dfe-ab5e-67767a3bc653', '2026-07-16 02:44:03.304861+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('cf72ce4b-fd5f-4c43-bae0-97aaaac72bdd', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', 'c3fe20e2-722e-488e-bf4d-185fd024e900', '2026-07-16 02:44:03.304861+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('80aa308d-5584-4f07-9305-a9b8afbc8038', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '4603fa7a-52a7-4c36-87f4-828cfe9c986e', '2026-07-16 02:44:03.304861+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('1077afdf-14ed-4aa8-a78b-944ed2c8f1eb', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', 'CHARACTER', '5e856f4d-05d8-4158-b71f-cb1ed557178e', '2026-07-16 02:44:03.304861+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('d35578ce-69f9-4f2e-bcff-6c81a6212741', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', '428801e6-e0be-485b-bc3d-ba2a87efcf3d', '2026-07-16 02:44:03.523753+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('082675a3-5b84-4971-b8e0-85f5f7544b32', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', 'e1ba55b5-5606-41dd-9532-f88875300e97', '2026-07-16 02:44:03.523753+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('d645a58f-bfe1-424d-b573-1c8435c3b4b9', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', '9f55b0ea-59fb-4ed9-b567-5ef28cdc5896', '2026-07-16 02:44:03.523753+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('71b1757a-68d0-479e-a4eb-f86d8809d536', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'LORE', '8986dc8b-69b3-4f61-bfac-1036d3ffba60', '2026-07-16 02:44:03.523753+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('865ba66a-4f69-4cca-8c4e-e49710a8bbde', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', 'b62042e9-bd1e-4090-ac28-7c61ff646c3d', '2026-07-16 02:44:03.523753+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('1e8aed55-1b54-4639-9b2b-a0a33095d6fa', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', '6aae628c-6e9c-4f02-9a4b-7b4ddbe120d7', '2026-07-16 02:44:03.523753+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('7311a2a5-f718-49b7-af1d-8e40b3750825', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', '3e480b7d-1931-4247-a2c7-cab2c90411da', '2026-07-16 02:44:03.523753+00');
-INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('ee48715c-ebdf-4704-b6b0-613c553d3647', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', 'CHARACTER', '73370eec-b3a9-41eb-b822-02d8a80c02e3', '2026-07-16 02:44:03.523753+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('4022e443-672e-4f76-bb4c-86cb5651607a', 'LORE', '47ecb08d-8306-498f-ab69-57b0e1660af1', 'CHARACTER', '32168a53-162c-4f6a-9fb9-8b3fd4cb3988', '2026-07-16 02:44:03.741031+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('d8e27052-e679-4e7c-a6cd-cb662124d37c', 'LORE', '1c1ec59c-99f8-4184-acc2-3a1725545080', 'CHARACTER', '38d1f0de-6024-4c54-a049-5923d15c9176', '2026-07-16 02:44:03.891015+00');
 INSERT INTO entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('9d59b644-7d9d-4f6a-818e-66ab9a061c9c', 'LORE', 'a1b2c3d4-e5f6-4789-8abc-def012345678', 'CHARACTER', 'b3e2c1d4-f5e6-4a7b-8c9d-0e1f2a3b4c5d', '2026-07-16 02:44:04.050183+00');
@@ -1519,6 +1533,14 @@ INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES 
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('a4a55c04-a097-4350-82d2-b7b309c4d35a', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Last%20Prayer.png', 0);
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('c964a915-17e2-4bb6-949e-50b2cfdc20d1', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/NumericGods.png', 0);
 INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('186e1df4-226c-4a0c-b0ab-3520aad3f91f', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/NumericGods.png', 0);
+INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Aggrax%C3%A6mon-1.png', 0);
+INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Aggrax%C3%A6mon-2.png', 1);
+INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Aggrax%C3%A6mon-3.png', 2);
+INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Aggrax%C3%A6mon-4.png', 3);
+INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('f1563a48-7f54-4836-bc4b-561aa68bc879', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Aggrax%C3%A6mon-1.png', 0);
+INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('f1563a48-7f54-4836-bc4b-561aa68bc879', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Aggrax%C3%A6mon-2.png', 1);
+INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('f1563a48-7f54-4836-bc4b-561aa68bc879', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Aggrax%C3%A6mon-3.png', 2);
+INSERT INTO universe_entity_images (entity_id, image_url, display_order) VALUES ('f1563a48-7f54-4836-bc4b-561aa68bc879', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Aggrax%C3%A6mon-4.png', 3);
 
 -- ============================================================
 -- ARCHETYPES
