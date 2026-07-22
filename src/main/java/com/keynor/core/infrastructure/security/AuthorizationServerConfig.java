@@ -46,6 +46,12 @@ public class AuthorizationServerConfig {
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
                 .oidc(Customizer.withDefaults());
         http
+                // /oauth2/token is called cross-origin via fetch() by the PKCE
+                // login flow (aniannoth-overview) — needs CORS the same as the
+                // Resource Server chain does for /api/**. The
+                // CorsConfigurationSource bean (ResourceServerConfig) already
+                // registers a pattern for /oauth2/**; this applies it here too.
+                .cors(Customizer.withDefaults())
                 .exceptionHandling(exceptions -> exceptions
                         .defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),

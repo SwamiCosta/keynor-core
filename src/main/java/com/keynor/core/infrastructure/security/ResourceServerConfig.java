@@ -66,6 +66,13 @@ public class ResourceServerConfig {
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
+        // /oauth2/token (token exchange) is called cross-origin via fetch() by
+        // the PKCE login flow (aniannoth-overview) — unlike /oauth2/authorize,
+        // which is a full-page navigation and never subject to CORS, POST
+        // /oauth2/token is an XHR/fetch call and needs this the same as
+        // /api/** does. Applied on AuthorizationServerConfig's chain via its
+        // own .cors(Customizer.withDefaults()) — see that class.
+        source.registerCorsConfiguration("/oauth2/**", configuration);
         return source;
     }
 }
