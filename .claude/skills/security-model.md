@@ -51,9 +51,13 @@ Spring Security evaluates filter chains in `@Order` sequence — the first chain
 
 ## CORS
 
-Allowed origins (configured in `ResourceServerConfig`):
+Allowed origins (configured in `ResourceServerConfig`'s `corsConfigurationSource` bean):
 - `http://localhost:5173` (aniannoth-overview dev server)
 - `http://localhost:4173` (aniannoth-overview preview)
+
+The `CorsConfigurationSource` bean registers patterns for both `/api/**` and `/oauth2/**`, but **registering the pattern is not sufficient by itself** — CORS is enforced per Spring Security filter chain (see "Security filter chains" above), so `.cors(Customizer.withDefaults())` must also be called on every chain that serves an endpoint the browser calls cross-origin via `fetch()`/XHR. `resourceServerSecurityFilterChain` (`/api/**`) has always had this. `authorizationServerSecurityFilterChain` (`/oauth2/**`, including `POST /oauth2/token`) needed it added separately (map-pins PKCE login flow, aniannoth-overview) — `/oauth2/authorize` never needed it (full-page browser navigation, not subject to CORS), which is why the gap went unnoticed until the token exchange itself was exercised.
+
+If a future endpoint needs to be called cross-origin, check both: (1) the path is covered by a `corsConfigurationSource` pattern, and (2) `.cors(Customizer.withDefaults())` is called on whichever chain actually serves that path.
 
 ---
 
