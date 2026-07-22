@@ -9,6 +9,7 @@ import com.keynor.core.domain.model.shared.EntityLinkSummary;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.port.in.map.CreateMapPinUseCase;
+import com.keynor.core.domain.port.in.map.UpdateMapPinUseCase;
 import com.keynor.core.domain.port.out.MapPinRepository;
 import com.keynor.core.domain.port.out.MapRepository;
 import com.keynor.core.domain.port.out.UniverseEntityLookupRepository;
@@ -100,6 +101,30 @@ class MapPinServiceTest {
         var command = new CreateMapPinUseCase.Command(MAP_ID, EntityType.CHARACTER, ENTITY_ID, 0.5, 0.5);
 
         assertThatThrownBy(() -> mapPinService.create(command))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void update_shouldRepositionPin_whenPinBelongsToGivenMap() {
+        UUID pinId = UUID.randomUUID();
+        MapPin pin = new MapPin(pinId, MAP_ID, EntityType.CHARACTER, ENTITY_ID, 0.1, 0.1, Instant.now());
+        when(mapPinRepository.findById(pinId)).thenReturn(Optional.of(pin));
+        when(mapPinRepository.save(any(MapPin.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        MapPin result = mapPinService.update(MAP_ID, pinId, new UpdateMapPinUseCase.Command(0.8, 0.9));
+
+        assertThat(result.getNormalizedX()).isEqualTo(0.8);
+        assertThat(result.getNormalizedY()).isEqualTo(0.9);
+        assertThat(result.getId()).isEqualTo(pinId);
+    }
+
+    @Test
+    void update_shouldThrow_whenPinBelongsToDifferentMap() {
+        UUID pinId = UUID.randomUUID();
+        MapPin pin = new MapPin(pinId, "other-map", EntityType.CHARACTER, ENTITY_ID, 0.1, 0.1, Instant.now());
+        when(mapPinRepository.findById(pinId)).thenReturn(Optional.of(pin));
+
+        assertThatThrownBy(() -> mapPinService.update(MAP_ID, pinId, new UpdateMapPinUseCase.Command(0.8, 0.9)))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
