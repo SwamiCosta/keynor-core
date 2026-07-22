@@ -31,6 +31,8 @@ archetypes, signs
 - `oauth2_registered_client`, `oauth2_authorization`, `oauth2_authorization_consent` — environment-specific secrets
 - Any future table that receives input from external users
 
+**Deferred, not yet decided** (2026-07-22): `map_pins` (V16, map-pins feature) is not in scope yet. It's structurally similar to `entity_links` (in scope) rather than user/environment data, so it's a plausible future addition — but it's currently empty (no pins created) and whether inputter-authored pin placements belong in a "universe content" dump, versus being closer to environment-specific curation, hasn't been decided. Evaluate before the first time it has real data.
+
 If a new table is added to the schema, the agent must evaluate whether it is universe content or user/environment data before adding it to the dump scope. When in doubt, exclude and flag to Imaws.
 
 ---
