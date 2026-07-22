@@ -24,6 +24,8 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
@@ -101,6 +103,27 @@ public class AuthorizationServerConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Embeds the authenticated user's role as a "role" claim on the access token.
+     * Only present for the {@code authorization_code} human login flow, where the
+     * token's principal is backed by {@link org.springframework.security.core.userdetails.UserDetails}
+     * (see {@link UserDetailsServiceImpl}). {@code client_credentials} tokens (SYSTEM,
+     * service-to-service) have no such principal, so they never receive a role claim —
+     * this is what lets ADMIN-only endpoints reject SYSTEM tokens via {@code hasRole('ADMIN')}.
+     */
+    @Bean
+    public OAuth2TokenCustomizer<JwtEncodingContext> jwtTokenCustomizer() {
+        return context -> {
+            if (context.getPrincipal().getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
+                userDetails.getAuthorities().stream()
+                        .map(authority -> authority.getAuthority())
+                        .filter(authority -> authority.startsWith("ROLE_"))
+                        .findFirst()
+                        .ifPresent(authority -> context.getClaims().claim("role", authority.substring("ROLE_".length())));
+            }
+        };
     }
 
     private static RSAKey generateRsaKey() {

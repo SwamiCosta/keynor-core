@@ -3,14 +3,16 @@ package com.keynor.core.domain.service;
 import com.keynor.core.domain.model.shared.EntityLink;
 import com.keynor.core.domain.model.shared.EntityLinkSummary;
 import com.keynor.core.domain.model.shared.EntityType;
+import com.keynor.core.domain.port.in.shared.FindEntitySummaryUseCase;
 import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.UniverseEntityLookupRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public class EntityLinkService implements FindLinkedEntitiesUseCase {
+public class EntityLinkService implements FindLinkedEntitiesUseCase, FindEntitySummaryUseCase {
 
     private final EntityLinkRepository entityLinkRepository;
     private final UniverseEntityLookupRepository universeEntityLookupRepository;
@@ -27,5 +29,10 @@ public class EntityLinkService implements FindLinkedEntitiesUseCase {
                 .map(link -> universeEntityLookupRepository.findSummary(link.getTargetType(), link.getTargetId()))
                 .flatMap(java.util.Optional::stream)
                 .toList();
+    }
+
+    @Override
+    public Optional<EntityLinkSummary> findSummary(EntityType type, UUID id) {
+        return universeEntityLookupRepository.findSummary(type, id);
     }
 }

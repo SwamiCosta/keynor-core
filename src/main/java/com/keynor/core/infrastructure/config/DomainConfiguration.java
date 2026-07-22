@@ -74,6 +74,14 @@ public class DomainConfiguration {
     }
 
     @Bean
+    public MapPinService mapPinService(
+            MapPinRepository mapPinRepository,
+            MapRepository mapRepository,
+            UniverseEntityLookupRepository universeEntityLookupRepository) {
+        return new MapPinService(mapPinRepository, mapRepository, universeEntityLookupRepository);
+    }
+
+    @Bean
     public ArchetypeService archetypeService(ArchetypeRepository archetypeRepository) {
         return new ArchetypeService(archetypeRepository);
     }

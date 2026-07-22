@@ -11,7 +11,17 @@
 | `ADMIN` | Human users (admin panel / RPG integration) | `authorization_code` + PKCE, form login |
 | `SYSTEM` | Service-to-service calls (keynor-rpg, aniannoth, etc.) | `client_credentials` |
 
-Both roles have full access to all endpoints in the current phase. No hierarchy between them.
+Both roles have full access to all `/api/**` endpoints by default. No hierarchy between them. **Exception:** a specific endpoint may be restricted to `ADMIN` only via `@PreAuthorize("hasRole('ADMIN')")` on the controller method (first used by `InternalMapPinController`'s create/delete, PR — map pins feature) — see "Role claim" below for how `ADMIN` becomes a checkable authority.
+
+---
+
+## Role claim (ADMIN vs SYSTEM at the Resource Server)
+
+The `role` claim is not a built-in part of the JWT — it is added by a custom `OAuth2TokenCustomizer<JwtEncodingContext>` bean (`AuthorizationServerConfig#jwtTokenCustomizer`). It only fires for the `authorization_code` human login flow, where the token's principal is backed by `UserDetails` (from `UserDetailsServiceImpl`, which sets the Spring Security authority `ROLE_<UserRole>` from the `users.role` column — currently only `ADMIN` exists as a `UserRole` value). `client_credentials` tokens (SYSTEM) have no such `UserDetails` principal, so they never receive a `role` claim.
+
+On the Resource Server side, `ResourceServerConfig#jwtAuthenticationConverter` reads the `role` claim (if present) and maps it to a `ROLE_<value>` `GrantedAuthority`; absent, it resolves to no authorities. This is what makes `@PreAuthorize("hasRole('ADMIN')")` reject SYSTEM tokens: they authenticate successfully (satisfying the blanket `.anyRequest().authenticated()`) but carry no `ROLE_ADMIN` authority.
+
+**Before this addition (pre map-pins feature), there was no way to distinguish an ADMIN request from a SYSTEM request at the Resource Server** — both were just "authenticated." Any future endpoint that needs to be ADMIN-only (or SYSTEM-only) should reuse this same `role` claim / `hasRole(...)` mechanism rather than inventing a new one.
 
 ---
 
