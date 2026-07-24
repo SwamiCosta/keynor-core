@@ -42,7 +42,8 @@ public class PublicItemController {
         EntityFilter filter = new EntityFilter(
                 LanguageRequestParser.parse(language),
                 List.of(EntityStatus.CANON),
-                categories != null ? categories : List.of());
+                categories != null ? categories : List.of(),
+                true);
         var result = findAllItemsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 item -> ItemResponse.from(item, findLinkedEntitiesUseCase.findLinks(EntityType.ITEM, item.getId()))));

@@ -39,7 +39,8 @@ public class CharacterMapper {
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 entity.getLanguage(),
-                entity.getTranslationGroupId());
+                entity.getTranslationGroupId(),
+                entity.isHidden());
     }
 
     public CharacterEntity toEntity(Character character) {
@@ -56,6 +57,7 @@ public class CharacterMapper {
         entity.setUpdatedAt(character.getUpdatedAt());
         entity.setLanguage(character.getLanguage());
         entity.setTranslationGroupId(character.getTranslationGroupId());
+        entity.setHidden(character.isHidden());
         return entity;
     }
 

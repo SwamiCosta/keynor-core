@@ -22,7 +22,8 @@ public record CharacterResponse(
         Instant updatedAt,
         String language,
         UUID translationGroupId,
-        List<LinkedEntityResponse> links) {
+        List<LinkedEntityResponse> links,
+        boolean hidden) {
 
     public static CharacterResponse from(Character character, List<EntityLinkSummary> links) {
         return new CharacterResponse(
@@ -39,6 +40,7 @@ public record CharacterResponse(
                 character.getUpdatedAt(),
                 character.getLanguage().name(),
                 character.getTranslationGroupId(),
-                links.stream().map(LinkedEntityResponse::from).toList());
+                links.stream().map(LinkedEntityResponse::from).toList(),
+                character.isHidden());
     }
 }

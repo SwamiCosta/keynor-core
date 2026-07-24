@@ -140,7 +140,7 @@ class EventServiceTest {
 
     @Test
     void findAll_shouldDelegateToRepository() {
-        EntityFilter filter = new EntityFilter(Language.EN, List.of(), List.of());
+        EntityFilter filter = new EntityFilter(Language.EN, List.of(), List.of(), false);
         PageRequest pageRequest = new PageRequest(0, 10);
         when(eventRepository.findAll(filter, pageRequest))
                 .thenReturn(new PageResult<>(List.of(), 0, 10, 0));

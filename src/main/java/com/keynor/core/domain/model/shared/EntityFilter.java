@@ -5,7 +5,8 @@ import java.util.List;
 public record EntityFilter(
         Language language,
         List<EntityStatus> statuses,
-        List<String> categories
+        List<String> categories,
+        boolean excludeHidden
 ) {
 
     public boolean hasStatusFilter() {

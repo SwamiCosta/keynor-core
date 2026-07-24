@@ -62,7 +62,7 @@ public class InternalItemController {
             @RequestParam(defaultValue = "20") int size) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList() : List.of();
-        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of());
+        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false);
         var result = findAllItemsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 item -> ItemResponse.from(item, findLinkedEntitiesUseCase.findLinks(EntityType.ITEM, item.getId()))));

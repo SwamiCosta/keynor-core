@@ -62,7 +62,7 @@ public class InternalEventController {
             @RequestParam(defaultValue = "20") int size) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList() : List.of();
-        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of());
+        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false);
         var result = findAllEventsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 event -> EventResponse.from(event, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, event.getId()))));

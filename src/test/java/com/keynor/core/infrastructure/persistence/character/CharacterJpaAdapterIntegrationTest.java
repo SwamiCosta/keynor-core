@@ -51,7 +51,7 @@ class CharacterJpaAdapterIntegrationTest {
         Instant now = Instant.now();
         return new Character(id, name, "Summary of " + name, "Body text",
                 List.of(),
-                List.of(category), status, new Timeline(eraName, null), now, now, Language.EN, UUID.randomUUID());
+                List.of(category), status, new Timeline(eraName, null), now, now, Language.EN, UUID.randomUUID(), false);
     }
 
     @Test
@@ -78,7 +78,7 @@ class CharacterJpaAdapterIntegrationTest {
     void findAll_shouldReturnOnlyMatchingStatus_whenStatusFilterApplied() {
         characterRepository.save(buildCharacter("Araveth", EntityStatus.DRAFT, CharacterCategory.HERO));
         characterRepository.save(buildCharacter("Morken", EntityStatus.CANON, CharacterCategory.VILLAIN));
-        EntityFilter canonFilter = new EntityFilter(Language.EN, List.of(EntityStatus.CANON), List.of());
+        EntityFilter canonFilter = new EntityFilter(Language.EN, List.of(EntityStatus.CANON), List.of(), false);
 
         PageResult<Character> result = characterRepository.findAll(canonFilter, new PageRequest(0, 10));
 
@@ -90,7 +90,7 @@ class CharacterJpaAdapterIntegrationTest {
         for (int i = 1; i <= 5; i++) {
             characterRepository.save(buildCharacter("Character " + i, EntityStatus.DRAFT, CharacterCategory.NPC));
         }
-        EntityFilter emptyFilter = new EntityFilter(Language.EN, List.of(), List.of());
+        EntityFilter emptyFilter = new EntityFilter(Language.EN, List.of(), List.of(), false);
 
         PageResult<Character> firstPage = characterRepository.findAll(emptyFilter, new PageRequest(0, 2));
         PageResult<Character> secondPage = characterRepository.findAll(emptyFilter, new PageRequest(1, 2));

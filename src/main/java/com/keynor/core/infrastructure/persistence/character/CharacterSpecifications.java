@@ -24,8 +24,15 @@ public class CharacterSpecifications {
                     .toList();
             spec = spec.and(hasAnyCategory(categories));
         }
+        if (filter.excludeHidden()) {
+            spec = spec.and(isNotHidden());
+        }
 
         return spec;
+    }
+
+    private static Specification<CharacterEntity> isNotHidden() {
+        return (root, query, cb) -> cb.isFalse(root.get("hidden"));
     }
 
     private static Specification<CharacterEntity> hasLanguage(Language language) {

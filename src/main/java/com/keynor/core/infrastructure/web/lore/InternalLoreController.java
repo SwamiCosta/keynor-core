@@ -62,7 +62,7 @@ public class InternalLoreController {
             @RequestParam(defaultValue = "20") int size) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList() : List.of();
-        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of());
+        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false);
         var result = findAllLoreUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 lore -> LoreResponse.from(lore, findLinkedEntitiesUseCase.findLinks(EntityType.LORE, lore.getId()))));
@@ -88,7 +88,10 @@ public class InternalLoreController {
                 categories, timeline, initialStatus,
                 LanguageRequestParser.parse(request.language()),
                 request.translationGroupId(),
-                links);
+                links,
+                request.hidden(),
+                request.riddleText(),
+                request.password());
         var created = createLoreUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 LoreResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.LORE, created.getId())));

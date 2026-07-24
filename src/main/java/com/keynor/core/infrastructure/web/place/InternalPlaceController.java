@@ -64,7 +64,7 @@ public class InternalPlaceController {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList()
                 : List.of();
-        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of());
+        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false);
         var result = findAllPlacesUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 place -> PlaceResponse.from(place, findLinkedEntitiesUseCase.findLinks(EntityType.PLACE, place.getId()))));

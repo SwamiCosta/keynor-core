@@ -42,7 +42,8 @@ public class PublicEventController {
         EntityFilter filter = new EntityFilter(
                 LanguageRequestParser.parse(language),
                 List.of(EntityStatus.CANON),
-                categories != null ? categories : List.of());
+                categories != null ? categories : List.of(),
+                true);
         var result = findAllEventsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 event -> EventResponse.from(event, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, event.getId()))));

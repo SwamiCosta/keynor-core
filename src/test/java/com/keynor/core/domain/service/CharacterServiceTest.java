@@ -14,9 +14,11 @@ import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.character.CreateCharacterUseCase;
 import com.keynor.core.domain.port.in.character.UpdateCharacterUseCase;
+import com.keynor.core.domain.port.in.shared.CreateHiddenContentLockUseCase;
 import com.keynor.core.domain.port.out.CharacterRepository;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.EraRepository;
+import com.keynor.core.domain.port.out.UniverseEntityLookupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,11 +46,18 @@ class CharacterServiceTest {
     @Mock
     private EraRepository eraRepository;
 
+    @Mock
+    private UniverseEntityLookupRepository universeEntityLookupRepository;
+
+    @Mock
+    private CreateHiddenContentLockUseCase createHiddenContentLockUseCase;
+
     private CharacterService characterService;
 
     @BeforeEach
     void setUp() {
-        characterService = new CharacterService(characterRepository, entityLinkRepository, eraRepository);
+        characterService = new CharacterService(characterRepository, entityLinkRepository, eraRepository,
+                universeEntityLookupRepository, createHiddenContentLockUseCase);
     }
 
     @Test
@@ -59,7 +68,7 @@ class CharacterServiceTest {
                 List.of(CharacterCategory.HERO),
                 null,
                 null, Language.EN, null,
-                null);
+                null, false, null, null);
         when(characterRepository.existsByNameAndLanguage("Araveth", Language.EN)).thenReturn(false);
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -79,7 +88,7 @@ class CharacterServiceTest {
                 List.of(CharacterCategory.HERO),
                 null,
                 EntityStatus.CANON, Language.EN, null,
-                null);
+                null, false, null, null);
         when(characterRepository.existsByNameAndLanguage("Araveth", Language.EN)).thenReturn(false);
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -92,7 +101,7 @@ class CharacterServiceTest {
     @Test
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateCharacterUseCase.Command(
-                "Araveth", null, null, List.of(), List.of(CharacterCategory.NPC), null, null, Language.EN, null, null);
+                "Araveth", null, null, List.of(), List.of(CharacterCategory.NPC), null, null, Language.EN, null, null, false, null, null);
         when(characterRepository.existsByNameAndLanguage("Araveth", Language.EN)).thenReturn(true);
 
         assertThatThrownBy(() -> characterService.create(command))
@@ -116,7 +125,7 @@ class CharacterServiceTest {
         Instant now = Instant.now();
         Character character = new Character(
                 id, "Araveth", null, null, List.of(),
-                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(characterRepository.findById(id)).thenReturn(Optional.of(character));
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -131,7 +140,7 @@ class CharacterServiceTest {
         Instant now = Instant.now();
         Character character = new Character(
                 id, "Araveth", null, null, List.of(),
-                List.of(CharacterCategory.HERO), EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(CharacterCategory.HERO), EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(characterRepository.findById(id)).thenReturn(Optional.of(character));
 
         assertThatThrownBy(() -> characterService.changeStatus(id, EntityStatus.CANON))
@@ -154,7 +163,7 @@ class CharacterServiceTest {
         Instant now = Instant.now();
         Character character = new Character(
                 id, "Old Name", null, null, List.of(),
-                List.of(CharacterCategory.NPC), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(CharacterCategory.NPC), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(characterRepository.findById(id)).thenReturn(Optional.of(character));
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -172,7 +181,7 @@ class CharacterServiceTest {
     void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
         var command = new CreateCharacterUseCase.Command(
                 "Araveth", null, null, List.of(), List.of(CharacterCategory.HERO),
-                new Timeline("Nonexistent Era", null), null, Language.EN, null, null);
+                new Timeline("Nonexistent Era", null), null, Language.EN, null, null, false, null, null);
         when(characterRepository.existsByNameAndLanguage("Araveth", Language.EN)).thenReturn(false);
         when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
 
@@ -184,7 +193,7 @@ class CharacterServiceTest {
 
     @Test
     void findAll_shouldDelegateToRepository() {
-        EntityFilter filter = new EntityFilter(Language.EN, List.of(), List.of());
+        EntityFilter filter = new EntityFilter(Language.EN, List.of(), List.of(), false);
         PageRequest pageRequest = new PageRequest(0, 10);
         when(characterRepository.findAll(filter, pageRequest))
                 .thenReturn(new PageResult<>(List.of(), 0, 10, 0));
@@ -200,7 +209,7 @@ class CharacterServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Character character = new Character(id, "Araveth", null, null, List.of(),
-                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(characterRepository.findAllByIds(List.of(id))).thenReturn(List.of(character));
 
         List<Character> result = characterService.findByIds(List.of(id));
@@ -213,7 +222,7 @@ class CharacterServiceTest {
         var command = new CreateCharacterUseCase.Command(
                 "Araveth", null, null,
                 List.of("https://example.com/araveth.png", "https://example.com/araveth2.png"),
-                List.of(CharacterCategory.HERO), null, null, Language.EN, null, null);
+                List.of(CharacterCategory.HERO), null, null, Language.EN, null, null, false, null, null);
         when(characterRepository.existsByNameAndLanguage("Araveth", Language.EN)).thenReturn(false);
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -227,7 +236,7 @@ class CharacterServiceTest {
     @Test
     void create_shouldReturnCharacterWithEmptyImages_whenNoImagesProvided() {
         var command = new CreateCharacterUseCase.Command(
-                "Araveth", null, null, List.of(), List.of(CharacterCategory.HERO), null, null, Language.EN, null, null);
+                "Araveth", null, null, List.of(), List.of(CharacterCategory.HERO), null, null, Language.EN, null, null, false, null, null);
         when(characterRepository.existsByNameAndLanguage("Araveth", Language.EN)).thenReturn(false);
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -243,7 +252,7 @@ class CharacterServiceTest {
         Character character = new Character(
                 id, "Araveth", null, null,
                 List.of("https://example.com/old.png"),
-                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(characterRepository.findById(id)).thenReturn(Optional.of(character));
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
