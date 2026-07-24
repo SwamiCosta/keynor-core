@@ -157,6 +157,16 @@ For the schema, domain model, reference implementation, and the FE field naming 
 
 ---
 
+## Hidden content (`hidden`, `hidden_content_lock`)
+
+A visibility dimension orthogonal to `status`, powering the Hidden Content & Black Pins cross-project feature (see root `ARCHITECTURE.md`). A hidden entity is always `status = CANON` but is excluded from every public list/browse endpoint regardless — the only routes to it are a black pin or a link from another already-unlocked hidden entity.
+
+**Rule that content authors must never violate:** a hidden entity may link to a visible one; a visible entity may never link to hidden content. Enforced server-side and rejected at write time — see `aroneus.md` for the authoring-facing explanation.
+
+Currently wired for `Character` and `Lore` only. For the full schema, domain wiring, and the replication steps for `Place`/`Faction`/`Item`/`Event`, see `.claude/skills/hidden-content-implementation.md`.
+
+---
+
 ## Universe content seed
 
 `db/seed/universe-content.sql` is the single source of truth for all universe content data. It uses TRUNCATE + INSERT and represents the complete current state of all universe tables.
@@ -327,4 +337,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-07-15 (documented the `GET /api/public/v1/characters/batch` endpoint as the second exception to the CANON-only public API invariant, alongside the pre-existing Era/Archetype/Sign closed-set exception — see keynor-core PR #71)*
+*Last updated: 2026-07-24 (added the "Hidden content" section documenting `hidden`/`hidden_content_lock` and the one-way linking rule, alongside the new `.claude/skills/hidden-content-implementation.md` — see keynor-core PR #88. Previous entry, 2026-07-15: documented the `GET /api/public/v1/characters/batch` endpoint as the second exception to the CANON-only public API invariant, alongside the pre-existing Era/Archetype/Sign closed-set exception — see keynor-core PR #71)*
