@@ -21,6 +21,7 @@ All universe entities extend `UniverseEntity` (abstract base class):
 | `updatedAt` | Instant | Updated on every mutation |
 | `language` | Language | `EN` or `PT` — which language this row's text is written in |
 | `translationGroupId` | UUID | Links this row to its counterpart(s) in other languages; not a one-directional "original" FK — a shared group id |
+| `hidden` | boolean | Visibility dimension orthogonal to `status` (V17). A hidden entity is always `CANON` but is excluded from every public list/browse query regardless — the sole route to it in the UI is a black pin or a link from another already-unlocked hidden entity. See root `ARCHITECTURE.md` — "Cross-Project Feature: Hidden Content & Black Pins" |
 
 Entity types and their category enums:
 
