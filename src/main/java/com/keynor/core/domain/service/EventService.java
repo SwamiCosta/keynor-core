@@ -87,11 +87,19 @@ public class EventService implements
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Event", id));
         validateTimeline(command.timeline());
+        if (command.hidden() && (command.riddleText() == null || command.riddleText().isBlank()
+                || command.password() == null || command.password().isBlank())) {
+            throw new IllegalArgumentException("riddleText and password are required when hidden is true");
+        }
         event.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
+        event.setHidden(command.hidden());
         Event saved = eventRepository.save(event);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
         entityLinkRepository.replaceLinks(EntityType.EVENT, saved.getId(), links);
+        if (saved.isHidden()) {
+            createHiddenContentLockUseCase.createOrReplace(EntityType.EVENT, saved.getId(), command.riddleText(), command.password());
+        }
         return saved;
     }
 

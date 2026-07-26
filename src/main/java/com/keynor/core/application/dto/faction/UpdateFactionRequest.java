@@ -7,6 +7,12 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * `hidden` must be explicitly resent with every update to preserve an
+ * already-hidden entity's state -- full-replacement semantics like every
+ * other field on this record, not a partial patch. Omitting it is
+ * interpreted as {@code false} and will un-hide the entity.
+ */
 public record UpdateFactionRequest(
         @NotBlank String name,
         String summary,
@@ -16,5 +22,8 @@ public record UpdateFactionRequest(
         List<UUID> members,
         @NotBlank String timelineFoundedEra,
         String timelineDestroyedEra,
-        List<EntityLinkRequest> links) {
+        List<EntityLinkRequest> links,
+        boolean hidden,
+        String riddleText,
+        String password) {
 }

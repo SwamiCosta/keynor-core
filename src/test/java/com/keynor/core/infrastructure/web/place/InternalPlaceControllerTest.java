@@ -150,7 +150,7 @@ class InternalPlaceControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdatePlaceRequest("Thornvale Updated", null, null,
-                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null);
+                List.of(), List.of("CITY"), "NAVIGABLE", "era-1", null, null, false, null, null);
 
         var response = controller.update(id, request);
 

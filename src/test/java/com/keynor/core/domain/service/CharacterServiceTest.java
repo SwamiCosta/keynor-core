@@ -169,7 +169,7 @@ class CharacterServiceTest {
 
         var command = new UpdateCharacterUseCase.Command(
                 "New Name", "New summary", "New body",
-                List.of(), List.of(CharacterCategory.HERO, CharacterCategory.DEITY), null, null);
+                List.of(), List.of(CharacterCategory.HERO, CharacterCategory.DEITY), null, null, false, null, null);
 
         Character result = characterService.update(id, command);
 
@@ -259,7 +259,7 @@ class CharacterServiceTest {
         var command = new UpdateCharacterUseCase.Command(
                 "Araveth", null, null,
                 List.of("https://example.com/new1.png", "https://example.com/new2.png"),
-                List.of(CharacterCategory.HERO), null, null);
+                List.of(CharacterCategory.HERO), null, null, false, null, null);
 
         Character result = characterService.update(id, command);
 

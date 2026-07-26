@@ -110,7 +110,8 @@ public class InternalPlaceController {
         var command = new UpdatePlaceUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.images() != null ? request.images() : List.of(),
-                categories, mapType, timeline, links);
+                categories, mapType, timeline, links,
+                request.hidden(), request.riddleText(), request.password());
         var updated = updatePlaceUseCase.update(id, command);
         return ResponseEntity.ok(PlaceResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.PLACE, updated.getId())));
     }

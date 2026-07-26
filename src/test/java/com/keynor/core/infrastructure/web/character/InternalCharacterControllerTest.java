@@ -151,7 +151,7 @@ class InternalCharacterControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdateCharacterRequest("Araveth Updated", "New summary", "New body",
-                List.of(), List.of("HERO"), "era-1", null, null);
+                List.of(), List.of("HERO"), "era-1", null, null, false, null, null);
 
         var response = controller.update(id, request);
 

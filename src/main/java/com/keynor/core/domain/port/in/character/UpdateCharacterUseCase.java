@@ -17,7 +17,10 @@ public interface UpdateCharacterUseCase {
             List<String> images,
             List<CharacterCategory> categories,
             Timeline timeline,
-            List<EntityLinkRef> links) {}
+            List<EntityLinkRef> links,
+            boolean hidden,
+            String riddleText,
+            String password) {}
 
     Character update(UUID id, Command command);
 }

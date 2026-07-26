@@ -150,7 +150,7 @@ class InternalEventControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdateEventRequest("Battle Updated", null, null,
-                List.of(), List.of("BATTLE"), "era-1", null, null);
+                List.of(), List.of("BATTLE"), "era-1", null, null, false, null, null);
 
         var response = controller.update(id, request);
 

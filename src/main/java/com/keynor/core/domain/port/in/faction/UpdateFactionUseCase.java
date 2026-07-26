@@ -18,7 +18,10 @@ public interface UpdateFactionUseCase {
             List<FactionCategory> categories,
             List<UUID> members,
             Timeline timeline,
-            List<EntityLinkRef> links) {}
+            List<EntityLinkRef> links,
+            boolean hidden,
+            String riddleText,
+            String password) {}
 
     Faction update(UUID id, Command command);
 }

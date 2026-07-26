@@ -217,7 +217,7 @@ class EventServiceTest {
         var command = new UpdateEventUseCase.Command(
                 "New Name", "New summary", "New body",
                 List.of(),
-                List.of(EventCategory.BATTLE, EventCategory.DIVINE), null, null);
+                List.of(EventCategory.BATTLE, EventCategory.DIVINE), null, null, false, null, null);
 
         Event result = eventService.update(id, command);
 

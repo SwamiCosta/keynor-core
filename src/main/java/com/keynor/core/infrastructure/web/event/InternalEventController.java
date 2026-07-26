@@ -106,7 +106,8 @@ public class InternalEventController {
         var command = new UpdateEventUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.images() != null ? request.images() : List.of(),
-                categories, timeline, links);
+                categories, timeline, links,
+                request.hidden(), request.riddleText(), request.password());
         var updated = updateEventUseCase.update(id, command);
         return ResponseEntity.ok(EventResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, updated.getId())));
     }
