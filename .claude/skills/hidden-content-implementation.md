@@ -22,13 +22,14 @@ Character and Lore were wired first, then replicated identically to Place, Facti
 2. **JPA entity** (`infrastructure/persistence/<entity>/<Entity>Entity.java`) — new `@Column(nullable = false) private boolean hidden;` + getter/setter.
 3. **Mapper** (`infrastructure/persistence/<entity>/<Entity>Mapper.java`) — `toDomain`/`toEntity` both carry `hidden` across.
 4. **Create command + DTOs** — `Create<Entity>UseCase.Command` and `Create<Entity>Request` both gain trailing `boolean hidden, String riddleText, String password`. `Internal<Entity>Controller.create()` passes these through unchanged.
-5. **Service** (`domain/service/<Entity>Service.java`) — constructor gains two dependencies: `UniverseEntityLookupRepository` and `CreateHiddenContentLockUseCase`. In `create()`/`update()`, call `HiddenLinkDirectionValidator.validate(sourceHidden, links, universeEntityLookupRepository)` **before** `entityLinkRepository.replaceLinks(...)`. In `create()` only, if `saved.isHidden()`, call `createHiddenContentLockUseCase.createOrReplace(EntityType.X, saved.getId(), command.riddleText(), command.password())`.
+5. **Update command + DTOs** — `Update<Entity>UseCase.Command` and `Update<Entity>Request` gain the same trailing `boolean hidden, String riddleText, String password`. `Internal<Entity>Controller.update()` passes them through unchanged.
+6. **Service** (`domain/service/<Entity>Service.java`) — constructor gains two dependencies: `UniverseEntityLookupRepository` and `CreateHiddenContentLockUseCase`. In both `create()` and `update()`, call `HiddenLinkDirectionValidator.validate(sourceHidden, links, universeEntityLookupRepository)` **before** `entityLinkRepository.replaceLinks(...)`, and if the result is hidden, call `createHiddenContentLockUseCase.createOrReplace(EntityType.X, saved.getId(), command.riddleText(), command.password())`. `update()` additionally: reject with `IllegalArgumentException` up front if `command.hidden()` is true and `riddleText`/`password` are blank (can't hide something with no way to ever unlock it), and call `entity.setHidden(command.hidden())` before saving.
 
-`hidden` is **create-only** by design — there is no way to flip it after creation (mirrors how `status` also has no field on `Update*Request`; a dedicated endpoint would be needed to change it later, not built yet).
+`hidden` is mutable post-creation via `UniverseEntity.setHidden(boolean)`, which enforces the same "hidden implies CANON" invariant as the constructor. **`Update*Request` is full-replacement** like every other field on it — omitting `hidden` from an update payload defaults to `false` and un-hides the entity. This is a real trap for content authors, not just a technical note — see `aroneus.md`.
 
 ## Replicating to a future new entity type
 
-If a 7th universe entity type is ever added, apply the same five changes listed above, plus:
+If a 7th universe entity type is ever added, apply the same six changes listed above, plus:
 
 - `EntityFilter.excludeHidden` already exists and is passed by every `Public*Controller` (`true`) and `Internal*Controller` (`false`) — no change needed there.
 - Add the `hidden = false` predicate to the entity's `*Specifications.fromFilter` (see any existing `*Specifications` for the pattern: `if (filter.excludeHidden()) { spec = spec.and(...); }`).
@@ -53,4 +54,4 @@ If a 7th universe entity type is ever added, apply the same five changes listed 
 
 ---
 
-*Maintained by Imaws. Update the "Current rollout status" section whenever a new entity type is replicated.*
+*Maintained by Imaws. Update the "Current rollout status" section whenever a new entity type is replicated. When extending a capability to one entity type, extend it to all 6 in the same pass by default — this feature has twice gone through a narrow-then-widened cycle (Create in PR #88→#91, Update in PR #93→#95) that a wider default from the start would have avoided.*
