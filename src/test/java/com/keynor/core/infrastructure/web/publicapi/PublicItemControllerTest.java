@@ -79,7 +79,7 @@ class PublicItemControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Item item = new Item(id, "Sword of Dawn", "A legendary blade", "Body",
-                List.of(), List.of(ItemCategory.WEAPON), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(), List.of(ItemCategory.WEAPON), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(findAllItemsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(item), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
@@ -100,7 +100,7 @@ class PublicItemControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Item item = new Item(id, "Sword of Dawn", "A legendary blade", "Body",
-                List.of(), List.of(ItemCategory.ARTIFACT), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(), List.of(ItemCategory.ARTIFACT), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(findItemByIdUseCase.findById(id)).thenReturn(item);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 

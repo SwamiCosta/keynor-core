@@ -11,9 +11,11 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.faction.*;
+import com.keynor.core.domain.port.in.shared.CreateHiddenContentLockUseCase;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.domain.port.out.FactionRepository;
+import com.keynor.core.domain.port.out.UniverseEntityLookupRepository;
 
 import java.time.Instant;
 import java.util.List;
@@ -30,14 +32,20 @@ public class FactionService implements
     private final FactionRepository factionRepository;
     private final EntityLinkRepository entityLinkRepository;
     private final EraRepository eraRepository;
+    private final UniverseEntityLookupRepository universeEntityLookupRepository;
+    private final CreateHiddenContentLockUseCase createHiddenContentLockUseCase;
 
     public FactionService(
             FactionRepository factionRepository,
             EntityLinkRepository entityLinkRepository,
-            EraRepository eraRepository) {
+            EraRepository eraRepository,
+            UniverseEntityLookupRepository universeEntityLookupRepository,
+            CreateHiddenContentLockUseCase createHiddenContentLockUseCase) {
         this.factionRepository = factionRepository;
         this.entityLinkRepository = entityLinkRepository;
         this.eraRepository = eraRepository;
+        this.universeEntityLookupRepository = universeEntityLookupRepository;
+        this.createHiddenContentLockUseCase = createHiddenContentLockUseCase;
     }
 
     @Override
@@ -63,9 +71,15 @@ public class FactionService implements
                 now,
                 now,
                 command.language(),
-                translationGroupId);
+                translationGroupId,
+                command.hidden());
         Faction saved = factionRepository.save(faction);
-        entityLinkRepository.replaceLinks(EntityType.FACTION, saved.getId(), command.links() != null ? command.links() : List.of());
+        List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
+        HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
+        entityLinkRepository.replaceLinks(EntityType.FACTION, saved.getId(), links);
+        if (saved.isHidden()) {
+            createHiddenContentLockUseCase.createOrReplace(EntityType.FACTION, saved.getId(), command.riddleText(), command.password());
+        }
         return saved;
     }
 
@@ -76,7 +90,9 @@ public class FactionService implements
         validateTimeline(command.timeline());
         faction.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.members(), command.timeline());
         Faction saved = factionRepository.save(faction);
-        entityLinkRepository.replaceLinks(EntityType.FACTION, saved.getId(), command.links() != null ? command.links() : List.of());
+        List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
+        HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
+        entityLinkRepository.replaceLinks(EntityType.FACTION, saved.getId(), links);
         return saved;
     }
 

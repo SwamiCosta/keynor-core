@@ -49,7 +49,7 @@ class InternalFactionControllerTest {
     private Faction buildFaction(UUID id) {
         Instant now = Instant.now();
         return new Faction(id, "The Silver Order", "A guild", "Body",
-                List.of(), List.of(FactionCategory.ORDER), List.of(), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(), List.of(FactionCategory.ORDER), List.of(), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
     }
 
     @BeforeEach
@@ -67,7 +67,7 @@ class InternalFactionControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateFactionRequest("The Silver Order", "A guild", "Body",
-                List.of(), List.of("ORDER"), List.of(), "era-1", null, null,"en", null, null);
+                List.of(), List.of("ORDER"), List.of(), "era-1", null, null,"en", null, null, false, null, null);
 
         var response = controller.create(request);
 
@@ -84,7 +84,7 @@ class InternalFactionControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateFactionRequest("The Silver Order", null, null,
-                List.of(), List.of("ORDER"), List.of(), "era-1", null, null,"en", null, null);
+                List.of(), List.of("ORDER"), List.of(), "era-1", null, null,"en", null, null, false, null, null);
 
         controller.create(request);
 
@@ -102,7 +102,7 @@ class InternalFactionControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateFactionRequest("The Silver Order", null, null,
-                List.of(), List.of("ORDER"), List.of(), "era-1", null, null,"en", null, null);
+                List.of(), List.of("ORDER"), List.of(), "era-1", null, null,"en", null, null, false, null, null);
 
         controller.create(request);
 
@@ -117,12 +117,12 @@ class InternalFactionControllerTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Faction canonFaction = new Faction(id, "The Silver Order", null, null, List.of(),
-                List.of(FactionCategory.ORDER), List.of(), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(FactionCategory.ORDER), List.of(), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(createFactionUseCase.create(any())).thenReturn(canonFaction);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateFactionRequest("The Silver Order", null, null,
-                List.of(), List.of("ORDER"), List.of(), "era-1", null, "CANON","en", null, null);
+                List.of(), List.of("ORDER"), List.of(), "era-1", null, "CANON","en", null, null, false, null, null);
 
         controller.create(request);
 
@@ -135,7 +135,7 @@ class InternalFactionControllerTest {
     @Test
     void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
         var request = new CreateFactionRequest("The Silver Order", null, null,
-                List.of(), List.of("ORDER"), List.of(), "era-1", null, "DEPRECATED","en", null, null);
+                List.of(), List.of("ORDER"), List.of(), "era-1", null, "DEPRECATED","en", null, null, false, null, null);
 
         assertThatThrownBy(() -> controller.create(request))
                 .isInstanceOf(IllegalArgumentException.class)

@@ -22,7 +22,10 @@ public interface CreateEventUseCase {
             EntityStatus status,
             Language language,
             UUID translationGroupId,
-            List<EntityLinkRef> links) {}
+            List<EntityLinkRef> links,
+            boolean hidden,
+            String riddleText,
+            String password) {}
 
     Event create(Command command);
 }

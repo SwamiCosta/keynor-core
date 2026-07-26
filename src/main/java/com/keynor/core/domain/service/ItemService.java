@@ -11,9 +11,11 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.item.*;
+import com.keynor.core.domain.port.in.shared.CreateHiddenContentLockUseCase;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.domain.port.out.ItemRepository;
+import com.keynor.core.domain.port.out.UniverseEntityLookupRepository;
 
 import java.time.Instant;
 import java.util.List;
@@ -30,14 +32,20 @@ public class ItemService implements
     private final ItemRepository itemRepository;
     private final EntityLinkRepository entityLinkRepository;
     private final EraRepository eraRepository;
+    private final UniverseEntityLookupRepository universeEntityLookupRepository;
+    private final CreateHiddenContentLockUseCase createHiddenContentLockUseCase;
 
     public ItemService(
             ItemRepository itemRepository,
             EntityLinkRepository entityLinkRepository,
-            EraRepository eraRepository) {
+            EraRepository eraRepository,
+            UniverseEntityLookupRepository universeEntityLookupRepository,
+            CreateHiddenContentLockUseCase createHiddenContentLockUseCase) {
         this.itemRepository = itemRepository;
         this.entityLinkRepository = entityLinkRepository;
         this.eraRepository = eraRepository;
+        this.universeEntityLookupRepository = universeEntityLookupRepository;
+        this.createHiddenContentLockUseCase = createHiddenContentLockUseCase;
     }
 
     @Override
@@ -62,9 +70,15 @@ public class ItemService implements
                 now,
                 now,
                 command.language(),
-                translationGroupId);
+                translationGroupId,
+                command.hidden());
         Item saved = itemRepository.save(item);
-        entityLinkRepository.replaceLinks(EntityType.ITEM, saved.getId(), command.links() != null ? command.links() : List.of());
+        List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
+        HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
+        entityLinkRepository.replaceLinks(EntityType.ITEM, saved.getId(), links);
+        if (saved.isHidden()) {
+            createHiddenContentLockUseCase.createOrReplace(EntityType.ITEM, saved.getId(), command.riddleText(), command.password());
+        }
         return saved;
     }
 
@@ -75,7 +89,9 @@ public class ItemService implements
         validateTimeline(command.timeline());
         item.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
         Item saved = itemRepository.save(item);
-        entityLinkRepository.replaceLinks(EntityType.ITEM, saved.getId(), command.links() != null ? command.links() : List.of());
+        List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
+        HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
+        entityLinkRepository.replaceLinks(EntityType.ITEM, saved.getId(), links);
         return saved;
     }
 

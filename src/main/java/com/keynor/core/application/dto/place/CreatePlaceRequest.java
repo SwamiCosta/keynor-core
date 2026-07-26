@@ -19,5 +19,8 @@ public record CreatePlaceRequest(
         String status,
         @NotBlank String language,
         UUID translationGroupId,
-        List<EntityLinkRequest> links) {
+        List<EntityLinkRequest> links,
+        boolean hidden,
+        String riddleText,
+        String password) {
 }

@@ -22,7 +22,10 @@ public interface CreateItemUseCase {
             EntityStatus status,
             Language language,
             UUID translationGroupId,
-            List<EntityLinkRef> links) {}
+            List<EntityLinkRef> links,
+            boolean hidden,
+            String riddleText,
+            String password) {}
 
     Item create(Command command);
 }

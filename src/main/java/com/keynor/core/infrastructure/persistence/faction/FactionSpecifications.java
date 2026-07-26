@@ -24,6 +24,9 @@ public class FactionSpecifications {
                     .toList();
             spec = spec.and((root, query, cb) -> root.join("categories").in(categories));
         }
+        if (filter.excludeHidden()) {
+            spec = spec.and((root, query, cb) -> cb.isFalse(root.get("hidden")));
+        }
 
         return spec;
     }

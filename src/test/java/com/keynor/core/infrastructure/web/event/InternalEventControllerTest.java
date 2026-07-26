@@ -50,7 +50,7 @@ class InternalEventControllerTest {
         Instant now = Instant.now();
         return new Event(id, "The Battle of Kor", "A decisive battle", "Body",
                 List.of(), List.of(EventCategory.BATTLE),
-                EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+                EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
     }
 
     @BeforeEach
@@ -68,7 +68,7 @@ class InternalEventControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateEventRequest("The Battle of Kor", "A decisive battle", "Body",
-                List.of(), List.of("BATTLE"), "era-1", null, null,"en", null, null);
+                List.of(), List.of("BATTLE"), "era-1", null, null,"en", null, null, false, null, null);
 
         var response = controller.create(request);
 
@@ -85,7 +85,7 @@ class InternalEventControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateEventRequest("The Battle of Kor", null, null,
-                List.of(), List.of("BATTLE"), "era-1", null, null,"en", null, null);
+                List.of(), List.of("BATTLE"), "era-1", null, null,"en", null, null, false, null, null);
 
         controller.create(request);
 
@@ -103,7 +103,7 @@ class InternalEventControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateEventRequest("The Battle of Kor", null, null,
-                List.of(), List.of("BATTLE"), "era-1", null, null,"en", null, null);
+                List.of(), List.of("BATTLE"), "era-1", null, null,"en", null, null, false, null, null);
 
         controller.create(request);
 
@@ -118,12 +118,12 @@ class InternalEventControllerTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Event canonEvent = new Event(id, "The Battle of Kor", null, null, List.of(),
-                List.of(EventCategory.BATTLE), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(EventCategory.BATTLE), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(createEventUseCase.create(any())).thenReturn(canonEvent);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateEventRequest("The Battle of Kor", null, null,
-                List.of(), List.of("BATTLE"), "era-1", null, "CANON","en", null, null);
+                List.of(), List.of("BATTLE"), "era-1", null, "CANON","en", null, null, false, null, null);
 
         controller.create(request);
 
@@ -136,7 +136,7 @@ class InternalEventControllerTest {
     @Test
     void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
         var request = new CreateEventRequest("The Battle of Kor", null, null,
-                List.of(), List.of("BATTLE"), "era-1", null, "DEPRECATED","en", null, null);
+                List.of(), List.of("BATTLE"), "era-1", null, "DEPRECATED","en", null, null, false, null, null);
 
         assertThatThrownBy(() -> controller.create(request))
                 .isInstanceOf(IllegalArgumentException.class)

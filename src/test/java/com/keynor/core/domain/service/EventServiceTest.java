@@ -14,9 +14,11 @@ import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.event.CreateEventUseCase;
 import com.keynor.core.domain.port.in.event.UpdateEventUseCase;
+import com.keynor.core.domain.port.in.shared.CreateHiddenContentLockUseCase;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.domain.port.out.EventRepository;
+import com.keynor.core.domain.port.out.UniverseEntityLookupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,11 +46,18 @@ class EventServiceTest {
     @Mock
     private EraRepository eraRepository;
 
+    @Mock
+    private UniverseEntityLookupRepository universeEntityLookupRepository;
+
+    @Mock
+    private CreateHiddenContentLockUseCase createHiddenContentLockUseCase;
+
     private EventService eventService;
 
     @BeforeEach
     void setUp() {
-        eventService = new EventService(eventRepository, entityLinkRepository, eraRepository);
+        eventService = new EventService(eventRepository, entityLinkRepository, eraRepository,
+                universeEntityLookupRepository, createHiddenContentLockUseCase);
     }
 
     @Test
@@ -59,7 +68,7 @@ class EventServiceTest {
                 List.of(EventCategory.BATTLE),
                 null,
                 null, Language.EN, null,
-                null);
+                null, false, null, null);
         when(eventRepository.existsByNameAndLanguage("The Battle of Kor", Language.EN)).thenReturn(false);
         when(eventRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -79,7 +88,7 @@ class EventServiceTest {
                 List.of(EventCategory.BATTLE),
                 null,
                 EntityStatus.CANON, Language.EN, null,
-                null);
+                null, false, null, null);
         when(eventRepository.existsByNameAndLanguage("The Battle of Kor", Language.EN)).thenReturn(false);
         when(eventRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -93,7 +102,7 @@ class EventServiceTest {
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateEventUseCase.Command(
                 "The Battle of Kor", null, null, List.of(),
-                List.of(EventCategory.POLITICAL), null, null, Language.EN, null, null);
+                List.of(EventCategory.POLITICAL), null, null, Language.EN, null, null, false, null, null);
         when(eventRepository.existsByNameAndLanguage("The Battle of Kor", Language.EN)).thenReturn(true);
 
         assertThatThrownBy(() -> eventService.create(command))
@@ -106,7 +115,7 @@ class EventServiceTest {
     void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
         var command = new CreateEventUseCase.Command(
                 "The Battle of Kor", null, null, List.of(), List.of(EventCategory.BATTLE),
-                new Timeline("Nonexistent Era", null), null, Language.EN, null, null);
+                new Timeline("Nonexistent Era", null), null, Language.EN, null, null, false, null, null);
         when(eventRepository.existsByNameAndLanguage("The Battle of Kor", Language.EN)).thenReturn(false);
         when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
 
@@ -121,7 +130,7 @@ class EventServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Event event = new Event(id, "The Battle of Kor", null, null, List.of(),
-                List.of(EventCategory.BATTLE), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(EventCategory.BATTLE), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(eventRepository.findById(id)).thenReturn(Optional.of(event));
 
         Event result = eventService.findById(id);
@@ -156,7 +165,7 @@ class EventServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Event event = new Event(id, "The Battle of Kor", null, null, List.of(),
-                List.of(EventCategory.BATTLE), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(EventCategory.BATTLE), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(eventRepository.findById(id)).thenReturn(Optional.of(event));
         when(eventRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -170,7 +179,7 @@ class EventServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Event event = new Event(id, "The Battle of Kor", null, null, List.of(),
-                List.of(EventCategory.BATTLE), EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(EventCategory.BATTLE), EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(eventRepository.findById(id)).thenReturn(Optional.of(event));
 
         assertThatThrownBy(() -> eventService.changeStatus(id, EntityStatus.CANON))
@@ -201,7 +210,7 @@ class EventServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Event event = new Event(id, "Old Name", null, null, List.of(),
-                List.of(EventCategory.SOCIAL), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(EventCategory.SOCIAL), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(eventRepository.findById(id)).thenReturn(Optional.of(event));
         when(eventRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 

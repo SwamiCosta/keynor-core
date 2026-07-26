@@ -88,7 +88,10 @@ public class InternalEventController {
                 categories, timeline, initialStatus,
                 LanguageRequestParser.parse(request.language()),
                 request.translationGroupId(),
-                links);
+                links,
+                request.hidden(),
+                request.riddleText(),
+                request.password());
         var created = createEventUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(EventResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, created.getId())));
     }

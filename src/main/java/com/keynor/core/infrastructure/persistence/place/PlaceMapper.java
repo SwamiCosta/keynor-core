@@ -40,7 +40,8 @@ public class PlaceMapper {
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 entity.getLanguage(),
-                entity.getTranslationGroupId());
+                entity.getTranslationGroupId(),
+                entity.isHidden());
     }
 
     public PlaceEntity toEntity(Place place) {
@@ -58,6 +59,7 @@ public class PlaceMapper {
         entity.setUpdatedAt(place.getUpdatedAt());
         entity.setLanguage(place.getLanguage());
         entity.setTranslationGroupId(place.getTranslationGroupId());
+        entity.setHidden(place.isHidden());
         return entity;
     }
 

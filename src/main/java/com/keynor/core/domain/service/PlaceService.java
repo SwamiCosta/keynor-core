@@ -11,9 +11,11 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.place.*;
+import com.keynor.core.domain.port.in.shared.CreateHiddenContentLockUseCase;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.domain.port.out.PlaceRepository;
+import com.keynor.core.domain.port.out.UniverseEntityLookupRepository;
 
 import java.time.Instant;
 import java.util.List;
@@ -30,14 +32,20 @@ public class PlaceService implements
     private final PlaceRepository placeRepository;
     private final EntityLinkRepository entityLinkRepository;
     private final EraRepository eraRepository;
+    private final UniverseEntityLookupRepository universeEntityLookupRepository;
+    private final CreateHiddenContentLockUseCase createHiddenContentLockUseCase;
 
     public PlaceService(
             PlaceRepository placeRepository,
             EntityLinkRepository entityLinkRepository,
-            EraRepository eraRepository) {
+            EraRepository eraRepository,
+            UniverseEntityLookupRepository universeEntityLookupRepository,
+            CreateHiddenContentLockUseCase createHiddenContentLockUseCase) {
         this.placeRepository = placeRepository;
         this.entityLinkRepository = entityLinkRepository;
         this.eraRepository = eraRepository;
+        this.universeEntityLookupRepository = universeEntityLookupRepository;
+        this.createHiddenContentLockUseCase = createHiddenContentLockUseCase;
     }
 
     @Override
@@ -63,9 +71,15 @@ public class PlaceService implements
                 now,
                 now,
                 command.language(),
-                translationGroupId);
+                translationGroupId,
+                command.hidden());
         Place saved = placeRepository.save(place);
-        entityLinkRepository.replaceLinks(EntityType.PLACE, saved.getId(), command.links() != null ? command.links() : List.of());
+        List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
+        HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
+        entityLinkRepository.replaceLinks(EntityType.PLACE, saved.getId(), links);
+        if (saved.isHidden()) {
+            createHiddenContentLockUseCase.createOrReplace(EntityType.PLACE, saved.getId(), command.riddleText(), command.password());
+        }
         return saved;
     }
 
@@ -76,7 +90,9 @@ public class PlaceService implements
         validateTimeline(command.timeline());
         place.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.mapType(), command.timeline());
         Place saved = placeRepository.save(place);
-        entityLinkRepository.replaceLinks(EntityType.PLACE, saved.getId(), command.links() != null ? command.links() : List.of());
+        List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
+        HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
+        entityLinkRepository.replaceLinks(EntityType.PLACE, saved.getId(), links);
         return saved;
     }
 

@@ -15,9 +15,11 @@ import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.place.CreatePlaceUseCase;
 import com.keynor.core.domain.port.in.place.UpdatePlaceUseCase;
+import com.keynor.core.domain.port.in.shared.CreateHiddenContentLockUseCase;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.EraRepository;
 import com.keynor.core.domain.port.out.PlaceRepository;
+import com.keynor.core.domain.port.out.UniverseEntityLookupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,11 +47,18 @@ class PlaceServiceTest {
     @Mock
     private EraRepository eraRepository;
 
+    @Mock
+    private UniverseEntityLookupRepository universeEntityLookupRepository;
+
+    @Mock
+    private CreateHiddenContentLockUseCase createHiddenContentLockUseCase;
+
     private PlaceService placeService;
 
     @BeforeEach
     void setUp() {
-        placeService = new PlaceService(placeRepository, entityLinkRepository, eraRepository);
+        placeService = new PlaceService(placeRepository, entityLinkRepository, eraRepository,
+                universeEntityLookupRepository, createHiddenContentLockUseCase);
     }
 
     @Test
@@ -61,7 +70,7 @@ class PlaceServiceTest {
                 MapType.NAVIGABLE,
                 null,
                 null, Language.EN, null,
-                null);
+                null, false, null, null);
         when(placeRepository.existsByNameAndLanguage("Thornvale", Language.EN)).thenReturn(false);
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -83,7 +92,7 @@ class PlaceServiceTest {
                 MapType.NAVIGABLE,
                 null,
                 EntityStatus.CANON, Language.EN, null,
-                null);
+                null, false, null, null);
         when(placeRepository.existsByNameAndLanguage("Thornvale", Language.EN)).thenReturn(false);
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -97,7 +106,7 @@ class PlaceServiceTest {
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreatePlaceUseCase.Command(
                 "Thornvale", null, null, List.of(),
-                List.of(PlaceCategory.REGION), MapType.ABSTRACT, null, null, Language.EN, null, null);
+                List.of(PlaceCategory.REGION), MapType.ABSTRACT, null, null, Language.EN, null, null, false, null, null);
         when(placeRepository.existsByNameAndLanguage("Thornvale", Language.EN)).thenReturn(true);
 
         assertThatThrownBy(() -> placeService.create(command))
@@ -110,7 +119,7 @@ class PlaceServiceTest {
     void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
         var command = new CreatePlaceUseCase.Command(
                 "Thornvale", null, null, List.of(), List.of(PlaceCategory.CITY),
-                MapType.NAVIGABLE, new Timeline("Nonexistent Era", null), null, Language.EN, null, null);
+                MapType.NAVIGABLE, new Timeline("Nonexistent Era", null), null, Language.EN, null, null, false, null, null);
         when(placeRepository.existsByNameAndLanguage("Thornvale", Language.EN)).thenReturn(false);
         when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
 
@@ -125,7 +134,7 @@ class PlaceServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Place place = new Place(id, "Thornvale", null, null, List.of(),
-                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
 
         Place result = placeService.findById(id);
@@ -161,7 +170,7 @@ class PlaceServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Place place = new Place(id, "Thornvale", null, null, List.of(),
-                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -175,7 +184,7 @@ class PlaceServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Place place = new Place(id, "Thornvale", null, null, List.of(),
-                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -189,7 +198,7 @@ class PlaceServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Place place = new Place(id, "Thornvale", null, null, List.of(),
-                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
 
         assertThatThrownBy(() -> placeService.changeStatus(id, EntityStatus.CANON))
@@ -220,7 +229,7 @@ class PlaceServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Place place = new Place(id, "Old Name", null, null, List.of(),
-                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID());
+                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
