@@ -88,7 +88,10 @@ public class InternalItemController {
                 categories, timeline, initialStatus,
                 LanguageRequestParser.parse(request.language()),
                 request.translationGroupId(),
-                links);
+                links,
+                request.hidden(),
+                request.riddleText(),
+                request.password());
         var created = createItemUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(ItemResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.ITEM, created.getId())));
     }

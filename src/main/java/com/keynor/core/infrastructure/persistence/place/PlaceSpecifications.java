@@ -24,6 +24,9 @@ public class PlaceSpecifications {
                     .toList();
             spec = spec.and(hasAnyCategory(categories));
         }
+        if (filter.excludeHidden()) {
+            spec = spec.and((root, query, cb) -> cb.isFalse(root.get("hidden")));
+        }
 
         return spec;
     }

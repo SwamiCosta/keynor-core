@@ -22,7 +22,8 @@ public record ItemResponse(
         Instant updatedAt,
         String language,
         UUID translationGroupId,
-        List<LinkedEntityResponse> links) {
+        List<LinkedEntityResponse> links,
+        boolean hidden) {
 
     public static ItemResponse from(Item item, List<EntityLinkSummary> links) {
         return new ItemResponse(
@@ -39,6 +40,7 @@ public record ItemResponse(
                 item.getUpdatedAt(),
                 item.getLanguage().name(),
                 item.getTranslationGroupId(),
-                links.stream().map(LinkedEntityResponse::from).toList());
+                links.stream().map(LinkedEntityResponse::from).toList(),
+                item.isHidden());
     }
 }

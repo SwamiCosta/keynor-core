@@ -24,7 +24,10 @@ public interface CreatePlaceUseCase {
             EntityStatus status,
             Language language,
             UUID translationGroupId,
-            List<EntityLinkRef> links) {}
+            List<EntityLinkRef> links,
+            boolean hidden,
+            String riddleText,
+            String password) {}
 
     Place create(Command command);
 }

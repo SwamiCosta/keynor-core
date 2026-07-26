@@ -90,7 +90,10 @@ public class InternalFactionController {
                 timeline, initialStatus,
                 LanguageRequestParser.parse(request.language()),
                 request.translationGroupId(),
-                links);
+                links,
+                request.hidden(),
+                request.riddleText(),
+                request.password());
         var created = createFactionUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(FactionResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.FACTION, created.getId())));
     }

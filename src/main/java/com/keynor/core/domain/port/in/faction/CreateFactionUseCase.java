@@ -23,7 +23,10 @@ public interface CreateFactionUseCase {
             EntityStatus status,
             Language language,
             UUID translationGroupId,
-            List<EntityLinkRef> links) {}
+            List<EntityLinkRef> links,
+            boolean hidden,
+            String riddleText,
+            String password) {}
 
     Faction create(Command command);
 }

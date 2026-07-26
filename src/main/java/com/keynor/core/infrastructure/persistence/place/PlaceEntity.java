@@ -53,6 +53,9 @@ public class PlaceEntity {
     @Column(nullable = false)
     private UUID translationGroupId;
 
+    @Column(nullable = false)
+    private boolean hidden;
+
     @Embedded
     private TimelineEmbeddable timeline;
 
@@ -82,6 +85,8 @@ public class PlaceEntity {
     public void setLanguage(Language language) { this.language = language; }
     public UUID getTranslationGroupId() { return translationGroupId; }
     public void setTranslationGroupId(UUID translationGroupId) { this.translationGroupId = translationGroupId; }
+    public boolean isHidden() { return hidden; }
+    public void setHidden(boolean hidden) { this.hidden = hidden; }
     public TimelineEmbeddable getTimeline() { return timeline; }
     public void setTimeline(TimelineEmbeddable timeline) { this.timeline = timeline; }
     public Instant getCreatedAt() { return createdAt; }

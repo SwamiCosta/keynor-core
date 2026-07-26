@@ -91,7 +91,10 @@ public class InternalPlaceController {
                 categories, mapType, timeline, initialStatus,
                 LanguageRequestParser.parse(request.language()),
                 request.translationGroupId(),
-                links);
+                links,
+                request.hidden(),
+                request.riddleText(),
+                request.password());
         var created = createPlaceUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(PlaceResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.PLACE, created.getId())));
     }

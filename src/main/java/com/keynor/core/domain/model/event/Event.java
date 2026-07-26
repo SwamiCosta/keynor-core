@@ -26,8 +26,9 @@ public class Event extends UniverseEntity {
             Instant createdAt,
             Instant updatedAt,
             Language language,
-            UUID translationGroupId) {
-        super(id, name, summary, body, images, status, timeline, createdAt, updatedAt, language, translationGroupId, false);
+            UUID translationGroupId,
+            boolean hidden) {
+        super(id, name, summary, body, images, status, timeline, createdAt, updatedAt, language, translationGroupId, hidden);
         this.categories = new ArrayList<>(categories);
     }
 

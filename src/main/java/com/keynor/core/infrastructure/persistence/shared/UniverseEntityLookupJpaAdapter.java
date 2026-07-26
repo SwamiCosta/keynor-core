@@ -44,18 +44,14 @@ public class UniverseEntityLookupJpaAdapter implements UniverseEntityLookupRepos
         return switch (type) {
             case CHARACTER -> characterJpaRepository.findById(id)
                     .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
-            // PLACE, FACTION, ITEM, EVENT do not support hidden content yet -- their
-            // JPA entities have no `hidden` column, so every row is structurally
-            // non-hidden. See keynor-core .claude/skills/hidden-content-implementation.md
-            // for the replication steps once one of these needs it.
             case PLACE -> placeJpaRepository.findById(id)
-                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), false));
+                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
             case FACTION -> factionJpaRepository.findById(id)
-                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), false));
+                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
             case ITEM -> itemJpaRepository.findById(id)
-                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), false));
+                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
             case EVENT -> eventJpaRepository.findById(id)
-                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), false));
+                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
             case LORE -> loreJpaRepository.findById(id)
                     .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
         };

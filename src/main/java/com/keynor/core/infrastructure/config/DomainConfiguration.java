@@ -24,32 +24,44 @@ public class DomainConfiguration {
     public PlaceService placeService(
             PlaceRepository placeRepository,
             EntityLinkRepository entityLinkRepository,
-            EraRepository eraRepository) {
-        return new PlaceService(placeRepository, entityLinkRepository, eraRepository);
+            EraRepository eraRepository,
+            UniverseEntityLookupRepository universeEntityLookupRepository,
+            CreateHiddenContentLockUseCase createHiddenContentLockUseCase) {
+        return new PlaceService(placeRepository, entityLinkRepository, eraRepository,
+                universeEntityLookupRepository, createHiddenContentLockUseCase);
     }
 
     @Bean
     public FactionService factionService(
             FactionRepository factionRepository,
             EntityLinkRepository entityLinkRepository,
-            EraRepository eraRepository) {
-        return new FactionService(factionRepository, entityLinkRepository, eraRepository);
+            EraRepository eraRepository,
+            UniverseEntityLookupRepository universeEntityLookupRepository,
+            CreateHiddenContentLockUseCase createHiddenContentLockUseCase) {
+        return new FactionService(factionRepository, entityLinkRepository, eraRepository,
+                universeEntityLookupRepository, createHiddenContentLockUseCase);
     }
 
     @Bean
     public ItemService itemService(
             ItemRepository itemRepository,
             EntityLinkRepository entityLinkRepository,
-            EraRepository eraRepository) {
-        return new ItemService(itemRepository, entityLinkRepository, eraRepository);
+            EraRepository eraRepository,
+            UniverseEntityLookupRepository universeEntityLookupRepository,
+            CreateHiddenContentLockUseCase createHiddenContentLockUseCase) {
+        return new ItemService(itemRepository, entityLinkRepository, eraRepository,
+                universeEntityLookupRepository, createHiddenContentLockUseCase);
     }
 
     @Bean
     public EventService eventService(
             EventRepository eventRepository,
             EntityLinkRepository entityLinkRepository,
-            EraRepository eraRepository) {
-        return new EventService(eventRepository, entityLinkRepository, eraRepository);
+            EraRepository eraRepository,
+            UniverseEntityLookupRepository universeEntityLookupRepository,
+            CreateHiddenContentLockUseCase createHiddenContentLockUseCase) {
+        return new EventService(eventRepository, entityLinkRepository, eraRepository,
+                universeEntityLookupRepository, createHiddenContentLockUseCase);
     }
 
     @Bean

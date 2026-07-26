@@ -23,7 +23,8 @@ public record PlaceResponse(
         Instant updatedAt,
         String language,
         UUID translationGroupId,
-        List<LinkedEntityResponse> links) {
+        List<LinkedEntityResponse> links,
+        boolean hidden) {
 
     public static PlaceResponse from(Place place, List<EntityLinkSummary> links) {
         return new PlaceResponse(
@@ -41,6 +42,7 @@ public record PlaceResponse(
                 place.getUpdatedAt(),
                 place.getLanguage().name(),
                 place.getTranslationGroupId(),
-                links.stream().map(LinkedEntityResponse::from).toList());
+                links.stream().map(LinkedEntityResponse::from).toList(),
+                place.isHidden());
     }
 }

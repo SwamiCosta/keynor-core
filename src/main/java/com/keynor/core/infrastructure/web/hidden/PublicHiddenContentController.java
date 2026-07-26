@@ -1,17 +1,29 @@
 package com.keynor.core.infrastructure.web.hidden;
 
 import com.keynor.core.application.dto.character.CharacterResponse;
+import com.keynor.core.application.dto.event.EventResponse;
+import com.keynor.core.application.dto.faction.FactionResponse;
 import com.keynor.core.application.dto.hidden.HiddenContentRiddleResponse;
 import com.keynor.core.application.dto.hidden.UnlockHiddenContentRequest;
 import com.keynor.core.application.dto.hidden.UnlockHiddenContentResponse;
+import com.keynor.core.application.dto.item.ItemResponse;
 import com.keynor.core.application.dto.lore.LoreResponse;
+import com.keynor.core.application.dto.place.PlaceResponse;
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.exception.HiddenContentAccessDeniedException;
 import com.keynor.core.domain.model.character.Character;
+import com.keynor.core.domain.model.event.Event;
+import com.keynor.core.domain.model.faction.Faction;
+import com.keynor.core.domain.model.item.Item;
 import com.keynor.core.domain.model.lore.Lore;
+import com.keynor.core.domain.model.place.Place;
 import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.port.in.character.FindCharacterByIdUseCase;
+import com.keynor.core.domain.port.in.event.FindEventByIdUseCase;
+import com.keynor.core.domain.port.in.faction.FindFactionByIdUseCase;
+import com.keynor.core.domain.port.in.item.FindItemByIdUseCase;
 import com.keynor.core.domain.port.in.lore.FindLoreByIdUseCase;
+import com.keynor.core.domain.port.in.place.FindPlaceByIdUseCase;
 import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import com.keynor.core.domain.port.in.shared.HiddenContentAccessUseCase;
 import jakarta.validation.Valid;
@@ -22,16 +34,12 @@ import java.util.UUID;
 
 /**
  * Serves hidden content -- see root ARCHITECTURE.md, "Cross-Project
- * Feature: Hidden Content & Black Pins". Only LORE and CHARACTER are wired
- * so far (the two entity types in the reference example); the other four
- * fall into the default branch below until replicated -- see
- * .claude/skills/hidden-content-implementation.md.
+ * Feature: Hidden Content & Black Pins". All 6 entity types are wired.
  *
  * Deliberately outside the normal Public*Controller family (does not reuse
- * PublicLoreController/PublicCharacterController's findById): those must
- * keep excluding hidden entities unconditionally, with no token bypass, so
- * a black pin (or a link from another unlocked hidden entity) stays the
- * only route in.
+ * Public*Controller's own findById): those must keep excluding hidden
+ * entities unconditionally, with no token bypass, so a black pin (or a link
+ * from another unlocked hidden entity) stays the only route in.
  */
 @RestController
 @RequestMapping("/api/public/v1/hidden/{entityType}/{entityId}")
@@ -42,16 +50,28 @@ public class PublicHiddenContentController {
     private final HiddenContentAccessUseCase hiddenContentAccessUseCase;
     private final FindLoreByIdUseCase findLoreByIdUseCase;
     private final FindCharacterByIdUseCase findCharacterByIdUseCase;
+    private final FindPlaceByIdUseCase findPlaceByIdUseCase;
+    private final FindFactionByIdUseCase findFactionByIdUseCase;
+    private final FindItemByIdUseCase findItemByIdUseCase;
+    private final FindEventByIdUseCase findEventByIdUseCase;
     private final FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     public PublicHiddenContentController(
             HiddenContentAccessUseCase hiddenContentAccessUseCase,
             FindLoreByIdUseCase findLoreByIdUseCase,
             FindCharacterByIdUseCase findCharacterByIdUseCase,
+            FindPlaceByIdUseCase findPlaceByIdUseCase,
+            FindFactionByIdUseCase findFactionByIdUseCase,
+            FindItemByIdUseCase findItemByIdUseCase,
+            FindEventByIdUseCase findEventByIdUseCase,
             FindLinkedEntitiesUseCase findLinkedEntitiesUseCase) {
         this.hiddenContentAccessUseCase = hiddenContentAccessUseCase;
         this.findLoreByIdUseCase = findLoreByIdUseCase;
         this.findCharacterByIdUseCase = findCharacterByIdUseCase;
+        this.findPlaceByIdUseCase = findPlaceByIdUseCase;
+        this.findFactionByIdUseCase = findFactionByIdUseCase;
+        this.findItemByIdUseCase = findItemByIdUseCase;
+        this.findEventByIdUseCase = findEventByIdUseCase;
         this.findLinkedEntitiesUseCase = findLinkedEntitiesUseCase;
     }
 
@@ -93,7 +113,26 @@ public class PublicHiddenContentController {
                 requireHidden(character.isHidden(), type, entityId);
                 yield ResponseEntity.ok(CharacterResponse.from(character, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, entityId)));
             }
-            default -> throw new EntityNotFoundException("HiddenContent", entityId);
+            case PLACE -> {
+                Place place = findPlaceByIdUseCase.findById(entityId);
+                requireHidden(place.isHidden(), type, entityId);
+                yield ResponseEntity.ok(PlaceResponse.from(place, findLinkedEntitiesUseCase.findLinks(EntityType.PLACE, entityId)));
+            }
+            case FACTION -> {
+                Faction faction = findFactionByIdUseCase.findById(entityId);
+                requireHidden(faction.isHidden(), type, entityId);
+                yield ResponseEntity.ok(FactionResponse.from(faction, findLinkedEntitiesUseCase.findLinks(EntityType.FACTION, entityId)));
+            }
+            case ITEM -> {
+                Item item = findItemByIdUseCase.findById(entityId);
+                requireHidden(item.isHidden(), type, entityId);
+                yield ResponseEntity.ok(ItemResponse.from(item, findLinkedEntitiesUseCase.findLinks(EntityType.ITEM, entityId)));
+            }
+            case EVENT -> {
+                Event event = findEventByIdUseCase.findById(entityId);
+                requireHidden(event.isHidden(), type, entityId);
+                yield ResponseEntity.ok(EventResponse.from(event, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, entityId)));
+            }
         };
     }
 

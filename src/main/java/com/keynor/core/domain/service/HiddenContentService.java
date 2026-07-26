@@ -20,13 +20,12 @@ import java.util.UUID;
 public class HiddenContentService implements CreateHiddenContentLockUseCase, HiddenContentAccessUseCase {
 
     /**
-     * Placeholder only. The user must replace this with a real value before
-     * this feature is deployed -- a master password is not something an
-     * agent may invent (workspace SKILLS.md Skill 14, Ask Before Inferring).
      * Compared as plaintext against the request; not stored anywhere, so
-     * hashing this constant would add no real protection.
+     * hashing this constant would add no real protection. Supplied by the
+     * user directly (workspace SKILLS.md Skill 14, Ask Before Inferring) --
+     * not something an agent may invent.
      */
-    private static final String MASTER_PASSWORD = "REPLACE_ME_BEFORE_DEPLOY";
+    private static final String MASTER_PASSWORD = "PunicFnnEradis";
 
     private static final Duration TOKEN_TTL = Duration.ofHours(2);
 
