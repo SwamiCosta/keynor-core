@@ -6,6 +6,13 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
+/**
+ * `hidden` must be explicitly resent with every update to preserve an
+ * already-hidden entity's state -- like every other field on this record,
+ * this is full-replacement semantics, not a partial patch. Omitting it (or
+ * any JSON body that doesn't include "hidden") is interpreted as
+ * {@code false} and will un-hide the entity.
+ */
 public record UpdateLoreRequest(
         @NotBlank String name,
         String summary,
@@ -14,5 +21,8 @@ public record UpdateLoreRequest(
         @NotNull List<String> categories,
         @NotBlank String timelineFoundedEra,
         String timelineDestroyedEra,
-        List<EntityLinkRequest> links) {
+        List<EntityLinkRequest> links,
+        boolean hidden,
+        String riddleText,
+        String password) {
 }

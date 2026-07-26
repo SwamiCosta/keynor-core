@@ -213,7 +213,7 @@ class LoreServiceTest {
         var command = new UpdateLoreUseCase.Command(
                 "New Name", "New summary", "New body",
                 List.of(),
-                List.of(LoreCategory.HISTORY, LoreCategory.PROPHECY), null, List.of());
+                List.of(LoreCategory.HISTORY, LoreCategory.PROPHECY), null, List.of(), false, null, null);
 
         Lore result = loreService.update(id, command);
 

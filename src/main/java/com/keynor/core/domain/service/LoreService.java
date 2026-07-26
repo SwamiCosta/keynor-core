@@ -87,11 +87,19 @@ public class LoreService implements
         Lore lore = loreRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Lore", id));
         validateTimeline(command.timeline());
+        if (command.hidden() && (command.riddleText() == null || command.riddleText().isBlank()
+                || command.password() == null || command.password().isBlank())) {
+            throw new IllegalArgumentException("riddleText and password are required when hidden is true");
+        }
         lore.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
+        lore.setHidden(command.hidden());
         Lore saved = loreRepository.save(lore);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
         entityLinkRepository.replaceLinks(EntityType.LORE, saved.getId(), links);
+        if (saved.isHidden()) {
+            createHiddenContentLockUseCase.createOrReplace(EntityType.LORE, saved.getId(), command.riddleText(), command.password());
+        }
         return saved;
     }
 

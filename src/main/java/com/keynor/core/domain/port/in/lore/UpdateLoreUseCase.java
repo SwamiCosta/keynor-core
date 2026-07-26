@@ -17,7 +17,10 @@ public interface UpdateLoreUseCase {
             List<String> images,
             List<LoreCategory> categories,
             Timeline timeline,
-            List<EntityLinkRef> links) {}
+            List<EntityLinkRef> links,
+            boolean hidden,
+            String riddleText,
+            String password) {}
 
     Lore update(UUID id, Command command);
 }

@@ -24,7 +24,7 @@ public abstract class UniverseEntity {
     private Instant updatedAt;
     private final Language language;
     private final UUID translationGroupId;
-    private final boolean hidden;
+    private boolean hidden;
 
     protected UniverseEntity(
             UUID id,
@@ -72,6 +72,22 @@ public abstract class UniverseEntity {
         this.body = body;
         this.images = new ArrayList<>(images);
         this.timeline = timeline;
+        this.updatedAt = Instant.now();
+    }
+
+    /**
+     * Toggles hidden status on an existing entity -- e.g. marking a
+     * previously-visible Lore entry hidden after the fact. Same invariant as
+     * the constructor: hidden is only valid when status is already CANON.
+     * The caller (Service) is responsible for also creating/refreshing the
+     * HiddenContentLock when turning hidden on -- this method only flips the
+     * flag, it does not know about riddles or passwords.
+     */
+    public void setHidden(boolean hidden) {
+        if (hidden && this.status != EntityStatus.CANON) {
+            throw new IllegalArgumentException("Hidden content must always have status CANON");
+        }
+        this.hidden = hidden;
         this.updatedAt = Instant.now();
     }
 

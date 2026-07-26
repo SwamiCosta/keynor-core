@@ -145,7 +145,7 @@ class InternalLoreControllerTest {
         when(updateLoreUseCase.update(eq(id), any())).thenReturn(buildLore(id));
 
         var request = new UpdateLoreRequest("Updated Lore", null, null,
-                List.of(), List.of("HISTORY"), "era-1", null, null);
+                List.of(), List.of("HISTORY"), "era-1", null, null, false, null, null);
 
         var response = controller.update(id, request);
 
