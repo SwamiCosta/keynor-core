@@ -1,5 +1,6 @@
 package com.keynor.core.infrastructure.config;
 
+import com.keynor.core.domain.port.in.shared.CreateHiddenContentLockUseCase;
 import com.keynor.core.domain.port.out.*;
 import com.keynor.core.domain.service.*;
 import org.springframework.context.annotation.Bean;
@@ -12,8 +13,11 @@ public class DomainConfiguration {
     public CharacterService characterService(
             CharacterRepository characterRepository,
             EntityLinkRepository entityLinkRepository,
-            EraRepository eraRepository) {
-        return new CharacterService(characterRepository, entityLinkRepository, eraRepository);
+            EraRepository eraRepository,
+            UniverseEntityLookupRepository universeEntityLookupRepository,
+            CreateHiddenContentLockUseCase createHiddenContentLockUseCase) {
+        return new CharacterService(characterRepository, entityLinkRepository, eraRepository,
+                universeEntityLookupRepository, createHiddenContentLockUseCase);
     }
 
     @Bean
@@ -52,8 +56,19 @@ public class DomainConfiguration {
     public LoreService loreService(
             LoreRepository loreRepository,
             EntityLinkRepository entityLinkRepository,
-            EraRepository eraRepository) {
-        return new LoreService(loreRepository, entityLinkRepository, eraRepository);
+            EraRepository eraRepository,
+            UniverseEntityLookupRepository universeEntityLookupRepository,
+            CreateHiddenContentLockUseCase createHiddenContentLockUseCase) {
+        return new LoreService(loreRepository, entityLinkRepository, eraRepository,
+                universeEntityLookupRepository, createHiddenContentLockUseCase);
+    }
+
+    @Bean
+    public HiddenContentService hiddenContentService(
+            HiddenContentLockRepository hiddenContentLockRepository,
+            PasswordHasher passwordHasher,
+            HiddenUnlockTokenSigner hiddenUnlockTokenSigner) {
+        return new HiddenContentService(hiddenContentLockRepository, passwordHasher, hiddenUnlockTokenSigner);
     }
 
     @Bean

@@ -2,6 +2,9 @@ package com.keynor.core.infrastructure.web.handler;
 
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
+import com.keynor.core.domain.exception.HiddenContentAccessDeniedException;
+import com.keynor.core.domain.exception.HiddenContentLinkViolationException;
+import com.keynor.core.domain.exception.InvalidHiddenContentPasswordException;
 import com.keynor.core.domain.exception.InvalidStatusTransitionException;
 import com.keynor.core.domain.exception.UnknownEraNameException;
 import org.slf4j.Logger;
@@ -38,6 +41,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnknownEraNameException.class)
     public ProblemDetail handleUnknownEraName(UnknownEraNameException ex) {
         log.warn("Unknown era name: {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidHiddenContentPasswordException.class)
+    public ProblemDetail handleInvalidHiddenContentPassword(InvalidHiddenContentPasswordException ex) {
+        log.warn("Invalid hidden content password attempt");
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
+    @ExceptionHandler(HiddenContentAccessDeniedException.class)
+    public ProblemDetail handleHiddenContentAccessDenied(HiddenContentAccessDeniedException ex) {
+        log.warn("Hidden content access denied: {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
+    @ExceptionHandler(HiddenContentLinkViolationException.class)
+    public ProblemDetail handleHiddenContentLinkViolation(HiddenContentLinkViolationException ex) {
+        log.warn("Hidden content link violation: {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 

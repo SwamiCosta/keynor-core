@@ -42,7 +42,8 @@ public class PublicFactionController {
         EntityFilter filter = new EntityFilter(
                 LanguageRequestParser.parse(language),
                 List.of(EntityStatus.CANON),
-                categories != null ? categories : List.of());
+                categories != null ? categories : List.of(),
+                true);
         var result = findAllFactionsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 faction -> FactionResponse.from(faction, findLinkedEntitiesUseCase.findLinks(EntityType.FACTION, faction.getId()))));

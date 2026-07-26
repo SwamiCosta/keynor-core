@@ -42,7 +42,8 @@ public class PublicPlaceController {
         EntityFilter filter = new EntityFilter(
                 LanguageRequestParser.parse(language),
                 List.of(EntityStatus.CANON),
-                categories != null ? categories : List.of());
+                categories != null ? categories : List.of(),
+                true);
         var result = findAllPlacesUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 place -> PlaceResponse.from(place, findLinkedEntitiesUseCase.findLinks(EntityType.PLACE, place.getId()))));

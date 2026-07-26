@@ -42,7 +42,8 @@ public class PublicLoreController {
         EntityFilter filter = new EntityFilter(
                 LanguageRequestParser.parse(language),
                 List.of(EntityStatus.CANON),
-                categories != null ? categories : List.of());
+                categories != null ? categories : List.of(),
+                true);
         var result = findAllLoreUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 lore -> LoreResponse.from(lore, findLinkedEntitiesUseCase.findLinks(EntityType.LORE, lore.getId()))));

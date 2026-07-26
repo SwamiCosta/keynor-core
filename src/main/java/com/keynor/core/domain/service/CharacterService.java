@@ -11,9 +11,11 @@ import com.keynor.core.domain.model.shared.PageRequest;
 import com.keynor.core.domain.model.shared.PageResult;
 import com.keynor.core.domain.model.shared.Timeline;
 import com.keynor.core.domain.port.in.character.*;
+import com.keynor.core.domain.port.in.shared.CreateHiddenContentLockUseCase;
 import com.keynor.core.domain.port.out.CharacterRepository;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.EraRepository;
+import com.keynor.core.domain.port.out.UniverseEntityLookupRepository;
 
 import java.time.Instant;
 import java.util.List;
@@ -31,14 +33,20 @@ public class CharacterService implements
     private final CharacterRepository characterRepository;
     private final EntityLinkRepository entityLinkRepository;
     private final EraRepository eraRepository;
+    private final UniverseEntityLookupRepository universeEntityLookupRepository;
+    private final CreateHiddenContentLockUseCase createHiddenContentLockUseCase;
 
     public CharacterService(
             CharacterRepository characterRepository,
             EntityLinkRepository entityLinkRepository,
-            EraRepository eraRepository) {
+            EraRepository eraRepository,
+            UniverseEntityLookupRepository universeEntityLookupRepository,
+            CreateHiddenContentLockUseCase createHiddenContentLockUseCase) {
         this.characterRepository = characterRepository;
         this.entityLinkRepository = entityLinkRepository;
         this.eraRepository = eraRepository;
+        this.universeEntityLookupRepository = universeEntityLookupRepository;
+        this.createHiddenContentLockUseCase = createHiddenContentLockUseCase;
     }
 
     @Override
@@ -63,9 +71,15 @@ public class CharacterService implements
                 now,
                 now,
                 command.language(),
-                translationGroupId);
+                translationGroupId,
+                command.hidden());
         Character saved = characterRepository.save(character);
-        entityLinkRepository.replaceLinks(EntityType.CHARACTER, saved.getId(), command.links() != null ? command.links() : List.of());
+        List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
+        HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
+        entityLinkRepository.replaceLinks(EntityType.CHARACTER, saved.getId(), links);
+        if (saved.isHidden()) {
+            createHiddenContentLockUseCase.createOrReplace(EntityType.CHARACTER, saved.getId(), command.riddleText(), command.password());
+        }
         return saved;
     }
 
@@ -76,7 +90,9 @@ public class CharacterService implements
         validateTimeline(command.timeline());
         character.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
         Character saved = characterRepository.save(character);
-        entityLinkRepository.replaceLinks(EntityType.CHARACTER, saved.getId(), command.links() != null ? command.links() : List.of());
+        List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
+        HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
+        entityLinkRepository.replaceLinks(EntityType.CHARACTER, saved.getId(), links);
         return saved;
     }
 

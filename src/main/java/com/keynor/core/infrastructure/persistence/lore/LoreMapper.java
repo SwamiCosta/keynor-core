@@ -39,7 +39,8 @@ public class LoreMapper {
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 entity.getLanguage(),
-                entity.getTranslationGroupId());
+                entity.getTranslationGroupId(),
+                entity.isHidden());
     }
 
     public LoreEntity toEntity(Lore lore) {
@@ -56,6 +57,7 @@ public class LoreMapper {
         entity.setUpdatedAt(lore.getUpdatedAt());
         entity.setLanguage(lore.getLanguage());
         entity.setTranslationGroupId(lore.getTranslationGroupId());
+        entity.setHidden(lore.isHidden());
         return entity;
     }
 

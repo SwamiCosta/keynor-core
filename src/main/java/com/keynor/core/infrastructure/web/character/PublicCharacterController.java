@@ -48,7 +48,8 @@ public class PublicCharacterController {
         EntityFilter filter = new EntityFilter(
                 LanguageRequestParser.parse(language),
                 List.of(EntityStatus.CANON),
-                categories != null ? categories : List.of());
+                categories != null ? categories : List.of(),
+                true);
         var result = findAllCharactersUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 character -> CharacterResponse.from(character, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, character.getId()))));
@@ -65,7 +66,7 @@ public class PublicCharacterController {
         var characters = findCharactersByIdsUseCase.findByIds(ids);
         var response = characters.stream()
                 .map(character -> LinkedEntityResponse.from(
-                        new EntityLinkSummary(EntityType.CHARACTER, character.getId(), character.getName(), character.getStatus())))
+                        new EntityLinkSummary(EntityType.CHARACTER, character.getId(), character.getName(), character.getStatus(), character.isHidden())))
                 .toList();
         return ResponseEntity.ok(response);
     }
