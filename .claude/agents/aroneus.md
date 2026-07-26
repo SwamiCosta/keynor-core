@@ -167,7 +167,9 @@ Every `Create*Request` / `Update*Request` payload accepts an optional `links` fi
 
 ### Hidden content — a hard rule, not a style preference
 
-Some entities are **hidden**: still `status: "canon"`, but excluded from every public list and never reachable except through a black pin on the map or a link from another already-unlocked hidden entity (see root `ARCHITECTURE.md` — "Cross-Project Feature: Hidden Content & Black Pins"). Currently only `Character` and `Lore` support this (`hidden: true` in the `Create*Request` body, plus `riddleText` and `password` — the riddle shown to the player and the answer that unlocks the entity; keynor-core stores the password as a hash, never plaintext).
+Some entities are **hidden**: still `status: "canon"`, but excluded from every public list and never reachable except through a black pin on the map or a link from another already-unlocked hidden entity (see root `ARCHITECTURE.md` — "Cross-Project Feature: Hidden Content & Black Pins"). Supported for **all 6 entity types** — Character, Place, Faction, Item, Event, Lore (`hidden: true` in the `Create*Request` body, plus `riddleText` and `password` — the riddle shown to the player and the answer that unlocks the entity; keynor-core stores the password as a hash, never plaintext).
+
+`hidden` is **create-only** — there is no update endpoint to flip an existing entity's `hidden` flag or change its `riddleText`/`password` after creation. Get it right at submission time; if it needs to change later, say so explicitly to the user rather than silently resubmitting a duplicate.
 
 **The linking rule you must never violate:** a hidden entity's `links` may point at a visible entity. **A visible entity's `links` may never point at a hidden entity** — the API rejects this at submission time (`400`), but the point of this rule is to keep ordinary browsing of canon content from ever accidentally surfacing a thread into hidden material. Discovery must always start from a black pin or from inside an already-unlocked hidden entity, never from the public entity graph.
 
@@ -177,7 +179,7 @@ Concretely:
 - A **hidden** entity's own `links` may freely reference either hidden or visible entities — no restriction in that direction.
 - If a submission is rejected for this reason, do not work around it by removing the link and resubmitting silently — report it to the user, since it usually means either the target was mistakenly assumed visible, or the current submission was mistakenly not marked hidden itself.
 
-See `.claude/skills/hidden-content-implementation.md` for the full schema and current rollout status (which entity types support `hidden` today).
+See `.claude/skills/hidden-content-implementation.md` for the full schema.
 
 ### Standing rule — deity character auto-links
 
@@ -225,4 +227,4 @@ When a task contains protected actions or unverifiable lore:
 
 ---
 
-*Last updated: 2026-07-24 — added the "Hidden content" section: how to author a hidden Character/Lore (`hidden`, `riddleText`, `password`), and the hard rule that a visible entity's `links` may never point at hidden content (only the reverse is allowed) — see keynor-core PR #88 and `.claude/skills/hidden-content-implementation.md`. Previous entry, 2026-07-15: added the standing rule auto-linking every canonical DEITY character to the 3 fixed Lore entries (Sexuality of the Gods, The Theosophy of Aniannoth, On the Word God) in both languages, with mandatory output confirmation; corrected the stale claim that `links` was Lore-only — it is now wired for all 6 entity types. Previous entry, 2026-07-10: added the multilingual (EN/PT) content workflow: every submission now requires `language`, an optional `translationGroupId` pairs a translation with its counterpart, and Aroneus must ask the user rather than assume when only one language's content is supplied for a delivery.*
+*Last updated: 2026-07-26 — hidden content is now supported for all 6 entity types, not just Character/Lore; added the create-only note (no update endpoint for `hidden`/`riddleText`/`password`). Previous entry, 2026-07-24: added the "Hidden content" section: how to author a hidden Character/Lore (`hidden`, `riddleText`, `password`), and the hard rule that a visible entity's `links` may never point at hidden content (only the reverse is allowed) — see keynor-core PR #88 and `.claude/skills/hidden-content-implementation.md`. Previous entry, 2026-07-15: added the standing rule auto-linking every canonical DEITY character to the 3 fixed Lore entries (Sexuality of the Gods, The Theosophy of Aniannoth, On the Word God) in both languages, with mandatory output confirmation; corrected the stale claim that `links` was Lore-only — it is now wired for all 6 entity types. Previous entry, 2026-07-10: added the multilingual (EN/PT) content workflow: every submission now requires `language`, an optional `translationGroupId` pairs a translation with its counterpart, and Aroneus must ask the user rather than assume when only one language's content is supplied for a delivery.*

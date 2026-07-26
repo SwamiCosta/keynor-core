@@ -12,13 +12,11 @@ A hidden entity has an associated `HiddenContentLock` (`hidden_content_lock` tab
 
 ## Current rollout status
 
-**Fully wired:** `Character`, `Lore` — domain, JPA entity/mapper, `Create*Request`/`*Response` DTOs, `Internal*Controller`.
-
-**Schema-only (not yet replicated):** `Place`, `Faction`, `Item`, `Event` — `UniverseEntity.hidden` applies to them too (they extend the same base class), but their JPA entities have no `hidden` column and their `Create*Request`/`*Response` DTOs have no `hidden` field, so `hidden` is always constructed as `false` for these four. `UniverseEntityLookupJpaAdapter.findSummary` passes a literal `false` for these four types' `EntityLinkSummary.hidden()` for the same reason. This is not a bug — it means these four entity types cannot be marked hidden yet, which is correct until replicated.
+**Fully wired — all 6 entity types:** `Character`, `Lore`, `Place`, `Faction`, `Item`, `Event` — domain, JPA entity/mapper, `Create*Request`/`*Response` DTOs, `Internal*Controller`, `*Specifications.excludeHidden`, `UniverseEntityLookupJpaAdapter`, `DomainConfiguration`, and `PublicHiddenContentController`'s dispatch switch. Any universe entity can now be authored as hidden content.
 
 ## Reference implementation: Lore and Character
 
-Both were wired identically. The five changes, per entity:
+Character and Lore were wired first, then replicated identically to Place, Faction, Item, and Event. The five changes, per entity:
 
 1. **Domain model** (`domain/model/<entity>/<Entity>.java`) — constructor gains a trailing `boolean hidden` parameter, passed straight through to `super(...)`.
 2. **JPA entity** (`infrastructure/persistence/<entity>/<Entity>Entity.java`) — new `@Column(nullable = false) private boolean hidden;` + getter/setter.
@@ -28,15 +26,16 @@ Both were wired identically. The five changes, per entity:
 
 `hidden` is **create-only** by design — there is no way to flip it after creation (mirrors how `status` also has no field on `Update*Request`; a dedicated endpoint would be needed to change it later, not built yet).
 
-## Replicating to Place, Faction, Item, Event
+## Replicating to a future new entity type
 
-Apply the same five changes listed above. Additionally:
+If a 7th universe entity type is ever added, apply the same five changes listed above, plus:
 
-- `EntityFilter.excludeHidden` already exists and is already passed by every `Public*Controller` (`true`) and `Internal*Controller` (`false`) for all six entity types — no change needed there.
-- Add the `hidden = false` predicate to the entity's `*Specifications.fromFilter` (see `CharacterSpecifications`/`LoreSpecifications` for the pattern: `if (filter.excludeHidden()) { spec = spec.and(...); }`) — this is currently absent for Place/Faction/Item/Event because their JPA entities have no `hidden` column yet; adding the column (step 2 above) makes this predicate buildable.
-- Update `UniverseEntityLookupJpaAdapter.findSummary`'s switch case for that type to call `e.isHidden()` instead of the literal `false`.
-- Register the new `Service` constructor dependencies in `DomainConfiguration`'s corresponding `@Bean` method.
-- Update this skill file's "Current rollout status" section to move the entity from "Schema-only" to "Fully wired".
+- `EntityFilter.excludeHidden` already exists and is passed by every `Public*Controller` (`true`) and `Internal*Controller` (`false`) — no change needed there.
+- Add the `hidden = false` predicate to the entity's `*Specifications.fromFilter` (see any existing `*Specifications` for the pattern: `if (filter.excludeHidden()) { spec = spec.and(...); }`).
+- Add a case to `UniverseEntityLookupJpaAdapter.findSummary`'s switch calling `e.isHidden()`.
+- Register the new `Service`'s two extra constructor dependencies (`UniverseEntityLookupRepository`, `CreateHiddenContentLockUseCase`) in `DomainConfiguration`.
+- Add a case to `PublicHiddenContentController.findById`'s switch, delegating to that entity's own `Find<Entity>ByIdUseCase` and `<Entity>Response.from(...)`.
+- Update this skill file's "Current rollout status" section.
 
 ## Shared infrastructure (already generic, no replication needed)
 

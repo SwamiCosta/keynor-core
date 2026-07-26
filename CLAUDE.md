@@ -163,7 +163,7 @@ A visibility dimension orthogonal to `status`, powering the Hidden Content & Bla
 
 **Rule that content authors must never violate:** a hidden entity may link to a visible one; a visible entity may never link to hidden content. Enforced server-side and rejected at write time — see `aroneus.md` for the authoring-facing explanation.
 
-Currently wired for `Character` and `Lore` only. For the full schema, domain wiring, and the replication steps for `Place`/`Faction`/`Item`/`Event`, see `.claude/skills/hidden-content-implementation.md`.
+Wired for all 6 entity types (`Character`, `Place`, `Faction`, `Item`, `Event`, `Lore`) — any universe entity can be authored as hidden content. For the full schema and domain wiring, see `.claude/skills/hidden-content-implementation.md`.
 
 ---
 
@@ -337,4 +337,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-07-24 (added the "Hidden content" section documenting `hidden`/`hidden_content_lock` and the one-way linking rule, alongside the new `.claude/skills/hidden-content-implementation.md` — see keynor-core PR #88. Previous entry, 2026-07-15: documented the `GET /api/public/v1/characters/batch` endpoint as the second exception to the CANON-only public API invariant, alongside the pre-existing Era/Archetype/Sign closed-set exception — see keynor-core PR #71)*
+*Last updated: 2026-07-26 (hidden content is now wired for all 6 entity types, not just Character/Lore — updated the "Hidden content" section accordingly. Previous entry, 2026-07-24: added the "Hidden content" section documenting `hidden`/`hidden_content_lock` and the one-way linking rule, alongside the new `.claude/skills/hidden-content-implementation.md` — see keynor-core PR #88. Previous entry, 2026-07-15: documented the `GET /api/public/v1/characters/batch` endpoint as the second exception to the CANON-only public API invariant, alongside the pre-existing Era/Archetype/Sign closed-set exception — see keynor-core PR #71)*
