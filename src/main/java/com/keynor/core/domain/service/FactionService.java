@@ -88,11 +88,19 @@ public class FactionService implements
         Faction faction = factionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Faction", id));
         validateTimeline(command.timeline());
+        if (command.hidden() && (command.riddleText() == null || command.riddleText().isBlank()
+                || command.password() == null || command.password().isBlank())) {
+            throw new IllegalArgumentException("riddleText and password are required when hidden is true");
+        }
         faction.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.members(), command.timeline());
+        faction.setHidden(command.hidden());
         Faction saved = factionRepository.save(faction);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
         entityLinkRepository.replaceLinks(EntityType.FACTION, saved.getId(), links);
+        if (saved.isHidden()) {
+            createHiddenContentLockUseCase.createOrReplace(EntityType.FACTION, saved.getId(), command.riddleText(), command.password());
+        }
         return saved;
     }
 

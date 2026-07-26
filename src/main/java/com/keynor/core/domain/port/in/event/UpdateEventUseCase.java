@@ -17,7 +17,10 @@ public interface UpdateEventUseCase {
             List<String> images,
             List<EventCategory> categories,
             Timeline timeline,
-            List<EntityLinkRef> links) {}
+            List<EntityLinkRef> links,
+            boolean hidden,
+            String riddleText,
+            String password) {}
 
     Event update(UUID id, Command command);
 }

@@ -110,7 +110,8 @@ public class InternalFactionController {
                 request.images() != null ? request.images() : List.of(),
                 categories,
                 request.members() != null ? request.members() : List.of(),
-                timeline, links);
+                timeline, links,
+                request.hidden(), request.riddleText(), request.password());
         var updated = updateFactionUseCase.update(id, command);
         return ResponseEntity.ok(FactionResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.FACTION, updated.getId())));
     }

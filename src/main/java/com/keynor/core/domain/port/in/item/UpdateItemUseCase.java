@@ -17,7 +17,10 @@ public interface UpdateItemUseCase {
             List<String> images,
             List<ItemCategory> categories,
             Timeline timeline,
-            List<EntityLinkRef> links) {}
+            List<EntityLinkRef> links,
+            boolean hidden,
+            String riddleText,
+            String password) {}
 
     Item update(UUID id, Command command);
 }

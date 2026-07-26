@@ -88,11 +88,19 @@ public class PlaceService implements
         Place place = placeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Place", id));
         validateTimeline(command.timeline());
+        if (command.hidden() && (command.riddleText() == null || command.riddleText().isBlank()
+                || command.password() == null || command.password().isBlank())) {
+            throw new IllegalArgumentException("riddleText and password are required when hidden is true");
+        }
         place.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.mapType(), command.timeline());
+        place.setHidden(command.hidden());
         Place saved = placeRepository.save(place);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
         entityLinkRepository.replaceLinks(EntityType.PLACE, saved.getId(), links);
+        if (saved.isHidden()) {
+            createHiddenContentLockUseCase.createOrReplace(EntityType.PLACE, saved.getId(), command.riddleText(), command.password());
+        }
         return saved;
     }
 

@@ -235,7 +235,7 @@ class PlaceServiceTest {
 
         var command = new UpdatePlaceUseCase.Command(
                 "New Name", "New summary", "New body",
-                List.of(), List.of(PlaceCategory.REALM), MapType.ABSTRACT, null, null);
+                List.of(), List.of(PlaceCategory.REALM), MapType.ABSTRACT, null, null, false, null, null);
 
         Place result = placeService.update(id, command);
 

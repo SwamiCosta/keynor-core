@@ -87,11 +87,19 @@ public class ItemService implements
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Item", id));
         validateTimeline(command.timeline());
+        if (command.hidden() && (command.riddleText() == null || command.riddleText().isBlank()
+                || command.password() == null || command.password().isBlank())) {
+            throw new IllegalArgumentException("riddleText and password are required when hidden is true");
+        }
         item.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
+        item.setHidden(command.hidden());
         Item saved = itemRepository.save(item);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
         entityLinkRepository.replaceLinks(EntityType.ITEM, saved.getId(), links);
+        if (saved.isHidden()) {
+            createHiddenContentLockUseCase.createOrReplace(EntityType.ITEM, saved.getId(), command.riddleText(), command.password());
+        }
         return saved;
     }
 

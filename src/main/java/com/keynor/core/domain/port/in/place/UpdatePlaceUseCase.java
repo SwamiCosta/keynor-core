@@ -19,7 +19,10 @@ public interface UpdatePlaceUseCase {
             List<PlaceCategory> categories,
             MapType mapType,
             Timeline timeline,
-            List<EntityLinkRef> links) {}
+            List<EntityLinkRef> links,
+            boolean hidden,
+            String riddleText,
+            String password) {}
 
     Place update(UUID id, Command command);
 }

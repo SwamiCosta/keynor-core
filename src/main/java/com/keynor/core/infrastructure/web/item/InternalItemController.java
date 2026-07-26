@@ -106,7 +106,8 @@ public class InternalItemController {
         var command = new UpdateItemUseCase.Command(
                 request.name(), request.summary(), request.body(),
                 request.images() != null ? request.images() : List.of(),
-                categories, timeline, links);
+                categories, timeline, links,
+                request.hidden(), request.riddleText(), request.password());
         var updated = updateItemUseCase.update(id, command);
         return ResponseEntity.ok(ItemResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.ITEM, updated.getId())));
     }

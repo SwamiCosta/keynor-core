@@ -149,7 +149,7 @@ class InternalFactionControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdateFactionRequest("Updated Name", null, null,
-                List.of(), List.of("ORDER"), List.of(), "era-1", null, null);
+                List.of(), List.of("ORDER"), List.of(), "era-1", null, null, false, null, null);
 
         var response = controller.update(id, request);
 

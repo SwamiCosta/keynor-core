@@ -105,7 +105,8 @@ public class InternalCharacterController {
                 request.images() != null ? request.images() : List.of(),
                 parseCategories(request.categories()),
                 buildTimeline(request.timelineFoundedEra(), request.timelineDestroyedEra()),
-                links);
+                links,
+                request.hidden(), request.riddleText(), request.password());
         var updated = updateCharacterUseCase.update(id, command);
         return ResponseEntity.ok(CharacterResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, updated.getId())));
     }

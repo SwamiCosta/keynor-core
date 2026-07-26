@@ -220,7 +220,7 @@ class FactionServiceTest {
         var command = new UpdateFactionUseCase.Command(
                 "New Name", "New summary", "New body",
                 List.of(),
-                List.of(FactionCategory.EMPIRE, FactionCategory.ORDER), List.of(), null, null);
+                List.of(FactionCategory.EMPIRE, FactionCategory.ORDER), List.of(), null, null, false, null, null);
 
         Faction result = factionService.update(id, command);
 

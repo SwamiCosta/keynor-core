@@ -217,7 +217,7 @@ class ItemServiceTest {
         var command = new UpdateItemUseCase.Command(
                 "New Name", "New summary", "New body",
                 List.of(),
-                List.of(ItemCategory.WEAPON, ItemCategory.ARTIFACT), null, null);
+                List.of(ItemCategory.WEAPON, ItemCategory.ARTIFACT), null, null, false, null, null);
 
         Item result = itemService.update(id, command);
 
