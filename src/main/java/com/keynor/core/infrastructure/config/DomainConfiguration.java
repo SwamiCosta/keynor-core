@@ -91,8 +91,8 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public EraService eraService(EraRepository eraRepository) {
-        return new EraService(eraRepository);
+    public EraService eraService(EraRepository eraRepository, EntityLinkRepository entityLinkRepository) {
+        return new EraService(eraRepository, entityLinkRepository);
     }
 
     @Bean

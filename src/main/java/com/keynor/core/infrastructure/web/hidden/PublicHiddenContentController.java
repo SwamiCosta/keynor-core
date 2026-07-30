@@ -133,6 +133,9 @@ public class PublicHiddenContentController {
                 requireHidden(event.isHidden(), type, entityId);
                 yield ResponseEntity.ok(EventResponse.from(event, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, entityId)));
             }
+            // Era has no `hidden` field at all -- it is not a UniverseEntity subclass
+            // and can never be hidden content, so this route is never valid for it.
+            case ERA -> throw new IllegalArgumentException("Era is not a valid hidden-content entity type");
         };
     }
 
