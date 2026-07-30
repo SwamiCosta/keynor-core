@@ -153,6 +153,8 @@ For the migration changelog (V1–V8), see `.claude/skills/migration-history.md`
 
 Any universe entity can reference any other universe entity — e.g. a `Lore` entry that mentions two `Character`s renders as a list of clickable links in aniannoth-overview. This is modeled as a **polymorphic join table** (no real FKs to the six entity tables), already wired end-to-end for all 6 entity types.
 
+**`Era`/`POINT` entries also link out (2026-07-30, source-only):** `EntityType.ERA` was added as a source-only exception so era/point descriptions can link to real entities too — see `.claude/skills/entity-links-implementation.md`'s "ERA is a one-directional exception" note.
+
 For the schema, domain model, reference implementation, and the FE field naming contract, see `.claude/skills/entity-links-implementation.md`.
 
 ---
@@ -337,4 +339,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-07-26 (hidden content is now wired for all 6 entity types, not just Character/Lore — updated the "Hidden content" section accordingly. Previous entry, 2026-07-24: added the "Hidden content" section documenting `hidden`/`hidden_content_lock` and the one-way linking rule, alongside the new `.claude/skills/hidden-content-implementation.md` — see keynor-core PR #88. Previous entry, 2026-07-15: documented the `GET /api/public/v1/characters/batch` endpoint as the second exception to the CANON-only public API invariant, alongside the pre-existing Era/Archetype/Sign closed-set exception — see keynor-core PR #71)*
+*Last updated: 2026-07-30 (`EntityType.ERA` added as a source-only `entity_links` exception — era/point descriptions can now link out to real entities, resolved via a new `links` field on `EraResponse`. `CreateEraRequest`/`CreateEraUseCase.Command` gained a `links` field; no update endpoint exists yet for eras, so links are creation-time only. See `.claude/skills/entity-links-implementation.md` and `.claude/skills/domain-entity-reference.md`. Cross-project feature coordinated by Lamont, paired with an `aniannoth-overview` change reusing the existing `RelatedEntities` FE component; see keynor-core PR #103 for the code. Previous entry, 2026-07-26: hidden content is now wired for all 6 entity types, not just Character/Lore — updated the "Hidden content" section accordingly. Previous entry, 2026-07-24: added the "Hidden content" section documenting `hidden`/`hidden_content_lock` and the one-way linking rule, alongside the new `.claude/skills/hidden-content-implementation.md` — see keynor-core PR #88. Previous entry, 2026-07-15: documented the `GET /api/public/v1/characters/batch` endpoint as the second exception to the CANON-only public API invariant, alongside the pre-existing Era/Archetype/Sign closed-set exception — see keynor-core PR #71)*

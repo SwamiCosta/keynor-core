@@ -116,6 +116,8 @@ Universe entities (lore/story data) support **hard delete**. User data (`users` 
 
 `eras.name` keeps its pre-existing `UNIQUE` constraint (not widened to `UNIQUE(name, language)`) — a PT era's name is itself translated text, so it never literally collides with its EN counterpart's name.
 
+**`links` (2026-07-30):** every `Era`/`POINT` entry now resolves an `entity_links`-backed `links` field (`List<LinkedEntityResponse>`), exactly like a `UniverseEntity`'s `links` field, letting an era or point's description reference real entities (e.g. "the era in which the Amets first appeared" linking to that Faction). `Era` itself is still not a `UniverseEntity` subclass and gained no new domain field — `links` is resolved on read via `FindLinkedEntitiesUseCase.findLinks(EntityType.ERA, id)`, same as every other entity. **One-directional only:** `EntityType.ERA` is valid as an `entity_links` `source_type`, never as a `target_type` — `UniverseEntityLookupJpaAdapter.findSummary(ERA, id)` throws `UnsupportedOperationException` if ever called, since nothing in the codebase creates a link with `target_type = ERA`. `CreateEraRequest`/`CreateEraUseCase.Command` gained a `links: List<EntityLinkRequest>`/`List<EntityLinkRef>` field, submitted and replaced the same way `Lore`'s links are (see `entity-links-implementation.md`). No `UpdateEraUseCase` exists yet (eras have no update endpoint at all), so links can currently only be set at creation time.
+
 ### Domain invariant
 
 The `Era` constructor enforces: `importance` is required when `type = POINT`; must be null when `type = ERA`. Violation throws `IllegalArgumentException`.
