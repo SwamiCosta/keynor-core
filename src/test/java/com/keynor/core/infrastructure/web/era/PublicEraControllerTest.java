@@ -1,12 +1,17 @@
 package com.keynor.core.infrastructure.web.era;
 
 import com.keynor.core.application.dto.era.EraResponse;
+import com.keynor.core.application.dto.shared.LinkedEntityResponse;
 import com.keynor.core.domain.model.era.Era;
+import com.keynor.core.domain.model.shared.EntityLinkSummary;
+import com.keynor.core.domain.model.shared.EntityStatus;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.era.EraImportance;
 import com.keynor.core.domain.model.era.EraType;
 import com.keynor.core.domain.port.in.era.FindAllErasUseCase;
 import com.keynor.core.domain.port.in.era.FindEraByIdUseCase;
+import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,13 +36,16 @@ class PublicEraControllerTest {
     @Mock
     private FindEraByIdUseCase findEraByIdUseCase;
 
+    @Mock
+    private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
+
     private PublicEraController controller;
 
     private static final Instant NOW = Instant.parse("2026-01-01T00:00:00Z");
 
     @BeforeEach
     void setUp() {
-        controller = new PublicEraController(findAllErasUseCase, findEraByIdUseCase);
+        controller = new PublicEraController(findAllErasUseCase, findEraByIdUseCase, findLinkedEntitiesUseCase);
     }
 
     @Test
@@ -140,5 +148,24 @@ class PublicEraControllerTest {
         assertThat(response.getBody().type()).isEqualTo("POINT");
         assertThat(response.getBody().importance()).isEqualTo("MAJOR");
         verify(findEraByIdUseCase).findById(id);
+    }
+
+    @Test
+    void findById_shouldIncludeResolvedLinks_whenEraHasEntityLinks() {
+        UUID id = UUID.randomUUID();
+        UUID loreId = UUID.randomUUID();
+        Era era = new Era(id, "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW, Language.EN, UUID.randomUUID());
+        when(findEraByIdUseCase.findById(id)).thenReturn(era);
+        when(findLinkedEntitiesUseCase.findLinks(EntityType.ERA, id)).thenReturn(
+                List.of(new EntityLinkSummary(EntityType.LORE, loreId, "On the Word God", EntityStatus.CANON, false)));
+
+        var response = controller.findById(id);
+
+        assertThat(response.getBody()).isNotNull();
+        List<LinkedEntityResponse> links = response.getBody().links();
+        assertThat(links).hasSize(1);
+        assertThat(links.get(0).type()).isEqualTo("LORE");
+        assertThat(links.get(0).id()).isEqualTo(loreId);
+        assertThat(links.get(0).name()).isEqualTo("On the Word God");
     }
 }

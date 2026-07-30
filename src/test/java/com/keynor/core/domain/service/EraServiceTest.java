@@ -2,13 +2,18 @@ package com.keynor.core.domain.service;
 
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.era.Era;
+import com.keynor.core.domain.model.shared.EntityLinkRef;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.era.EraImportance;
 import com.keynor.core.domain.model.era.EraType;
+import com.keynor.core.domain.port.in.era.CreateEraUseCase;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.EraRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -26,13 +31,16 @@ class EraServiceTest {
     @Mock
     private EraRepository eraRepository;
 
+    @Mock
+    private EntityLinkRepository entityLinkRepository;
+
     private EraService eraService;
 
     private static final Instant NOW = Instant.parse("2026-01-01T00:00:00Z");
 
     @BeforeEach
     void setUp() {
-        eraService = new EraService(eraRepository);
+        eraService = new EraService(eraRepository, entityLinkRepository);
     }
 
     @Test
@@ -100,6 +108,35 @@ class EraServiceTest {
 
         assertThatThrownBy(() -> eraService.findById(id))
                 .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    // --- create() / entity_links wiring ---
+
+    @Test
+    void create_shouldReplaceLinks_withProvidedTargets() {
+        when(eraRepository.save(any(Era.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        UUID loreTargetId = UUID.randomUUID();
+        var command = new CreateEraUseCase.Command(
+                "Age of Creation", 1, EraType.ERA, null, "The first age",
+                Language.EN, null, List.of(new EntityLinkRef(EntityType.LORE, loreTargetId)));
+
+        Era result = eraService.create(command);
+
+        ArgumentCaptor<List<EntityLinkRef>> linksCaptor = ArgumentCaptor.forClass(List.class);
+        verify(entityLinkRepository).replaceLinks(eq(EntityType.ERA), eq(result.getId()), linksCaptor.capture());
+        assertThat(linksCaptor.getValue()).containsExactly(new EntityLinkRef(EntityType.LORE, loreTargetId));
+    }
+
+    @Test
+    void create_shouldReplaceLinksWithEmptyList_whenLinksIsNull() {
+        when(eraRepository.save(any(Era.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        var command = new CreateEraUseCase.Command(
+                "Age of Creation", 1, EraType.ERA, null, "The first age",
+                Language.EN, null, null);
+
+        Era result = eraService.create(command);
+
+        verify(entityLinkRepository).replaceLinks(EntityType.ERA, result.getId(), List.of());
     }
 
     // --- Domain invariant tests ---

@@ -2,10 +2,12 @@ package com.keynor.core.domain.service;
 
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.era.Era;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.port.in.era.CreateEraUseCase;
 import com.keynor.core.domain.port.in.era.FindAllErasUseCase;
 import com.keynor.core.domain.port.in.era.FindEraByIdUseCase;
+import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.EraRepository;
 
 import java.time.Instant;
@@ -15,9 +17,11 @@ import java.util.UUID;
 public class EraService implements FindAllErasUseCase, FindEraByIdUseCase, CreateEraUseCase {
 
     private final EraRepository eraRepository;
+    private final EntityLinkRepository entityLinkRepository;
 
-    public EraService(EraRepository eraRepository) {
+    public EraService(EraRepository eraRepository, EntityLinkRepository entityLinkRepository) {
         this.eraRepository = eraRepository;
+        this.entityLinkRepository = entityLinkRepository;
     }
 
     @Override
@@ -47,6 +51,9 @@ public class EraService implements FindAllErasUseCase, FindEraByIdUseCase, Creat
                 now,
                 command.language(),
                 translationGroupId);
-        return eraRepository.save(era);
+        Era saved = eraRepository.save(era);
+        List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
+        entityLinkRepository.replaceLinks(EntityType.ERA, saved.getId(), links);
+        return saved;
     }
 }

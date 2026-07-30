@@ -54,6 +54,10 @@ public class UniverseEntityLookupJpaAdapter implements UniverseEntityLookupRepos
                     .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
             case LORE -> loreJpaRepository.findById(id)
                     .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
+            // Era only ever appears as an entity_links source (see EntityType.ERA) --
+            // nothing in this codebase ever creates a link with target_type = ERA.
+            case ERA -> throw new UnsupportedOperationException(
+                    "ERA cannot be resolved as an entity_link target -- Era only appears as a link source");
         };
     }
 }
