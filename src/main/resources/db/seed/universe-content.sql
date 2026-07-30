@@ -6,7 +6,7 @@
 --   places, place_categories, factions, faction_categories,
 --   faction_members, items, item_categories, events, event_categories,
 --   lore, lore_categories, entity_links, universe_entity_images,
---   archetypes, signs
+--   archetypes, signs, map_pins
 --
 -- Excluded: users, oauth2_* (environment-specific, never in scope);
 --   hidden_content_lock (V17) -- riddle + BCrypt password_hash per hidden
@@ -24,9 +24,21 @@
 -- How to apply:
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
--- Last updated: 2026-07-28
--- Updated by:   Siegmund (regenerated fresh from the live database). Per
---               the handoff: INSERT Item "The Scepter of Infinity and
+-- Last updated: 2026-07-30
+-- Updated by:   Siegmund (regenerated fresh from the live database).
+--               map_pins brought into scope per Omnia's decision
+--               (2026-07-30): structurally identical to entity_links
+--               (already in scope), treated as universe content rather
+--               than environment-specific curation. .claude/skills/
+--               universe-content-dump.md updated to reflect this --
+--               its "Deferred, not yet decided" note is resolved.
+--               Dumped all 13 live rows via pg_dump (--data-only
+--               --column-inserts -t map_pins), added as a new MAP_PINS
+--               section after SIGNS and added to the TRUNCATE list --
+--               row count matches the live DB (13), verified via
+--               `SELECT COUNT(*) FROM map_pins`.
+--
+-- Previous entry, 2026-07-28: INSERT Item "The Scepter of Infinity and
 --               the Jewel of Existence" (EN
 --               3174578b-2265-4e8b-a3b8-614ad080516e / PT
 --               fe273072-0d3b-4622-bc04-88f66119fa2b), CANON RELIC, with
@@ -51,9 +63,6 @@
 --
 --               Re-ran the full entity_links integrity sweep (464 rows):
 --               zero visible->hidden violations found.
---
--- ⚠  Still flagged, unresolved: map_pins remains at 13 rows, still
---   excluded pending the user/Imaws scope decision.
 
 -- ============================================================
 -- TRUNCATE (join tables first, then parents, then root tables)
@@ -62,6 +71,7 @@
 TRUNCATE
     universe_entity_images,
     entity_links,
+    map_pins,
     character_categories,
     place_categories,
     faction_categories,
@@ -2396,3 +2406,21 @@ INSERT INTO public.signs (id, name, sign_order, season_time, archetype_id, sub_a
 INSERT INTO public.signs (id, name, sign_order, season_time, archetype_id, sub_archetype, summary, body, created_at, updated_at, language, translation_group_id) VALUES ('8d339dcc-7405-4a2d-878b-fbfe7dd40820', 'O Espelho', 11, 'Início da Primavera', 'e5f9998b-cbfd-4e90-acd2-3d19adbe528e', 'Persuasão', 'Representa manipulação e diplomacia em seu ápice.', 'Representa manipulação e diplomacia em seu ápice. As pessoas deste signo veem os outros como recursos, vivendo para influenciar e construir sua própria imagem. Naturalmente amistosas, elevam o moral dos que as cercam com facilidade, lendo e moldando comportamentos como lhes convém. Ideais como políticas, mercadoras, apostadoras ou espiãs. Não acreditam em verdade universal, sustentando em vez disso que tudo é questão de opinião — suas preferências são voláteis, importando-se pouco com qualquer resultado específico, desde que satisfaça a maioria. Podem ser profundamente indecisas, preferindo seguir a direção de outrem em assuntos complexos a escolher uma própria. Carecem de um senso de propósito pessoal, preenchendo essa ausência com os objetivos de seu grupo ou sociedade. Leem rostos e linguagem corporal como quem lê um livro aberto, e sabem precisamente como provocar ou seduzir.', '2026-06-25 01:30:12.047656+00', '2026-06-25 01:30:12.047656+00', 'pt', '0394b7de-e1bd-447e-9f38-faf24782c378');
 INSERT INTO public.signs (id, name, sign_order, season_time, archetype_id, sub_archetype, summary, body, created_at, updated_at, language, translation_group_id) VALUES ('258c3c13-99d1-481e-8613-b36fd1ff188c', 'A Coroa', 12, 'Meio da Primavera', 'e5f9998b-cbfd-4e90-acd2-3d19adbe528e', 'Comunhão', 'Simboliza liderança e governo.', 'Simboliza liderança e governo. As pessoas deste signo são bem articuladas, valorizando a conexão interpessoal e a conversa acima da maioria das coisas — ideais como governantes e gestoras. Possuem um carisma natural e um dom para a oratória e o comando; quando falam, os outros escutam. Preocupam-se profundamente com a unidade e a solidariedade, e isso transparece em tudo o que fazem. Adoram coordenar grupos, inspirar motivação e direcionar os outros rumo ao caminho certo — embora nem sempre tenham certeza, elas mesmas, de qual seja esse caminho. Sempre projetam confiança e sempre parecem saber o que dizer, mesmo ao falar de assuntos que mal compreendem. A Coroa despreza a solidão e adora a rotina, raramente cessando seu trabalho e raramente viajando a menos que outros o desejem. Sentem pouco prazer em reuniões sociais, mas ainda assim comparecem, valorizando-as como oportunidades de conexão.', '2026-06-25 01:30:12.047656+00', '2026-06-25 01:30:12.047656+00', 'pt', 'cac54126-d160-41f6-aa93-da760505d57a');
 INSERT INTO public.signs (id, name, sign_order, season_time, archetype_id, sub_archetype, summary, body, created_at, updated_at, language, translation_group_id) VALUES ('c523932f-bfea-4807-931b-4c90fc0f18e4', 'A Fenda', 13, 'Os dias fora de estação — aqueles que caem fora da contagem das quatro estações, os dias ‘excedentes’ do ano', '21c3575b-4681-4d81-bcfb-97a07de3bd0a', NULL, 'Marca um vazio no centro do próprio ser — um vazio que seus portadores passam a vida inteira tentando preencher, e nunca conseguirão.', 'Diz-se que, em certos dias e noites, uma pessoa pode nascer fora de qualquer um dos Doze Signos. Não é tarefa simples determinar qual hora exata, de qual dia exato, produzirá um filho da Fenda, pois sua influência se espalha tenuemente por todo o ano. E, ainda assim, eles nascem, e carregam uma natureza perturbada. A Fenda marca um vazio no centro do próprio ser — um vazio que passarão a vida inteira tentando preencher, e nunca conseguirão. Não possuem um senso real de sociedade, nem moral, nem motivação verdadeira. Buscarão tudo: atenção, elogio, valor e poder, mas jamais serão satisfeitos por qualquer um deles. Não se importam com emoção ou razão, com significado ou crescimento. Sempre provocarão destruição, seja tentando consumir tudo para si, seja reduzindo tudo ao seu redor ao mesmo vazio que eles próprios habitam. Aqueles nascidos sob a Fenda são vítimas tanto quanto são perigos — a serem abordados com cautela, mas também com compaixão. Sua fome infindável os impulsiona a níveis de habilidade sem igual entre os demais signos; sua disposição para o sacrifício pode levá-los mais longe do que qualquer outro poderia ir. São capazes de coisas extraordinárias, mas sempre operarão além dos limites naturais do mundo. Precisam ser detidos — e, ainda assim, que pena.', '2026-06-25 01:30:12.047656+00', '2026-06-25 01:30:12.047656+00', 'pt', 'bafd608a-31bd-48b3-bcb6-6ec61c42e5a4');
+
+-- ============================================================
+-- MAP_PINS
+-- ============================================================
+
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('56cfc2ab-0a80-40f4-8df1-d61fabf0e5ec', 'primordial-map', 'CHARACTER', 'e1d5f144-37f5-46fb-9f65-0d65f53e4b2c', 0.5055449107273828, 0.5127024408642844, '2026-07-22 07:36:42.470288+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('b8336a8f-0e08-4e7e-bf09-f343cc8f7047', 'primordial-map', 'CHARACTER', 'c3fe20e2-722e-488e-bf4d-185fd024e900', 0.4993176228443732, 0.09204239294176175, '2026-07-22 07:36:56.757077+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('b4367e47-56ca-4d7a-9fea-c713231b4f90', 'primordial-map', 'CHARACTER', '1a45079b-3a0e-4f21-9c71-4c024a03048c', 0.6756619736960533, 0.9170070142747667, '2026-07-26 23:09:36.398737+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('84b22448-9f77-4d28-9303-bdf3530d19f8', 'primordial-map', 'CHARACTER', 'f5a61b14-e05f-4d69-880e-bc3056bbb039', 0.62533331872924, 0.1874508907391842, '2026-07-27 09:18:14.026604+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('016353ac-fb85-4435-a383-0e2d0a53d52a', 'primordial-map', 'CHARACTER', '08faa861-e131-4a9c-ad64-a3ccb40e7df9', 0.6706034705158417, 0.7464361371671896, '2026-07-22 07:38:04.533406+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('456a4c27-5b4d-4a67-8710-83785763d357', 'primordial-map', 'CHARACTER', '63beea19-161c-43cc-8a76-e6041ffeac7e', 0.3000076068515695, 0.3497118381256539, '2026-07-24 00:38:01.501441+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('d4da1cd6-b6bf-4c0b-b667-bfdfc3284e7f', 'primordial-map', 'CHARACTER', '59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 0.3552550054552374, 0.20110367182769862, '2026-07-22 07:37:58.528094+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('33cb5671-90c2-4fd9-ba1f-e0cfb9589400', 'primordial-map', 'CHARACTER', '4603fa7a-52a7-4c36-87f4-828cfe9c986e', 0.5631853041420107, 0.8663995773409, '2026-07-22 07:37:31.945939+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('c02e0620-9c41-4d9f-91f2-2c7b0320fe7b', 'primordial-map', 'CHARACTER', '4b7d2e2c-82cb-4dfe-ab5e-67767a3bc653', 0.28465993235170367, 0.5596334538209154, '2026-07-22 07:37:08.761977+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('026ae006-8c9b-41d3-acd9-1908e41367d0', 'primordial-map', 'CHARACTER', '7ae23e7f-ee42-4159-994c-81530d4b6753', 0.33572789601584063, 0.7448841567425882, '2026-07-27 09:19:22.129847+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('75dfddba-915f-4b98-8a4c-075509daaee5', 'primordial-map', 'CHARACTER', '8b0ac830-df17-4143-a681-d88bf55a41d5', 0.4312248756587701, 0.8652527846199669, '2026-07-27 09:19:29.003306+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('3165345b-2ec3-4d71-9401-b11aac389ecf', 'primordial-map', 'CHARACTER', 'a329e9d5-071c-4610-aca4-bdeeb86c9f58', 0.703593140694932, 0.3524375618294596, '2026-07-27 09:18:31.602025+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('0968fc65-5523-4bdf-989a-6490d73fb321', 'primordial-map', 'CHARACTER', '5e856f4d-05d8-4158-b71f-cb1ed557178e', 0.7151042461232072, 0.5787441876242108, '2026-07-22 07:37:19.110666+00');
