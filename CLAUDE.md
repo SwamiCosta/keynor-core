@@ -290,7 +290,8 @@ keynor-core/
         ├── imaws.md           ← Level 3 — project architect
         ├── imperium.md        ← Level 2 — Java code developer
         ├── siegmund.md        ← Level 2 — database data and seed scripts
-        └── judis.md           ← Level 2 — unit and integration tests
+        ├── judis.md           ← Level 2 — unit and integration tests
+        └── dixia.md           ← Level 1 (narrower) — Primordial Era historian, read-only DB exception
 ```
 
 | Agent | Level | Scope |
@@ -299,6 +300,7 @@ keynor-core/
 | Imperium | 2 — Developer | Java source code: domain, application, infrastructure layers |
 | Siegmund | 2 — Developer | SQL seed and maintenance scripts; read-only DB queries |
 | Judis | 2 — Developer | Unit tests (Mockito) and integration tests (Testcontainers) |
+| Dixia | 1 (narrower) | Primordial Era historian — answers questions from live DB data, glossary, and hidden content; named read-only/unlimited-row DB exception (see `dixia.md`); never writes or edits anything |
 
 ---
 
@@ -337,4 +339,4 @@ Follow the workspace `SKILLS.md` — Skill 01.
 
 ---
 
-*Last updated: 2026-07-26 (hidden content is now wired for all 6 entity types, not just Character/Lore — updated the "Hidden content" section accordingly. Previous entry, 2026-07-24: added the "Hidden content" section documenting `hidden`/`hidden_content_lock` and the one-way linking rule, alongside the new `.claude/skills/hidden-content-implementation.md` — see keynor-core PR #88. Previous entry, 2026-07-15: documented the `GET /api/public/v1/characters/batch` endpoint as the second exception to the CANON-only public API invariant, alongside the pre-existing Era/Archetype/Sign closed-set exception — see keynor-core PR #71)*
+*Last updated: 2026-07-30 (new Level 1 agent Dixia — Primordial Era historian, narrower-than-baseline scope, carrying a named read-only/unlimited-row database exception modeled on Jung's migration exception and Siegmund's `pg_dump` exception. Updated the Agent structure diagram and table accordingly. Previous entry, 2026-07-26: hidden content is now wired for all 6 entity types, not just Character/Lore — updated the "Hidden content" section accordingly. Previous entry, 2026-07-24: added the "Hidden content" section documenting `hidden`/`hidden_content_lock` and the one-way linking rule, alongside the new `.claude/skills/hidden-content-implementation.md` — see keynor-core PR #88. Previous entry, 2026-07-15: documented the `GET /api/public/v1/characters/batch` endpoint as the second exception to the CANON-only public API invariant, alongside the pre-existing Era/Archetype/Sign closed-set exception — see keynor-core PR #71)*
