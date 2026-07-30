@@ -3,8 +3,10 @@ package com.keynor.core.domain.port.in.era;
 import com.keynor.core.domain.model.era.Era;
 import com.keynor.core.domain.model.era.EraImportance;
 import com.keynor.core.domain.model.era.EraType;
+import com.keynor.core.domain.model.shared.EntityLinkRef;
 import com.keynor.core.domain.model.shared.Language;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface CreateEraUseCase {
@@ -16,7 +18,8 @@ public interface CreateEraUseCase {
             EraImportance importance,
             String description,
             Language language,
-            UUID translationGroupId) {}
+            UUID translationGroupId,
+            List<EntityLinkRef> links) {}
 
     Era create(Command command);
 }
