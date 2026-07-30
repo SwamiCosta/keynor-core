@@ -153,6 +153,8 @@ For the migration changelog (V1–V8), see `.claude/skills/migration-history.md`
 
 Any universe entity can reference any other universe entity — e.g. a `Lore` entry that mentions two `Character`s renders as a list of clickable links in aniannoth-overview. This is modeled as a **polymorphic join table** (no real FKs to the six entity tables), already wired end-to-end for all 6 entity types.
 
+**`Era`/`POINT` entries also link out (2026-07-30, source-only):** `EntityType.ERA` was added as a source-only exception so era/point descriptions can link to real entities too — see `.claude/skills/entity-links-implementation.md`'s "ERA is a one-directional exception" note.
+
 For the schema, domain model, reference implementation, and the FE field naming contract, see `.claude/skills/entity-links-implementation.md`.
 
 ---

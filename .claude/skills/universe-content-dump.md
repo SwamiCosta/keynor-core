@@ -23,15 +23,16 @@ items, item_categories,
 events, event_categories,
 lore, lore_categories,
 universe_entity_images, entity_links,
-archetypes, signs
+archetypes, signs, map_pins
 ```
 
 **Excluded tables** (never in scope):
 - `users` — environment-specific, contains hashed credentials
 - `oauth2_registered_client`, `oauth2_authorization`, `oauth2_authorization_consent` — environment-specific secrets
+- `hidden_content_lock` (V17) — riddle text + BCrypt password hash per hidden entity; excluded per that migration's own warning against leaking riddle answers into git history
 - Any future table that receives input from external users
 
-**Deferred, not yet decided** (2026-07-22): `map_pins` (V16, map-pins feature) is not in scope yet. It's structurally similar to `entity_links` (in scope) rather than user/environment data, so it's a plausible future addition — but it's currently empty (no pins created) and whether inputter-authored pin placements belong in a "universe content" dump, versus being closer to environment-specific curation, hasn't been decided. Evaluate before the first time it has real data.
+**Resolved** (2026-07-30): `map_pins` (V16, map-pins feature) is now in scope, brought in by Omnia's decision once it held real data (13 rows). It's structurally identical to `entity_links` — inputter-authored but universe-descriptive, not environment-specific — so it's treated the same way. The `MAP_PINS` section sits after `SIGNS` in the file, since `maps` and every entity type it can reference are already inserted earlier in file order.
 
 If a new table is added to the schema, the agent must evaluate whether it is universe content or user/environment data before adding it to the dump scope. When in doubt, exclude and flag to Imaws.
 
@@ -105,7 +106,7 @@ INSERT INTO eras (...) VALUES (...);
 
 Triggered when: the user asks Siegmund to update the dump after a data change in the local DB.
 
-1. Siegmund runs `pg_dump --data-only --column-inserts -t maps -t eras -t map_eras -t characters -t character_categories -t places -t place_categories -t factions -t faction_categories -t faction_members -t items -t item_categories -t events -t event_categories -t lore -t lore_categories -t universe_entity_images -t entity_links -t archetypes -t signs keynor_core` directly against the already-running local database. If the database is not reachable, Siegmund stops and reports — never starts one to proceed
+1. Siegmund runs `pg_dump --data-only --column-inserts -t maps -t eras -t map_eras -t characters -t character_categories -t places -t place_categories -t factions -t faction_categories -t faction_members -t items -t item_categories -t events -t event_categories -t lore -t lore_categories -t universe_entity_images -t entity_links -t archetypes -t signs -t map_pins keynor_core` directly against the already-running local database. If the database is not reachable, Siegmund stops and reports — never starts one to proceed
 2. Siegmund assembles the file: TRUNCATE block (table list carried over from the previous file), then one section per table in dependency order, each containing that table's `pg_dump` output pasted verbatim — see "File format" above for what NOT to hand-rework
 3. Siegmund updates the header's "Last updated" / "Updated by" lines to describe the change
 4. Siegmund verifies the new file against the previous version **by row content per table** (e.g. sort both old and new row sets by primary key before diffing) — not by literal line position. Physical row reordering with identical content (Postgres heap relocation after a past `UPDATE`) is expected and is not a defect
