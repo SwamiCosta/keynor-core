@@ -22,6 +22,7 @@ All universe entities extend `UniverseEntity` (abstract base class):
 | `language` | Language | `EN` or `PT` — which language this row's text is written in |
 | `translationGroupId` | UUID | Links this row to its counterpart(s) in other languages; not a one-directional "original" FK — a shared group id |
 | `hidden` | boolean | Visibility dimension orthogonal to `status` (V17). A hidden entity is always `CANON` but is excluded from every public list/browse query regardless — the sole route to it in the UI is a black pin or a link from another already-unlocked hidden entity. See root `ARCHITECTURE.md` — "Cross-Project Feature: Hidden Content & Black Pins" |
+| `versionGroupId` | UUID | Links this row to its "version" counterpart(s) — separate entity rows representing successive narrative versions of the same element (e.g. a Character continued in a later era, same display `name`, own `body`/`summary`/timeline). Same shape as `translationGroupId`: a shared group id, not a directional FK (V18). Deliberately independent of `hidden`, `status`, and `language` — a version group may freely mix hidden and non-hidden rows, any status, any language; no constraint enforces homogeneity. Distinct from the optional, visual `entity_links` relation an author may additionally create between two versions — that is never required for `versionGroupId` to do its job |
 
 Entity types and their category enums:
 
@@ -62,6 +63,19 @@ Every `Create*Request` DTO carries `@NotBlank String language` (parsed via `Lang
 | a UUID of an existing row's group | the new entity joins that translation group (e.g. submitting the PT counterpart of an existing EN entity) |
 
 This is the mechanism Aroneus uses to submit a translation pair, and the same one Siegmund/Lethra rely on to detect an entity with no translation yet (its group has fewer distinct `language` values than the 2 supported).
+
+### Version fields (`versionGroupId`)
+
+Every `Create*Request` DTO also carries an optional `UUID versionGroupId`, positioned alongside `translationGroupId`. Same defaulting semantics:
+
+| `versionGroupId` in request body | Result |
+|-----------------------------------|--------|
+| absent / `null` | the new entity becomes its own group anchor — `versionGroupId` defaults to the entity's own newly generated `id` |
+| a UUID of an existing row's group | the new entity joins that version group (e.g. submitting "Character v2" as the continuation of an already-existing "Character v1") |
+
+`versionGroupId` is create-only — there is no update path for it, the same restriction `translationGroupId` has. It is orthogonal to `hidden`, `status`, and `language`: a version group may mix hidden and non-hidden rows, any status, any language, with no constraint enforcing consistency across the group. It is also independent of the optional, visual `entity_links` relation — an author may additionally link two versions so they show as Related Entities in aniannoth-overview, but that link is never required for the two rows to belong to the same version group.
+
+**Querying a full version history** (e.g. "every version of John Silver, across eras") is not exposed as a dedicated API endpoint — group the relevant table by `version_group_id` (e.g. `SELECT * FROM characters WHERE version_group_id = :id`) via an ad hoc query, the same way Siegmund already answers similar one-off data questions. See `aroneus.md` for how content submissions should recognize and set this field.
 
 ### Optional `status` field on creation
 
