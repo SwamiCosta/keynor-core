@@ -49,7 +49,7 @@ class InternalItemControllerTest {
     private Item buildItem(UUID id) {
         Instant now = Instant.now();
         return new Item(id, "Shadowblade", "A cursed sword", "Body",
-                List.of(), List.of(ItemCategory.WEAPON), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
+                List.of(), List.of(ItemCategory.WEAPON), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
     }
 
     @BeforeEach
@@ -67,7 +67,7 @@ class InternalItemControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateItemRequest("Shadowblade", "A cursed sword", "Body",
-                List.of(), List.of("WEAPON"), "era-1", null, null,"en", null, null, false, null, null);
+                List.of(), List.of("WEAPON"), "era-1", null, null,"en", null, null, null, false, null, null);
 
         var response = controller.create(request);
 
@@ -84,7 +84,7 @@ class InternalItemControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateItemRequest("Shadowblade", null, null,
-                List.of(), List.of("WEAPON"), "era-1", null, null,"en", null, null, false, null, null);
+                List.of(), List.of("WEAPON"), "era-1", null, null,"en", null, null, null, false, null, null);
 
         controller.create(request);
 
@@ -102,7 +102,7 @@ class InternalItemControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateItemRequest("Shadowblade", null, null,
-                List.of(), List.of("WEAPON"), "era-1", null, null,"en", null, null, false, null, null);
+                List.of(), List.of("WEAPON"), "era-1", null, null,"en", null, null, null, false, null, null);
 
         controller.create(request);
 
@@ -117,12 +117,12 @@ class InternalItemControllerTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Item canonItem = new Item(id, "Shadowblade", null, null, List.of(),
-                List.of(ItemCategory.WEAPON), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), false);
+                List.of(ItemCategory.WEAPON), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
         when(createItemUseCase.create(any())).thenReturn(canonItem);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateItemRequest("Shadowblade", null, null,
-                List.of(), List.of("WEAPON"), "era-1", null, "CANON","en", null, null, false, null, null);
+                List.of(), List.of("WEAPON"), "era-1", null, "CANON","en", null, null, null, false, null, null);
 
         controller.create(request);
 
@@ -135,7 +135,7 @@ class InternalItemControllerTest {
     @Test
     void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
         var request = new CreateItemRequest("Shadowblade", null, null,
-                List.of(), List.of("WEAPON"), "era-1", null, "DEPRECATED","en", null, null, false, null, null);
+                List.of(), List.of("WEAPON"), "era-1", null, "DEPRECATED","en", null, null, null, false, null, null);
 
         assertThatThrownBy(() -> controller.create(request))
                 .isInstanceOf(IllegalArgumentException.class)

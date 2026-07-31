@@ -58,6 +58,7 @@ public class EventService implements
         EntityStatus initialStatus = command.status() != null ? command.status() : EntityStatus.DRAFT;
         UUID newId = UUID.randomUUID();
         UUID translationGroupId = command.translationGroupId() != null ? command.translationGroupId() : newId;
+        UUID versionGroupId = command.versionGroupId() != null ? command.versionGroupId() : newId;
         Event event = new Event(
                 newId,
                 command.name(),
@@ -71,6 +72,7 @@ public class EventService implements
                 now,
                 command.language(),
                 translationGroupId,
+                versionGroupId,
                 command.hidden());
         Event saved = eventRepository.save(event);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();

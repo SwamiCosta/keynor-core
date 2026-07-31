@@ -40,6 +40,7 @@ public class ItemMapper {
                 entity.getUpdatedAt(),
                 entity.getLanguage(),
                 entity.getTranslationGroupId(),
+                entity.getVersionGroupId(),
                 entity.isHidden());
     }
 
@@ -57,6 +58,7 @@ public class ItemMapper {
         entity.setUpdatedAt(item.getUpdatedAt());
         entity.setLanguage(item.getLanguage());
         entity.setTranslationGroupId(item.getTranslationGroupId());
+        entity.setVersionGroupId(item.getVersionGroupId());
         entity.setHidden(item.isHidden());
         return entity;
     }

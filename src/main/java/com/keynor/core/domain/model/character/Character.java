@@ -27,8 +27,9 @@ public class Character extends UniverseEntity {
             Instant updatedAt,
             Language language,
             UUID translationGroupId,
+            UUID versionGroupId,
             boolean hidden) {
-        super(id, name, summary, body, images, status, timeline, createdAt, updatedAt, language, translationGroupId, hidden);
+        super(id, name, summary, body, images, status, timeline, createdAt, updatedAt, language, translationGroupId, versionGroupId, hidden);
         this.categories = new ArrayList<>(categories);
     }
 

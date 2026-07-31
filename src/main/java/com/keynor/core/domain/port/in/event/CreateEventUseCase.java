@@ -22,6 +22,7 @@ public interface CreateEventUseCase {
             EntityStatus status,
             Language language,
             UUID translationGroupId,
+            UUID versionGroupId,
             List<EntityLinkRef> links,
             boolean hidden,
             String riddleText,

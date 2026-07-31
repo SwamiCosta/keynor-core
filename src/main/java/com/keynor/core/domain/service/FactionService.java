@@ -58,6 +58,7 @@ public class FactionService implements
         EntityStatus initialStatus = command.status() != null ? command.status() : EntityStatus.DRAFT;
         UUID newId = UUID.randomUUID();
         UUID translationGroupId = command.translationGroupId() != null ? command.translationGroupId() : newId;
+        UUID versionGroupId = command.versionGroupId() != null ? command.versionGroupId() : newId;
         Faction faction = new Faction(
                 newId,
                 command.name(),
@@ -72,6 +73,7 @@ public class FactionService implements
                 now,
                 command.language(),
                 translationGroupId,
+                versionGroupId,
                 command.hidden());
         Faction saved = factionRepository.save(faction);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();

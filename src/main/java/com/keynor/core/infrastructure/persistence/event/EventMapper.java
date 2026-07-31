@@ -40,6 +40,7 @@ public class EventMapper {
                 entity.getUpdatedAt(),
                 entity.getLanguage(),
                 entity.getTranslationGroupId(),
+                entity.getVersionGroupId(),
                 entity.isHidden());
     }
 
@@ -57,6 +58,7 @@ public class EventMapper {
         entity.setUpdatedAt(event.getUpdatedAt());
         entity.setLanguage(event.getLanguage());
         entity.setTranslationGroupId(event.getTranslationGroupId());
+        entity.setVersionGroupId(event.getVersionGroupId());
         entity.setHidden(event.isHidden());
         return entity;
     }
