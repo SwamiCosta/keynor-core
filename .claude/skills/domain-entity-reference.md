@@ -64,6 +64,16 @@ Every `Create*Request` DTO carries `@NotBlank String language` (parsed via `Lang
 
 This is the mechanism Aroneus uses to submit a translation pair, and the same one Siegmund/Lethra rely on to detect an entity with no translation yet (its group has fewer distinct `language` values than the 2 supported).
 
+**`language` shows up differently across the three request shapes — do not conflate them:**
+
+| Request shape | `language` present? | How |
+|----------------|---------------------|-----|
+| `Create*Request` (`POST`) | Yes, required | `@NotBlank` field in the request body |
+| list / `findAll` (`GET`) | Yes, required | `@RequestParam String language`, no default — `400` if omitted. Applies to every list endpoint, public and internal, for all 6 `UniverseEntity` types plus `Era`, `Archetype`, `Sign` |
+| `findById` (`GET /{id}`) | No | The id already pins a single row's language; no filter needed |
+| `Update*Request` (`PUT`) | No | A row's `language` is immutable after creation — there is no field for it on any `Update*Request` DTO. To add the other language, submit a new `Create*Request` with `translationGroupId` set to the existing row's id, not a `PUT` on the existing row |
+
+See `keynor-core/CLAUDE.md` — "Query parameters (list endpoints)" for the full parameter table.
 ### Version fields (`versionGroupId`)
 
 Every `Create*Request` DTO also carries an optional `UUID versionGroupId`, positioned alongside `translationGroupId`. Same defaulting semantics:
