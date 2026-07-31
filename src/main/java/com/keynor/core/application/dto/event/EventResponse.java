@@ -22,6 +22,7 @@ public record EventResponse(
         Instant updatedAt,
         String language,
         UUID translationGroupId,
+        UUID versionGroupId,
         List<LinkedEntityResponse> links,
         boolean hidden) {
 
@@ -40,6 +41,7 @@ public record EventResponse(
                 event.getUpdatedAt(),
                 event.getLanguage().name(),
                 event.getTranslationGroupId(),
+                event.getVersionGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList(),
                 event.isHidden());
     }

@@ -41,6 +41,7 @@ public class FactionMapper {
                 entity.getUpdatedAt(),
                 entity.getLanguage(),
                 entity.getTranslationGroupId(),
+                entity.getVersionGroupId(),
                 entity.isHidden());
     }
 
@@ -59,6 +60,7 @@ public class FactionMapper {
         entity.setUpdatedAt(faction.getUpdatedAt());
         entity.setLanguage(faction.getLanguage());
         entity.setTranslationGroupId(faction.getTranslationGroupId());
+        entity.setVersionGroupId(faction.getVersionGroupId());
         entity.setHidden(faction.isHidden());
         return entity;
     }

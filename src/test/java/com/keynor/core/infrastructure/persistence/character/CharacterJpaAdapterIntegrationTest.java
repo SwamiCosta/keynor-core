@@ -51,7 +51,7 @@ class CharacterJpaAdapterIntegrationTest {
         Instant now = Instant.now();
         return new Character(id, name, "Summary of " + name, "Body text",
                 List.of(),
-                List.of(category), status, new Timeline(eraName, null), now, now, Language.EN, UUID.randomUUID(), false);
+                List.of(category), status, new Timeline(eraName, null), now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
     }
 
     @Test

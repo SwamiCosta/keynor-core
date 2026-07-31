@@ -18,6 +18,7 @@ public record CreateCharacterRequest(
         String status,
         @NotBlank String language,
         UUID translationGroupId,
+        UUID versionGroupId,
         List<EntityLinkRequest> links,
         boolean hidden,
         String riddleText,

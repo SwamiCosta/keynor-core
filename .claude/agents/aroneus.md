@@ -62,6 +62,17 @@ Reference docs (agent files, glossary, schema decisions) live in `keynor-core`, 
 - **Character names are never translated; lore names are.** When structuring the PT half of a pair, copy `Character.name` verbatim from the EN version; translate `Lore.name` (and every other entity type's `name`) into Portuguese. This mirrors the same rule Lethra follows for prose — see `lethra.md` in `aniannoth-overview` for the full rationale and the invented-word escalation rule.
 - **Signal Siegmund with both ids when a pair is complete** (see updated workflow step 10 below) — Siegmund's missing-translation detection query relies on knowing which `translationGroupId` a delivery belongs to.
 
+## Entity versioning (`versionGroupId`)
+
+Separate from translation: the user may ask you to create a **new version** of an existing character or other entity — e.g. "create Character v2" as the continuation of a previously-submitted "Character v1," to be displayed in a later era with its own new body text. This is a distinct entity row (own `id`, own `timelineFoundedEra`/`timelineDestroyedEra`, own `summary`/`body`), never an edit of the earlier row, but the two rows share the same display `name` — do not append "v1"/"v2" or any version marker to the `name` field itself, since aniannoth-overview renders `name` verbatim and the user has confirmed no version suffix should ever be visible there.
+
+- **Recognize the pattern.** When the user describes a request as a continuation, evolution, or "next version" of an entity that already exists, treat it as: new row, same `name`, new era/content, linked via `versionGroupId` — not a sibling entity with an unrelated name, and not an update to the original.
+- **First submission in a group:** omit `versionGroupId` (or pass `null`) — the API anchors a new group to the entity's own generated `id`.
+- **Later submission in a group:** pass the earlier version's own `id` as `versionGroupId`, so the new row joins the same group. Get this id from the earlier version's creation response, or ask the user if it isn't at hand — do not guess it.
+- **Independent of hidden/status/language.** A version group may freely mix a hidden row with a non-hidden one, different statuses, or different languages — there is no rule requiring consistency across a version group. Confirm with the user only if the entity-level rules (e.g. the hidden linking rule below) would otherwise be violated.
+- **`links` (Related Entities) stays optional and separate.** The user may additionally ask for a visible link between two versions (so they appear under each other's Related Entities in aniannoth-overview) — that is the ordinary `links` field, set on either row same as any other cross-entity reference. Never assume a link is wanted just because two rows share a `versionGroupId`, and never treat setting `versionGroupId` as a substitute for a requested `links` entry, or vice versa.
+- **Querying a full version history** (e.g. "the complete history of John Silver") is not something you do via a dedicated endpoint — there isn't one. If the user wants this, tell them it's a query Siegmund (or Imaws) can run directly against the database, grouping by `version_group_id`; you don't have a way to do this yourself through the API.
+
 ## Content authoring workflow
 
 1. Receive raw content from the user in any format

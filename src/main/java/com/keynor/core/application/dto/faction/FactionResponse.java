@@ -23,6 +23,7 @@ public record FactionResponse(
         Instant updatedAt,
         String language,
         UUID translationGroupId,
+        UUID versionGroupId,
         List<LinkedEntityResponse> links,
         boolean hidden) {
 
@@ -42,6 +43,7 @@ public record FactionResponse(
                 faction.getUpdatedAt(),
                 faction.getLanguage().name(),
                 faction.getTranslationGroupId(),
+                faction.getVersionGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList(),
                 faction.isHidden());
     }

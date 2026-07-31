@@ -58,6 +58,7 @@ public class LoreService implements
         EntityStatus initialStatus = command.status() != null ? command.status() : EntityStatus.DRAFT;
         UUID newId = UUID.randomUUID();
         UUID translationGroupId = command.translationGroupId() != null ? command.translationGroupId() : newId;
+        UUID versionGroupId = command.versionGroupId() != null ? command.versionGroupId() : newId;
         Lore lore = new Lore(
                 newId,
                 command.name(),
@@ -71,6 +72,7 @@ public class LoreService implements
                 now,
                 command.language(),
                 translationGroupId,
+                versionGroupId,
                 command.hidden());
         Lore saved = loreRepository.save(lore);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();

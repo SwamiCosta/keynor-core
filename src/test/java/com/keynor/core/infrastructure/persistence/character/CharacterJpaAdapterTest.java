@@ -37,7 +37,7 @@ class CharacterJpaAdapterTest {
                 id, "Araveth", "A hero", "Long body",
                 images,
                 List.of(CharacterCategory.HERO),
-                EntityStatus.DRAFT, null, now, now, com.keynor.core.domain.model.shared.Language.EN, UUID.randomUUID(), false);
+                EntityStatus.DRAFT, null, now, now, com.keynor.core.domain.model.shared.Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
 
         characterRepository.save(character);
 
