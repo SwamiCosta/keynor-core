@@ -23,6 +23,7 @@ public interface CreateFactionUseCase {
             EntityStatus status,
             Language language,
             UUID translationGroupId,
+            UUID versionGroupId,
             List<EntityLinkRef> links,
             boolean hidden,
             String riddleText,

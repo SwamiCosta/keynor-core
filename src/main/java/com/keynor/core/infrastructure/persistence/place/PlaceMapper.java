@@ -41,6 +41,7 @@ public class PlaceMapper {
                 entity.getUpdatedAt(),
                 entity.getLanguage(),
                 entity.getTranslationGroupId(),
+                entity.getVersionGroupId(),
                 entity.isHidden());
     }
 
@@ -59,6 +60,7 @@ public class PlaceMapper {
         entity.setUpdatedAt(place.getUpdatedAt());
         entity.setLanguage(place.getLanguage());
         entity.setTranslationGroupId(place.getTranslationGroupId());
+        entity.setVersionGroupId(place.getVersionGroupId());
         entity.setHidden(place.isHidden());
         return entity;
     }

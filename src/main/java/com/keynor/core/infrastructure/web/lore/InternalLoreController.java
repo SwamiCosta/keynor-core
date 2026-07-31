@@ -88,6 +88,7 @@ public class InternalLoreController {
                 categories, timeline, initialStatus,
                 LanguageRequestParser.parse(request.language()),
                 request.translationGroupId(),
+                request.versionGroupId(),
                 links,
                 request.hidden(),
                 request.riddleText(),

@@ -86,6 +86,7 @@ public class InternalCharacterController {
                 initialStatus,
                 LanguageRequestParser.parse(request.language()),
                 request.translationGroupId(),
+                request.versionGroupId(),
                 links,
                 request.hidden(),
                 request.riddleText(),

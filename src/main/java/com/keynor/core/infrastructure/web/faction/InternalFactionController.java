@@ -90,6 +90,7 @@ public class InternalFactionController {
                 timeline, initialStatus,
                 LanguageRequestParser.parse(request.language()),
                 request.translationGroupId(),
+                request.versionGroupId(),
                 links,
                 request.hidden(),
                 request.riddleText(),

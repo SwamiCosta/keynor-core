@@ -50,6 +50,9 @@ public class ItemEntity {
     private UUID translationGroupId;
 
     @Column(nullable = false)
+    private UUID versionGroupId;
+
+    @Column(nullable = false)
     private boolean hidden;
 
     @Embedded
@@ -79,6 +82,8 @@ public class ItemEntity {
     public void setLanguage(Language language) { this.language = language; }
     public UUID getTranslationGroupId() { return translationGroupId; }
     public void setTranslationGroupId(UUID translationGroupId) { this.translationGroupId = translationGroupId; }
+    public UUID getVersionGroupId() { return versionGroupId; }
+    public void setVersionGroupId(UUID versionGroupId) { this.versionGroupId = versionGroupId; }
     public boolean isHidden() { return hidden; }
     public void setHidden(boolean hidden) { this.hidden = hidden; }
     public TimelineEmbeddable getTimeline() { return timeline; }

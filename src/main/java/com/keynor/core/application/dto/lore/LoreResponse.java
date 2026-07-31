@@ -22,6 +22,7 @@ public record LoreResponse(
         Instant updatedAt,
         String language,
         UUID translationGroupId,
+        UUID versionGroupId,
         List<LinkedEntityResponse> links,
         boolean hidden) {
 
@@ -40,6 +41,7 @@ public record LoreResponse(
                 lore.getUpdatedAt(),
                 lore.getLanguage().name(),
                 lore.getTranslationGroupId(),
+                lore.getVersionGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList(),
                 lore.isHidden());
     }

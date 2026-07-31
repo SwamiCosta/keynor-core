@@ -24,6 +24,7 @@ public abstract class UniverseEntity {
     private Instant updatedAt;
     private final Language language;
     private final UUID translationGroupId;
+    private final UUID versionGroupId;
     private boolean hidden;
 
     protected UniverseEntity(
@@ -38,6 +39,7 @@ public abstract class UniverseEntity {
             Instant updatedAt,
             Language language,
             UUID translationGroupId,
+            UUID versionGroupId,
             boolean hidden) {
         if (hidden && status != EntityStatus.CANON) {
             throw new IllegalArgumentException("Hidden content must always have status CANON");
@@ -53,6 +55,7 @@ public abstract class UniverseEntity {
         this.updatedAt = updatedAt;
         this.language = language;
         this.translationGroupId = translationGroupId;
+        this.versionGroupId = versionGroupId;
         this.hidden = hidden;
     }
 
@@ -110,5 +113,6 @@ public abstract class UniverseEntity {
     public Instant getUpdatedAt() { return updatedAt; }
     public Language getLanguage() { return language; }
     public UUID getTranslationGroupId() { return translationGroupId; }
+    public UUID getVersionGroupId() { return versionGroupId; }
     public boolean isHidden() { return hidden; }
 }

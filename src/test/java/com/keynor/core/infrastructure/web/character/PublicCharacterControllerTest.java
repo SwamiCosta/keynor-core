@@ -59,7 +59,7 @@ class PublicCharacterControllerTest {
                 id, "Araveth", "A wandering hero", "Body",
                 images,
                 List.of(CharacterCategory.HERO),
-                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), false);
+                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(character), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
@@ -84,7 +84,7 @@ class PublicCharacterControllerTest {
                 id, "Araveth", "A wandering hero", "Body",
                 images,
                 List.of(CharacterCategory.HERO),
-                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), false);
+                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
         when(findCharacterByIdUseCase.findById(id)).thenReturn(character);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
@@ -105,7 +105,7 @@ class PublicCharacterControllerTest {
                 id, "Araveth", null, null,
                 List.of(),
                 List.of(CharacterCategory.NPC),
-                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), false);
+                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(character), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
@@ -134,9 +134,9 @@ class PublicCharacterControllerTest {
         UUID canonId = UUID.randomUUID();
         UUID draftId = UUID.randomUUID();
         Character canonCharacter = new Character(canonId, "Araveth", null, null, List.of(),
-                List.of(CharacterCategory.HERO), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), false);
+                List.of(CharacterCategory.HERO), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
         Character draftCharacter = new Character(draftId, "Unfinished One", null, null, List.of(),
-                List.of(CharacterCategory.NPC), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), false);
+                List.of(CharacterCategory.NPC), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
         when(findCharactersByIdsUseCase.findByIds(List.of(canonId, draftId)))
                 .thenReturn(List.of(canonCharacter, draftCharacter));
 

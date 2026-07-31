@@ -40,6 +40,7 @@ public class CharacterMapper {
                 entity.getUpdatedAt(),
                 entity.getLanguage(),
                 entity.getTranslationGroupId(),
+                entity.getVersionGroupId(),
                 entity.isHidden());
     }
 
@@ -57,6 +58,7 @@ public class CharacterMapper {
         entity.setUpdatedAt(character.getUpdatedAt());
         entity.setLanguage(character.getLanguage());
         entity.setTranslationGroupId(character.getTranslationGroupId());
+        entity.setVersionGroupId(character.getVersionGroupId());
         entity.setHidden(character.isHidden());
         return entity;
     }
