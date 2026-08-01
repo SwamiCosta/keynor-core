@@ -240,7 +240,8 @@ infrastructure/web/
 │   ├── InternalPlaceController.java
 │   └── PublicPlaceController.java
 ├── era/
-│   └── PublicEraController.java           ← no internal controller yet
+│   ├── InternalEraController.java         ← authenticated, create + update (no status/delete endpoints yet)
+│   └── PublicEraController.java
 ├── map/
 │   └── PublicMapController.java
 ├── archetype/

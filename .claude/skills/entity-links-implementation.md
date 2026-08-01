@@ -25,7 +25,7 @@ CREATE TABLE entity_links (
 
 `source_type` / `target_type` are one of the `EntityType` enum values: `CHARACTER`, `PLACE`, `FACTION`, `ITEM`, `EVENT`, `LORE`, plus `ERA` (added 2026-07-30, **source-only** — see below). There are no real foreign keys to the six entity tables — referential integrity (existence, hard-delete cascade) is enforced in the domain/application layer, not the database.
 
-**`ERA` is a one-directional exception (2026-07-30):** `Era` is not a `UniverseEntity` subclass, but era/point descriptions still needed a way to link out to real entities (e.g. clicking a name mentioned in an era's description). `EntityType.ERA` is valid only as `source_type` — `UniverseEntityLookupJpaAdapter.findSummary(ERA, id)` throws `UnsupportedOperationException` and must never be reached, since nothing creates a link with `target_type = ERA`. `EraService` wires `entityLinkRepository.replaceLinks(EntityType.ERA, id, links)` the same way `LoreService` does for `LORE`, but only in `create()` — there is no era update use case yet.
+**`ERA` is a one-directional exception (2026-07-30):** `Era` is not a `UniverseEntity` subclass, but era/point descriptions still needed a way to link out to real entities (e.g. clicking a name mentioned in an era's description). `EntityType.ERA` is valid only as `source_type` — `UniverseEntityLookupJpaAdapter.findSummary(ERA, id)` throws `UnsupportedOperationException` and must never be reached, since nothing creates a link with `target_type = ERA`. `EraService` wires `entityLinkRepository.replaceLinks(EntityType.ERA, id, links)` the same way `LoreService` does for `LORE`, in both `create()` and `update()` (`UpdateEraUseCase`, 2026-08-01 — see `domain-entity-reference.md`'s "Era entity" section).
 
 ### Domain model
 
