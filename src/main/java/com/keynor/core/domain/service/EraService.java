@@ -7,6 +7,7 @@ import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.port.in.era.CreateEraUseCase;
 import com.keynor.core.domain.port.in.era.FindAllErasUseCase;
 import com.keynor.core.domain.port.in.era.FindEraByIdUseCase;
+import com.keynor.core.domain.port.in.era.UpdateEraUseCase;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.EraRepository;
 
@@ -14,7 +15,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public class EraService implements FindAllErasUseCase, FindEraByIdUseCase, CreateEraUseCase {
+public class EraService implements FindAllErasUseCase, FindEraByIdUseCase, CreateEraUseCase, UpdateEraUseCase {
 
     private final EraRepository eraRepository;
     private final EntityLinkRepository entityLinkRepository;
@@ -36,7 +37,7 @@ public class EraService implements FindAllErasUseCase, FindEraByIdUseCase, Creat
     }
 
     @Override
-    public Era create(Command command) {
+    public Era create(CreateEraUseCase.Command command) {
         Instant now = Instant.now();
         UUID newId = UUID.randomUUID();
         UUID translationGroupId = command.translationGroupId() != null ? command.translationGroupId() : newId;
@@ -51,6 +52,17 @@ public class EraService implements FindAllErasUseCase, FindEraByIdUseCase, Creat
                 now,
                 command.language(),
                 translationGroupId);
+        Era saved = eraRepository.save(era);
+        List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
+        entityLinkRepository.replaceLinks(EntityType.ERA, saved.getId(), links);
+        return saved;
+    }
+
+    @Override
+    public Era update(UUID id, UpdateEraUseCase.Command command) {
+        Era era = eraRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Era", id));
+        era.update(command.name(), command.orderIndex(), command.type(), command.importance(), command.description());
         Era saved = eraRepository.save(era);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         entityLinkRepository.replaceLinks(EntityType.ERA, saved.getId(), links);

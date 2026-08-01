@@ -8,13 +8,13 @@ import java.util.UUID;
 public class Era {
 
     private final UUID id;
-    private final String name;
-    private final int orderIndex;
-    private final EraType type;
-    private final EraImportance importance;
-    private final String description;
+    private String name;
+    private int orderIndex;
+    private EraType type;
+    private EraImportance importance;
+    private String description;
     private final Instant createdAt;
-    private final Instant updatedAt;
+    private Instant updatedAt;
     private final Language language;
     private final UUID translationGroupId;
 
@@ -40,6 +40,16 @@ public class Era {
         this.updatedAt = updatedAt;
         this.language = language;
         this.translationGroupId = translationGroupId;
+    }
+
+    public void update(String name, int orderIndex, EraType type, EraImportance importance, String description) {
+        validateTypeImportanceInvariant(type, importance);
+        this.name = name;
+        this.orderIndex = orderIndex;
+        this.type = type;
+        this.importance = importance;
+        this.description = description;
+        this.updatedAt = Instant.now();
     }
 
     private static void validateTypeImportanceInvariant(EraType type, EraImportance importance) {
