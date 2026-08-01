@@ -23,7 +23,13 @@
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
 -- Last updated: 2026-08-01
--- Updated by:   Siegmund (regenerated fresh from the live database).
+-- Updated by:   Siegmund (added the Era of Vestiges map -- 'vestiges-map',
+--               mirroring the existing primordial-map row/map_eras pattern
+--               for a pre-material era with both language rows linked;
+--               NAVIGABLE map_type chosen to match primordial-map's own
+--               precedent, per explicit user decision).
+--
+-- Previous entry, 2026-08-01, Siegmund (regenerated fresh from the live database).
 --
 --               CORRECTION: my previous regeneration (PR #111, commit
 --               7624880) silently dropped the MAP_PINS section that
@@ -77,6 +83,7 @@ CASCADE;
 -- ============================================================
 
 INSERT INTO public.maps (id, name, map_type, image) VALUES ('primordial-map', 'Primordial Era Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/PrimordialEraMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('vestiges-map', 'Era of Vestiges Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/VesigesEraMap.png');
 
 -- ============================================================
 -- ERAS (timeline — ERA intervals and POINT moments, ordered by order_index)
@@ -193,6 +200,8 @@ INSERT INTO public.eras (id, name, order_index, type, importance, description, c
 
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('primordial-map', '48ed4b49-b7b5-4d4b-9715-00dcaa819209');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('primordial-map', '36d5e2a5-be00-456b-bf11-113c0b737904');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('vestiges-map', '49187d39-6121-44b9-8477-f19e16fac16b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('vestiges-map', 'eb903d2d-12a2-4e2b-9659-6d2243a8a70f');
 
 -- ============================================================
 -- CHARACTERS
