@@ -6,63 +6,48 @@
 --   places, place_categories, factions, faction_categories,
 --   faction_members, items, item_categories, events, event_categories,
 --   lore, lore_categories, entity_links, universe_entity_images,
---   archetypes, signs
+--   archetypes, signs, map_pins
 --
 -- Excluded: users, oauth2_* (environment-specific, never in scope);
 --   hidden_content_lock (V17) -- riddle + BCrypt password_hash per hidden
 --   entity, 8 rows in the live DB, deliberately excluded per that
 --   migration's own warning against leaking riddle answers into git
---   history. Still not formally added to
---   .claude/skills/universe-content-dump.md's exclusion list -- flagged
---   for Imaws again.
+--   history (formally documented in universe-content-dump.md).
 --
 -- ⚠  Destructive: TRUNCATE removes all existing universe content before reinserting.
--- ⚠  Apply only after Flyway migrations are fully up to date (V1–V18 at minimum,
---   including V18 which adds version_group_id to all 6 UniverseEntity tables).
+-- ⚠  Apply only after Flyway migrations are fully up to date (V1–V18 at minimum).
 -- ⚠  NOT idempotent — do not apply twice on the same database.
 -- ⚠  Requires user authorization before execution. Agents never run this directly.
 --
 -- How to apply:
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
--- Last updated: 2026-07-31
--- Updated by:   Siegmund (regenerated fresh from the live database). Per
---               Aroneus's handoff: INSERT lore "Valkari" (EN
---               9ab1acdd-10a1-4cf5-a263-12c6594fcf0c / PT
---               204e838e-5510-4b8e-8614-bf82787df2e0), CANON PHILOSOPHY,
---               timeline Era of Vestiges -> Era of Death, no outgoing
---               links of its own (though Fnn links to it). INSERT 6
---               characters, all CANON: Fnn, Z'Mthun, Eradis, Myr,
---               Neghalem (DEITY) and Knight Without a Name (VILLAIN) --
---               timeline verified per-character (all Vestiges ->
---               Vestiges except Z'Mthun, Primordial -> Vestiges,
---               exactly as specified). Updated the 3 fixed lore
---               entries' (Sexuality of the Gods, The Theosophy of
---               Aniannoth, On the Word God) timeline_destroyed_era_id
---               from null to Era of Death, both languages -- confirmed
---               using each language's own Era of Death row (EN
---               fd791fd4.../PT cdaf8525...). The War for the Lantern of
---               True Light and The Thirteen (hidden) each gained 3 new
---               outgoing links to the new deities, confirmed by name.
+-- Last updated: 2026-08-01
+-- Updated by:   Siegmund (regenerated fresh from the live database).
 --
---               70 new entity_links, all verified directly against the
---               live dump, zero dropped -- includes the 30-row standing
---               rule (5 deities x 2 languages x 3 fixed lore) plus a
---               broader web of character-to-character and
---               character-to-War links (e.g. Z'Mthun/Eradis linking to
---               the War lore, matching their established narrative
---               role) that the handoff's bullets didn't itemize but
---               that verified as fully consistent -- zero drops, exact
---               count match.
+--               CORRECTION: my previous regeneration (PR #111, commit
+--               7624880) silently dropped the MAP_PINS section that
+--               commit d08314a ("bring map_pins into universe-content
+--               dump scope") had just added -- I failed to re-read
+--               universe-content-dump.md after that sync, per the
+--               workspace's own re-read-after-sync rule, and my scripts
+--               still had map_pins hardcoded as excluded. Restored here:
+--               13 rows, section placed after SIGNS per the documented
+--               decision, table added back to TRUNCATE.
 --
---               Ran the missing-translation check Aroneus explicitly
---               requested, across every tagged table: 0 incomplete, 0
---               overfull translation groups everywhere. Re-ran the full
---               entity_links hidden-visibility integrity sweep (534
---               rows): zero violations.
+--               Also resolves the PR #111/#112 merge conflict: #111
+--               (Valkari etc.) merged to main while #112 (this branch,
+--               the Syngisdônia spelling fix) was still open against the
+--               pre-#111 base. Merged main into this branch and replaced
+--               the conflicted file with a fresh regeneration reflecting
+--               current live DB truth, which already includes both #111's
+--               content and the spelling fix -- verified row-for-row
+--               identical to main except for the restored MAP_PINS
+--               section.
 --
--- ⚠  Still flagged, unresolved: map_pins remains at 13 rows, still
---   excluded pending the user/Imaws scope decision.
+--               hidden_content_lock's exclusion is now formally
+--               documented in universe-content-dump.md (resolved by
+--               Imaws) -- no longer a standing flag in this header.
 
 -- ============================================================
 -- TRUNCATE (join tables first, then parents, then root tables)
@@ -71,6 +56,7 @@
 TRUNCATE
     universe_entity_images,
     entity_links,
+    map_pins,
     character_categories,
     place_categories,
     faction_categories,
@@ -382,15 +368,6 @@ Trios is known to be a friend to monstrous creatures, and is often seen perched 
 INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('e5c8fc7d-1128-40ea-8da3-eb93ebcd56d5', 'Unixia', 'The goddess of the Union between the Material and Spiritual Worlds, daughter of Trios. Unixia does not reconcile the two worlds — she moves between them, and in moving makes transit possible for others. Her devotees are mystics and those who have brushed against something they could not explain, and reached toward it.', 'Unixia is the goddess of number eleven, daughter of Trios. She is the deity of the Union between the Material and Spiritual Worlds — the living seam between what can be touched and what can only be felt. Eleven exceeds the familiar ten. It crosses a threshold. And Unixia, born of chaos and movement, is precisely that crossing.
 
 She is often depicted in postures of passage — stepping through a doorway, standing at the surface of water, suspended between two lights. In her, the teachings of her father are made explicit: a third element is required to break any deadlock. The material world and the spiritual world press against each other without resolution, each too complete to yield. Unixia does not reconcile them. She moves between them, and in moving, makes transit possible for others. Her devotees are mystics, mediums, and those who have brushed against something they could not explain — and rather than retreating, reached toward it.', 'CANON', '2026-07-05 14:54:20.180989+00', '2026-07-16 03:17:01.109249+00', '48ed4b49-b7b5-4d4b-9715-00dcaa819209', NULL, 'en', 'e5c8fc7d-1128-40ea-8da3-eb93ebcd56d5', false, 'e5c8fc7d-1128-40ea-8da3-eb93ebcd56d5');
-INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('c4939f45-4dc5-48d5-9bd6-c5bc729cfa5e', 'Knight Without a Name', 'The Nameless Knight, thirteenth knight of Syngisdonia and blamed for its fall, wanders every era in shadow and mystery — now lost within the event horizon of Fnn-816 after casting his friend Valker Kane free.', 'The Nameless Knight is a tall, gaunt figure, most often wrapped in a torn cloak that hides the greater part of his body. He is the thirteenth knight to come out of Syngisdonia, and is held responsible for its fall. His reasons remain a mystery, but his power and his influence are beyond doubt.
-
-This mysterious figure wanders through every era of every reality, crossing paths with individuals and historical events alike, yet never once revealing his presence, his name, or his intentions.
-
-His face is always hidden — sometimes behind helms of metal, sometimes behind helmets of strange technology, and sometimes behind skulls of bone. Through whatever gaps remain, a green light shines out from where his eyes should be, and never symmetrically: one eye always seems larger than the other.
-
-Those who challenge him soon learn how futile it is. The Knight cuts down his enemies with ease, whether by weapons that are always the finest edge available, or by magic. His presence is easily mistaken for that of a ghost — something ethereal — and it is said he bends time and souls with the same ease a writer bends words upon a page.
-
-He now wanders, unyielding, the event horizon of Fnn-816. There, where time does not exist, he meets figures from every era — the living and the dead alike, drawn into the black hole and now held fast for eternity in that unmoving ether. Along his path, he finds his great friend, Valker Kane. In one final act, he hurls him away, casting him clear of that prison. The force of that action-reaction sends the Knight himself hurtling the opposite way, down into the depths of the hole. There, he means to find what he has been seeking all along: his greatest enemy, the end of his long road, and one more ancient soul he intends to save.', 'CANON', '2026-08-01 05:08:38.24342+00', '2026-08-01 05:08:38.24342+00', '49187d39-6121-44b9-8477-f19e16fac16b', '49187d39-6121-44b9-8477-f19e16fac16b', 'en', 'c4939f45-4dc5-48d5-9bd6-c5bc729cfa5e', false, 'c4939f45-4dc5-48d5-9bd6-c5bc729cfa5e');
 INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('1a45079b-3a0e-4f21-9c71-4c024a03048c', 'Punic', 'Punic is a thin, unsettling shadow whose mere presence unravels the reality around him — objects forget weight, fire turns cold, time hesitates and reverses — leaving behind not darkness but pure, architectural despair. He does not kill; he attaches himself to his chosen and remains, transforming them layer by layer, and whether he is folklore invented to explain nameless dread or a patient intellect operating unseen for far longer than anyone has watched remains entirely unknown.', 'His symbol is a book of black pages. No one has read it. No one can. The pages are not blank — something is written there, or something that functions as writing, in a language that does not interface with comprehension. The book simply exists, illegible and ineffable, as a sign that points toward what Punic is without explaining it. This is the most information anyone has been able to extract about him: the symbol. Everything else is testimony, and testimony about Punic is difficult to trust, because those who supply it are rarely the same afterward as they were before.
 
 He appears as a thin shadow — unsettling in the way that something is unsettling when it occupies space incorrectly, when the eye keeps sliding off it and returning to find it has not quite resolved into what it looked like a moment ago. His eyes are bright. That brightness does not comfort. Looking into them produces immediate fear — not the fear that comes from assessing a threat, but the fear that arrives before assessment is possible, the fear that acts on the nervous system directly, bypassing thought.
@@ -404,7 +381,16 @@ Why? The question has no answer that satisfies. He seems driven by a constant ne
 Yet he is almost never seen. For the majority of those who have heard his name, he is folklore — a figure invented to give form to unspecific dread, something told to children to explain the fear that comes without reason in the middle of the night. They ask how the other Amets could permit such a thing to exist. They ask what purpose it serves. These are reasonable questions with no available answers, and perhaps they are meant to remain unanswered.
 
 The more unsettling possibility — the one that circulates among those who take him seriously — is that he has simply been too careful to be found. That the sporadic, seemingly purposeless appearances are not the full picture. That behind the apparent absence of motivation there is an intellect that has been operating for longer than anyone has been watching, and that his plan for what he intends to do to the world is not a series of isolated moments of cruelty, but something far more composed, far more patient, and far more complete than any of those who dismiss him as a legend have thought to fear.', 'CANON', '2026-07-26 07:22:05.921197+00', '2026-07-26 09:47:27.952988+00', '48ed4b49-b7b5-4d4b-9715-00dcaa819209', NULL, 'en', '1a45079b-3a0e-4f21-9c71-4c024a03048c', true, '1a45079b-3a0e-4f21-9c71-4c024a03048c');
-INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('6671adff-2357-4f90-a000-8bffb3c4a6d7', 'Cavaleiro sem Nome', 'O Cavaleiro sem Nome, décimo terceiro cavaleiro de Syngisdonia e tido como responsável por sua queda, vaga por todas as eras em sombra e mistério — agora perdido no horizonte de eventos de Fnn-816 após lançar seu amigo Valker Kane para a liberdade.', 'O Cavaleiro sem Nome é uma figura alta e magra, quase sempre envolta em uma capa rasgada que oculta a maior parte de seu corpo. É o décimo terceiro cavaleiro vindo de Syngisdonia, e é tido como o responsável por sua queda. Seus motivos permanecem um mistério, mas seu poder e sua influência estão além de qualquer dúvida.
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('c4939f45-4dc5-48d5-9bd6-c5bc729cfa5e', 'Knight Without a Name', 'The Nameless Knight, thirteenth knight of Singisdônia and blamed for its fall, wanders every era in shadow and mystery — now lost within the event horizon of Fnn-816 after casting his friend Valker Kane free.', 'The Nameless Knight is a tall, gaunt figure, most often wrapped in a torn cloak that hides the greater part of his body. He is the thirteenth knight to come out of Singisdônia, and is held responsible for its fall. His reasons remain a mystery, but his power and his influence are beyond doubt.
+
+This mysterious figure wanders through every era of every reality, crossing paths with individuals and historical events alike, yet never once revealing his presence, his name, or his intentions.
+
+His face is always hidden — sometimes behind helms of metal, sometimes behind helmets of strange technology, and sometimes behind skulls of bone. Through whatever gaps remain, a green light shines out from where his eyes should be, and never symmetrically: one eye always seems larger than the other.
+
+Those who challenge him soon learn how futile it is. The Knight cuts down his enemies with ease, whether by weapons that are always the finest edge available, or by magic. His presence is easily mistaken for that of a ghost — something ethereal — and it is said he bends time and souls with the same ease a writer bends words upon a page.
+
+He now wanders, unyielding, the event horizon of Fnn-816. There, where time does not exist, he meets figures from every era — the living and the dead alike, drawn into the black hole and now held fast for eternity in that unmoving ether. Along his path, he finds his great friend, Valker Kane. In one final act, he hurls him away, casting him clear of that prison. The force of that action-reaction sends the Knight himself hurtling the opposite way, down into the depths of the hole. There, he means to find what he has been seeking all along: his greatest enemy, the end of his long road, and one more ancient soul he intends to save.', 'CANON', '2026-08-01 05:08:38.24342+00', '2026-08-01 05:08:38.24342+00', '49187d39-6121-44b9-8477-f19e16fac16b', '49187d39-6121-44b9-8477-f19e16fac16b', 'en', 'c4939f45-4dc5-48d5-9bd6-c5bc729cfa5e', false, 'c4939f45-4dc5-48d5-9bd6-c5bc729cfa5e');
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('6671adff-2357-4f90-a000-8bffb3c4a6d7', 'Cavaleiro sem Nome', 'O Cavaleiro sem Nome, décimo terceiro cavaleiro de Singisdônia e tido como responsável por sua queda, vaga por todas as eras em sombra e mistério — agora perdido no horizonte de eventos de Fnn-816 após lançar seu amigo Valker Kane para a liberdade.', 'O Cavaleiro sem Nome é uma figura alta e magra, quase sempre envolta em uma capa rasgada que oculta a maior parte de seu corpo. É o décimo terceiro cavaleiro vindo de Singisdônia, e é tido como o responsável por sua queda. Seus motivos permanecem um mistério, mas seu poder e sua influência estão além de qualquer dúvida.
 
 Essa figura misteriosa vaga por todas as eras de todas as realidades, cruzando o caminho de indivíduos e de eventos históricos, mas sem nunca revelar sua presença, seu nome ou suas intenções.
 
@@ -2619,3 +2605,21 @@ INSERT INTO public.signs (id, name, sign_order, season_time, archetype_id, sub_a
 INSERT INTO public.signs (id, name, sign_order, season_time, archetype_id, sub_archetype, summary, body, created_at, updated_at, language, translation_group_id) VALUES ('8d339dcc-7405-4a2d-878b-fbfe7dd40820', 'O Espelho', 11, 'Início da Primavera', 'e5f9998b-cbfd-4e90-acd2-3d19adbe528e', 'Persuasão', 'Representa manipulação e diplomacia em seu ápice.', 'Representa manipulação e diplomacia em seu ápice. As pessoas deste signo veem os outros como recursos, vivendo para influenciar e construir sua própria imagem. Naturalmente amistosas, elevam o moral dos que as cercam com facilidade, lendo e moldando comportamentos como lhes convém. Ideais como políticas, mercadoras, apostadoras ou espiãs. Não acreditam em verdade universal, sustentando em vez disso que tudo é questão de opinião — suas preferências são voláteis, importando-se pouco com qualquer resultado específico, desde que satisfaça a maioria. Podem ser profundamente indecisas, preferindo seguir a direção de outrem em assuntos complexos a escolher uma própria. Carecem de um senso de propósito pessoal, preenchendo essa ausência com os objetivos de seu grupo ou sociedade. Leem rostos e linguagem corporal como quem lê um livro aberto, e sabem precisamente como provocar ou seduzir.', '2026-06-25 01:30:12.047656+00', '2026-06-25 01:30:12.047656+00', 'pt', '0394b7de-e1bd-447e-9f38-faf24782c378');
 INSERT INTO public.signs (id, name, sign_order, season_time, archetype_id, sub_archetype, summary, body, created_at, updated_at, language, translation_group_id) VALUES ('258c3c13-99d1-481e-8613-b36fd1ff188c', 'A Coroa', 12, 'Meio da Primavera', 'e5f9998b-cbfd-4e90-acd2-3d19adbe528e', 'Comunhão', 'Simboliza liderança e governo.', 'Simboliza liderança e governo. As pessoas deste signo são bem articuladas, valorizando a conexão interpessoal e a conversa acima da maioria das coisas — ideais como governantes e gestoras. Possuem um carisma natural e um dom para a oratória e o comando; quando falam, os outros escutam. Preocupam-se profundamente com a unidade e a solidariedade, e isso transparece em tudo o que fazem. Adoram coordenar grupos, inspirar motivação e direcionar os outros rumo ao caminho certo — embora nem sempre tenham certeza, elas mesmas, de qual seja esse caminho. Sempre projetam confiança e sempre parecem saber o que dizer, mesmo ao falar de assuntos que mal compreendem. A Coroa despreza a solidão e adora a rotina, raramente cessando seu trabalho e raramente viajando a menos que outros o desejem. Sentem pouco prazer em reuniões sociais, mas ainda assim comparecem, valorizando-as como oportunidades de conexão.', '2026-06-25 01:30:12.047656+00', '2026-06-25 01:30:12.047656+00', 'pt', 'cac54126-d160-41f6-aa93-da760505d57a');
 INSERT INTO public.signs (id, name, sign_order, season_time, archetype_id, sub_archetype, summary, body, created_at, updated_at, language, translation_group_id) VALUES ('c523932f-bfea-4807-931b-4c90fc0f18e4', 'A Fenda', 13, 'Os dias fora de estação — aqueles que caem fora da contagem das quatro estações, os dias ‘excedentes’ do ano', '21c3575b-4681-4d81-bcfb-97a07de3bd0a', NULL, 'Marca um vazio no centro do próprio ser — um vazio que seus portadores passam a vida inteira tentando preencher, e nunca conseguirão.', 'Diz-se que, em certos dias e noites, uma pessoa pode nascer fora de qualquer um dos Doze Signos. Não é tarefa simples determinar qual hora exata, de qual dia exato, produzirá um filho da Fenda, pois sua influência se espalha tenuemente por todo o ano. E, ainda assim, eles nascem, e carregam uma natureza perturbada. A Fenda marca um vazio no centro do próprio ser — um vazio que passarão a vida inteira tentando preencher, e nunca conseguirão. Não possuem um senso real de sociedade, nem moral, nem motivação verdadeira. Buscarão tudo: atenção, elogio, valor e poder, mas jamais serão satisfeitos por qualquer um deles. Não se importam com emoção ou razão, com significado ou crescimento. Sempre provocarão destruição, seja tentando consumir tudo para si, seja reduzindo tudo ao seu redor ao mesmo vazio que eles próprios habitam. Aqueles nascidos sob a Fenda são vítimas tanto quanto são perigos — a serem abordados com cautela, mas também com compaixão. Sua fome infindável os impulsiona a níveis de habilidade sem igual entre os demais signos; sua disposição para o sacrifício pode levá-los mais longe do que qualquer outro poderia ir. São capazes de coisas extraordinárias, mas sempre operarão além dos limites naturais do mundo. Precisam ser detidos — e, ainda assim, que pena.', '2026-06-25 01:30:12.047656+00', '2026-06-25 01:30:12.047656+00', 'pt', 'bafd608a-31bd-48b3-bcb6-6ec61c42e5a4');
+
+-- ============================================================
+-- MAP PINS
+-- ============================================================
+
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('56cfc2ab-0a80-40f4-8df1-d61fabf0e5ec', 'primordial-map', 'CHARACTER', 'e1d5f144-37f5-46fb-9f65-0d65f53e4b2c', 0.5055449107273828, 0.5127024408642844, '2026-07-22 07:36:42.470288+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('b8336a8f-0e08-4e7e-bf09-f343cc8f7047', 'primordial-map', 'CHARACTER', 'c3fe20e2-722e-488e-bf4d-185fd024e900', 0.4993176228443732, 0.09204239294176175, '2026-07-22 07:36:56.757077+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('b4367e47-56ca-4d7a-9fea-c713231b4f90', 'primordial-map', 'CHARACTER', '1a45079b-3a0e-4f21-9c71-4c024a03048c', 0.6756619736960533, 0.9170070142747667, '2026-07-26 23:09:36.398737+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('84b22448-9f77-4d28-9303-bdf3530d19f8', 'primordial-map', 'CHARACTER', 'f5a61b14-e05f-4d69-880e-bc3056bbb039', 0.62533331872924, 0.1874508907391842, '2026-07-27 09:18:14.026604+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('016353ac-fb85-4435-a383-0e2d0a53d52a', 'primordial-map', 'CHARACTER', '08faa861-e131-4a9c-ad64-a3ccb40e7df9', 0.6706034705158417, 0.7464361371671896, '2026-07-22 07:38:04.533406+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('456a4c27-5b4d-4a67-8710-83785763d357', 'primordial-map', 'CHARACTER', '63beea19-161c-43cc-8a76-e6041ffeac7e', 0.3000076068515695, 0.3497118381256539, '2026-07-24 00:38:01.501441+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('d4da1cd6-b6bf-4c0b-b667-bfdfc3284e7f', 'primordial-map', 'CHARACTER', '59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 0.3552550054552374, 0.20110367182769862, '2026-07-22 07:37:58.528094+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('33cb5671-90c2-4fd9-ba1f-e0cfb9589400', 'primordial-map', 'CHARACTER', '4603fa7a-52a7-4c36-87f4-828cfe9c986e', 0.5631853041420107, 0.8663995773409, '2026-07-22 07:37:31.945939+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('c02e0620-9c41-4d9f-91f2-2c7b0320fe7b', 'primordial-map', 'CHARACTER', '4b7d2e2c-82cb-4dfe-ab5e-67767a3bc653', 0.28465993235170367, 0.5596334538209154, '2026-07-22 07:37:08.761977+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('026ae006-8c9b-41d3-acd9-1908e41367d0', 'primordial-map', 'CHARACTER', '7ae23e7f-ee42-4159-994c-81530d4b6753', 0.33572789601584063, 0.7448841567425882, '2026-07-27 09:19:22.129847+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('75dfddba-915f-4b98-8a4c-075509daaee5', 'primordial-map', 'CHARACTER', '8b0ac830-df17-4143-a681-d88bf55a41d5', 0.4312248756587701, 0.8652527846199669, '2026-07-27 09:19:29.003306+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('3165345b-2ec3-4d71-9401-b11aac389ecf', 'primordial-map', 'CHARACTER', 'a329e9d5-071c-4610-aca4-bdeeb86c9f58', 0.703593140694932, 0.3524375618294596, '2026-07-27 09:18:31.602025+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('0968fc65-5523-4bdf-989a-6490d73fb321', 'primordial-map', 'CHARACTER', '5e856f4d-05d8-4158-b71f-cb1ed557178e', 0.7151042461232072, 0.5787441876242108, '2026-07-22 07:37:19.110666+00');
