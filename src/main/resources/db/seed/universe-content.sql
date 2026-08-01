@@ -23,37 +23,34 @@
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
 -- Last updated: 2026-08-01
--- Updated by:   Siegmund (added the Era of Vestiges map -- 'vestiges-map',
---               mirroring the existing primordial-map row/map_eras pattern
---               for a pre-material era with both language rows linked;
---               NAVIGABLE map_type chosen to match primordial-map's own
---               precedent, per explicit user decision).
+-- Updated by:   Siegmund (regenerated fresh from the live database). Per
+--               the handoff: the Era/POINT "Consecration of the Aleph
+--               and the Twelve Amets" / "Consagração do Aleph e dos
+--               Doze Amets" (EN 73192c9b-4b7f-45aa-93d4-cbd65026149e /
+--               PT 1b0a3ea9-2c12-49eb-a678-dbd7036781a6) gained 4
+--               outgoing entity_links (source_type = ERA, using the
+--               2026-07-30 ERA-as-source exception): each language ->
+--               its own "The Calling of Twelve Amets" and "The War for
+--               the Lantern of True Light". Confirmed the Era's own
+--               name/order_index/type/importance/description are
+--               byte-identical to before -- only updated_at (save-cycle
+--               side effect) and the 4 new links changed, exactly as
+--               specified.
 --
--- Previous entry, 2026-08-01, Siegmund (regenerated fresh from the live database).
+-- ⚠  FLAGGED, NOT PART OF THIS HANDOFF: "vestiges-map" (added in a prior
+--   commit, ea9026c, by a different session after my previous PR) is no
+--   longer in the live database -- neither the map row nor its 2
+--   map_eras associations (Era of Vestiges, both languages). Confirmed
+--   clean: no orphaned map_pins or entity_links reference it either, so
+--   this reads as a deliberate delete (same shape as the earlier
+--   omniverse->primordial-map cleanup), not a partial/broken one. This
+--   round's handoff never mentioned it -- reflected here because it's
+--   live DB truth, flagged because its origin/intent is unconfirmed.
+--   "primordial-map" remains the sole map, matching the pre-ea9026c
+--   state.
 --
---               CORRECTION: my previous regeneration (PR #111, commit
---               7624880) silently dropped the MAP_PINS section that
---               commit d08314a ("bring map_pins into universe-content
---               dump scope") had just added -- I failed to re-read
---               universe-content-dump.md after that sync, per the
---               workspace's own re-read-after-sync rule, and my scripts
---               still had map_pins hardcoded as excluded. Restored here:
---               13 rows, section placed after SIGNS per the documented
---               decision, table added back to TRUNCATE.
---
---               Also resolves the PR #111/#112 merge conflict: #111
---               (Valkari etc.) merged to main while #112 (this branch,
---               the Syngisdônia spelling fix) was still open against the
---               pre-#111 base. Merged main into this branch and replaced
---               the conflicted file with a fresh regeneration reflecting
---               current live DB truth, which already includes both #111's
---               content and the spelling fix -- verified row-for-row
---               identical to main except for the restored MAP_PINS
---               section.
---
---               hidden_content_lock's exclusion is now formally
---               documented in universe-content-dump.md (resolved by
---               Imaws) -- no longer a standing flag in this header.
+--               Re-ran the full entity_links hidden-visibility
+--               integrity sweep (538 rows): zero violations.
 
 -- ============================================================
 -- TRUNCATE (join tables first, then parents, then root tables)
@@ -83,13 +80,12 @@ CASCADE;
 -- ============================================================
 
 INSERT INTO public.maps (id, name, map_type, image) VALUES ('primordial-map', 'Primordial Era Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/PrimordialEraMap.png');
-INSERT INTO public.maps (id, name, map_type, image) VALUES ('vestiges-map', 'Era of Vestiges Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/VesigesEraMap.png');
 
 -- ============================================================
 -- ERAS (timeline — ERA intervals and POINT moments, ordered by order_index)
 -- ============================================================
 
-INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('73192c9b-4b7f-45aa-93d4-cbd65026149e', 'Consecration of the Aleph and the Twelve Amets', 2, 'POINT', 'STANDARD', NULL, '2026-06-23 18:54:04.126235+00', '2026-06-23 18:54:04.126235+00', 'en', '73192c9b-4b7f-45aa-93d4-cbd65026149e');
+INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('73192c9b-4b7f-45aa-93d4-cbd65026149e', 'Consecration of the Aleph and the Twelve Amets', 2, 'POINT', 'STANDARD', NULL, '2026-06-23 18:54:04.126235+00', '2026-08-01 10:07:51.223953+00', 'en', '73192c9b-4b7f-45aa-93d4-cbd65026149e');
 INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('49187d39-6121-44b9-8477-f19e16fac16b', 'Era of Vestiges', 3, 'ERA', NULL, 'The oldest era of the temporal world, predating the creation of matter. In a yet-nonexistent universe, vestiges of a previous world drift adrift, ready for a new story.', '2026-06-23 18:54:04.13818+00', '2026-06-23 18:54:04.13818+00', 'en', '49187d39-6121-44b9-8477-f19e16fac16b');
 INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('1a3a86db-9f36-4c9b-9509-1346576efdaa', 'Crash of the Prima Airship into the Sun', 4, 'POINT', 'STANDARD', NULL, '2026-06-23 18:54:04.151342+00', '2026-06-23 18:54:04.151342+00', 'en', '1a3a86db-9f36-4c9b-9509-1346576efdaa');
 INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('47eb040e-b0d3-492a-8817-525a91705240', 'Era of Glimpses', 5, 'ERA', NULL, 'Beneath a mountain, the first concepts emerge.', '2026-06-23 18:54:04.164302+00', '2026-06-23 18:54:04.164302+00', 'en', '47eb040e-b0d3-492a-8817-525a91705240');
@@ -141,7 +137,6 @@ INSERT INTO public.eras (id, name, order_index, type, importance, description, c
 INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('fd791fd4-6951-4fa8-957e-5979bff9427f', 'Era of Death', 51, 'ERA', NULL, 'The world is beset by constant conflict and marches toward its end.', '2026-06-23 18:54:05.914423+00', '2026-06-23 18:54:05.914423+00', 'en', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
 INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('f4f343d5-9208-45f9-b7d4-3debe69443da', 'End of Mortals', 52, 'POINT', 'STANDARD', NULL, '2026-06-23 18:54:05.928631+00', '2026-06-23 18:54:05.928631+00', 'en', 'f4f343d5-9208-45f9-b7d4-3debe69443da');
 INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('48ed4b49-b7b5-4d4b-9715-00dcaa819209', 'Primordial Era', 1, 'ERA', NULL, 'The age before the material world came into being — a time of pure essence, divine forces, and the foundation upon which all existence would be built. No navigable world exists here; only the infinite.', '2026-06-23 18:54:04.047617+00', '2026-06-24 02:31:11.341815+00', 'en', '48ed4b49-b7b5-4d4b-9715-00dcaa819209');
-INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('1b0a3ea9-2c12-49eb-a678-dbd7036781a6', 'Consagração do Aleph e dos Doze Amets', 2, 'POINT', 'STANDARD', NULL, '2026-06-23 18:54:04.126235+00', '2026-06-23 18:54:04.126235+00', 'pt', '73192c9b-4b7f-45aa-93d4-cbd65026149e');
 INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('eb903d2d-12a2-4e2b-9659-6d2243a8a70f', 'Era dos Vestígios', 3, 'ERA', NULL, 'A era mais antiga do mundo temporal, anterior à criação da matéria. Num universo ainda inexistente, vestígios de um mundo anterior flutuam à deriva, prontos para uma nova história.', '2026-06-23 18:54:04.13818+00', '2026-06-23 18:54:04.13818+00', 'pt', '49187d39-6121-44b9-8477-f19e16fac16b');
 INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('5c2ee251-b8ec-4023-8941-14640bc371f4', 'Queda da Aeronave Prima no Sol', 4, 'POINT', 'STANDARD', NULL, '2026-06-23 18:54:04.151342+00', '2026-06-23 18:54:04.151342+00', 'pt', '1a3a86db-9f36-4c9b-9509-1346576efdaa');
 INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('6f12e68d-ad71-4c51-8e80-942f8191fdda', 'Era dos Vislumbres', 5, 'ERA', NULL, 'Sob uma montanha, emergem os primeiros conceitos.', '2026-06-23 18:54:04.164302+00', '2026-06-23 18:54:04.164302+00', 'pt', '47eb040e-b0d3-492a-8817-525a91705240');
@@ -193,6 +188,7 @@ INSERT INTO public.eras (id, name, order_index, type, importance, description, c
 INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'Era da Morte', 51, 'ERA', NULL, 'O mundo é assolado por conflitos constantes e marcha rumo ao seu fim.', '2026-06-23 18:54:05.914423+00', '2026-06-23 18:54:05.914423+00', 'pt', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
 INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('b28c235a-0c6a-4b3d-9cf8-518eeec63559', 'Fim dos Mortais', 52, 'POINT', 'STANDARD', NULL, '2026-06-23 18:54:05.928631+00', '2026-06-23 18:54:05.928631+00', 'pt', 'f4f343d5-9208-45f9-b7d4-3debe69443da');
 INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('36d5e2a5-be00-456b-bf11-113c0b737904', 'Era Primordial', 1, 'ERA', NULL, 'A era anterior à existência do mundo material — um tempo de pura essência, forças divinas e o alicerce sobre o qual toda a existência viria a ser construída. Nenhum mundo navegável existe aqui; apenas o infinito.', '2026-06-23 18:54:04.047617+00', '2026-06-24 02:31:11.341815+00', 'pt', '48ed4b49-b7b5-4d4b-9715-00dcaa819209');
+INSERT INTO public.eras (id, name, order_index, type, importance, description, created_at, updated_at, language, translation_group_id) VALUES ('1b0a3ea9-2c12-49eb-a678-dbd7036781a6', 'Consagração do Aleph e dos Doze Amets', 2, 'POINT', 'STANDARD', NULL, '2026-06-23 18:54:04.126235+00', '2026-08-01 10:08:06.842971+00', 'pt', '73192c9b-4b7f-45aa-93d4-cbd65026149e');
 
 -- ============================================================
 -- MAP ↔ ERA ASSOCIATIONS
@@ -200,8 +196,6 @@ INSERT INTO public.eras (id, name, order_index, type, importance, description, c
 
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('primordial-map', '48ed4b49-b7b5-4d4b-9715-00dcaa819209');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('primordial-map', '36d5e2a5-be00-456b-bf11-113c0b737904');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('vestiges-map', '49187d39-6121-44b9-8477-f19e16fac16b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('vestiges-map', 'eb903d2d-12a2-4e2b-9659-6d2243a8a70f');
 
 -- ============================================================
 -- CHARACTERS
@@ -2252,6 +2246,8 @@ INSERT INTO public.entity_links (id, source_type, source_id, target_type, target
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('2b0051b4-c70a-4e7e-8428-c42892d4de27', 'FACTION', 'd4c683ad-8d4f-4710-85e6-9a9b30676d3d', 'LORE', '91165b17-3214-40b5-bbf3-0f4432905570', '2026-07-30 02:16:57.485104+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('175ec7ab-137f-42e4-8a85-890232019a88', 'FACTION', 'd4c683ad-8d4f-4710-85e6-9a9b30676d3d', 'LORE', 'acf5d45d-2163-4918-a4dd-eaac675ba44e', '2026-07-30 02:16:57.485104+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('f7f3e428-1e06-496b-9ea5-77ad44839eb0', 'FACTION', 'd4c683ad-8d4f-4710-85e6-9a9b30676d3d', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', '2026-07-30 02:16:57.485104+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('dbb366a3-cafe-4195-bec3-bcb90b46025f', 'ERA', '73192c9b-4b7f-45aa-93d4-cbd65026149e', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', '2026-08-01 10:07:51.277858+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('25b8f7e3-2819-458c-89b6-0f1d3ccbe1e5', 'ERA', '73192c9b-4b7f-45aa-93d4-cbd65026149e', 'LORE', '86550df5-4d20-4ba8-9bc8-f0b1dfdfe420', '2026-08-01 10:07:51.277858+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('553af078-167c-4793-ba7e-91329e26d45d', 'CHARACTER', '01ef16c4-09e2-40f3-9416-731d69f798b2', 'LORE', '334b7fb3-31e3-4a10-a3ce-4c6afb791934', '2026-07-16 03:17:01.487628+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('8e4ce26a-a6ee-4c21-b21f-bb44b12862ab', 'CHARACTER', '01ef16c4-09e2-40f3-9416-731d69f798b2', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-16 03:17:01.487628+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('727e1a68-4239-4f6c-96e8-cded6f133b8f', 'CHARACTER', '01ef16c4-09e2-40f3-9416-731d69f798b2', 'LORE', 'c4ba4207-7857-49ab-8e22-5acc57ea2cd5', '2026-07-16 03:17:01.487628+00');
@@ -2275,6 +2271,8 @@ INSERT INTO public.entity_links (id, source_type, source_id, target_type, target
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('042cc4fd-e688-49b8-8d43-cc8abc9a81db', 'CHARACTER', 'aa6e8cb3-d753-4c2c-a4d5-af895620affe', 'LORE', '91165b17-3214-40b5-bbf3-0f4432905570', '2026-07-16 03:17:38.162226+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('006e1678-a9da-4e59-ab0f-e995e1c2a8cf', 'CHARACTER', 'aa6e8cb3-d753-4c2c-a4d5-af895620affe', 'LORE', 'acf5d45d-2163-4918-a4dd-eaac675ba44e', '2026-07-16 03:17:38.162226+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('27908642-a9d2-47d1-927c-82fe7264fa9a', 'CHARACTER', 'aa6e8cb3-d753-4c2c-a4d5-af895620affe', 'FACTION', '186e1df4-226c-4a0c-b0ab-3520aad3f91f', '2026-07-16 03:17:38.162226+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('23c5cf5c-03cd-4ecb-b2b1-71f3c22cb9b4', 'ERA', '1b0a3ea9-2c12-49eb-a678-dbd7036781a6', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', '2026-08-01 10:08:06.963979+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('7ceca16c-f547-411a-b6ca-6be3c7dab7ad', 'ERA', '1b0a3ea9-2c12-49eb-a678-dbd7036781a6', 'LORE', 'a96e56ee-3b1e-46dd-90f0-2818379e3531', '2026-08-01 10:08:06.963979+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('24b1cceb-fbb6-42ae-be12-8ab1c67bc8d5', 'CHARACTER', 'e1d5f144-37f5-46fb-9f65-0d65f53e4b2c', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-22 01:43:14.363594+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('b048ca47-e826-44fb-ae54-53eff2afeb48', 'CHARACTER', 'e1d5f144-37f5-46fb-9f65-0d65f53e4b2c', 'LORE', 'ebd1073f-0a52-4c17-86c3-bfc1cb491a22', '2026-07-22 01:43:14.363594+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('be5b1a70-d0c1-4dd3-ac13-7998d8d544fb', 'CHARACTER', 'e1d5f144-37f5-46fb-9f65-0d65f53e4b2c', 'LORE', 'c4ba4207-7857-49ab-8e22-5acc57ea2cd5', '2026-07-22 01:43:14.363594+00');
