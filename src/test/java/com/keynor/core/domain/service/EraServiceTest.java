@@ -8,6 +8,7 @@ import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.era.EraImportance;
 import com.keynor.core.domain.model.era.EraType;
 import com.keynor.core.domain.port.in.era.CreateEraUseCase;
+import com.keynor.core.domain.port.in.era.UpdateEraUseCase;
 import com.keynor.core.domain.port.out.EntityLinkRepository;
 import com.keynor.core.domain.port.out.EraRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -137,6 +138,62 @@ class EraServiceTest {
         Era result = eraService.create(command);
 
         verify(entityLinkRepository).replaceLinks(EntityType.ERA, result.getId(), List.of());
+    }
+
+    // --- update() / entity_links wiring ---
+
+    @Test
+    void update_shouldUpdateFieldsAndReplaceLinks_whenEntityExists() {
+        UUID id = UUID.randomUUID();
+        Era existing = new Era(id, "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW, Language.EN, UUID.randomUUID());
+        when(eraRepository.findById(id)).thenReturn(Optional.of(existing));
+        when(eraRepository.save(any(Era.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        UUID loreTargetId = UUID.randomUUID();
+        var command = new UpdateEraUseCase.Command(
+                "Age of Creation, Revised", 2, EraType.ERA, null, "Updated description",
+                List.of(new EntityLinkRef(EntityType.LORE, loreTargetId)));
+
+        Era result = eraService.update(id, command);
+
+        assertThat(result.getName()).isEqualTo("Age of Creation, Revised");
+        assertThat(result.getOrderIndex()).isEqualTo(2);
+        assertThat(result.getDescription()).isEqualTo("Updated description");
+        verify(entityLinkRepository).replaceLinks(EntityType.ERA, id, List.of(new EntityLinkRef(EntityType.LORE, loreTargetId)));
+    }
+
+    @Test
+    void update_shouldReplaceLinksWithEmptyList_whenLinksIsNull() {
+        UUID id = UUID.randomUUID();
+        Era existing = new Era(id, "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW, Language.EN, UUID.randomUUID());
+        when(eraRepository.findById(id)).thenReturn(Optional.of(existing));
+        when(eraRepository.save(any(Era.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        var command = new UpdateEraUseCase.Command("Age of Creation", 1, EraType.ERA, null, "The first age", null);
+
+        eraService.update(id, command);
+
+        verify(entityLinkRepository).replaceLinks(EntityType.ERA, id, List.of());
+    }
+
+    @Test
+    void update_shouldThrowEntityNotFoundException_whenNotFound() {
+        UUID id = UUID.randomUUID();
+        when(eraRepository.findById(id)).thenReturn(Optional.empty());
+        var command = new UpdateEraUseCase.Command("Age of Creation", 1, EraType.ERA, null, "The first age", null);
+
+        assertThatThrownBy(() -> eraService.update(id, command))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void update_shouldThrowIllegalArgumentException_whenChangingTypeToPointWithoutImportance() {
+        UUID id = UUID.randomUUID();
+        Era existing = new Era(id, "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW, Language.EN, UUID.randomUUID());
+        when(eraRepository.findById(id)).thenReturn(Optional.of(existing));
+        var command = new UpdateEraUseCase.Command("The Great Sundering", 1, EraType.POINT, null, "desc", null);
+
+        assertThatThrownBy(() -> eraService.update(id, command))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("POINT");
     }
 
     // --- Domain invariant tests ---

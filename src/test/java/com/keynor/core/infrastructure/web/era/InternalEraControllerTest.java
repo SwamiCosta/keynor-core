@@ -1,6 +1,7 @@
 package com.keynor.core.infrastructure.web.era;
 
 import com.keynor.core.application.dto.era.CreateEraRequest;
+import com.keynor.core.application.dto.era.UpdateEraRequest;
 import com.keynor.core.application.dto.shared.EntityLinkRequest;
 import com.keynor.core.domain.model.era.Era;
 import com.keynor.core.domain.model.era.EraType;
@@ -8,6 +9,7 @@ import com.keynor.core.domain.model.shared.EntityLinkRef;
 import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.port.in.era.CreateEraUseCase;
+import com.keynor.core.domain.port.in.era.UpdateEraUseCase;
 import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,6 +33,7 @@ import static org.mockito.Mockito.when;
 class InternalEraControllerTest {
 
     @Mock private CreateEraUseCase createEraUseCase;
+    @Mock private UpdateEraUseCase updateEraUseCase;
     @Mock private FindLinkedEntitiesUseCase findLinkedEntitiesUseCase;
 
     private InternalEraController controller;
@@ -41,7 +45,7 @@ class InternalEraControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new InternalEraController(createEraUseCase, findLinkedEntitiesUseCase);
+        controller = new InternalEraController(createEraUseCase, updateEraUseCase, findLinkedEntitiesUseCase);
         org.mockito.Mockito.lenient().when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
     }
 
@@ -73,6 +77,37 @@ class InternalEraControllerTest {
 
         ArgumentCaptor<CreateEraUseCase.Command> captor = ArgumentCaptor.forClass(CreateEraUseCase.Command.class);
         verify(createEraUseCase).create(captor.capture());
+        assertThat(captor.getValue().links()).containsExactly(new EntityLinkRef(EntityType.LORE, loreTargetId));
+    }
+
+    @Test
+    void update_shouldReturn200AndResponseBody_whenCommandIsValid() {
+        UUID id = UUID.randomUUID();
+        when(updateEraUseCase.update(eq(id), any())).thenReturn(buildEra(id));
+
+        var request = new UpdateEraRequest("Age of Creation", 1, "ERA", null, "The first age", null);
+
+        var response = controller.update(id, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().name()).isEqualTo("Age of Creation");
+        verify(updateEraUseCase).update(eq(id), any());
+    }
+
+    @Test
+    void update_shouldPassResolvedLinkRefs_toCommand_whenLinksProvided() {
+        UUID id = UUID.randomUUID();
+        UUID loreTargetId = UUID.randomUUID();
+        when(updateEraUseCase.update(eq(id), any())).thenReturn(buildEra(id));
+
+        var request = new UpdateEraRequest("Age of Creation", 1, "ERA", null, "The first age",
+                List.of(new EntityLinkRequest("LORE", loreTargetId)));
+
+        controller.update(id, request);
+
+        ArgumentCaptor<UpdateEraUseCase.Command> captor = ArgumentCaptor.forClass(UpdateEraUseCase.Command.class);
+        verify(updateEraUseCase).update(eq(id), captor.capture());
         assertThat(captor.getValue().links()).containsExactly(new EntityLinkRef(EntityType.LORE, loreTargetId));
     }
 }
