@@ -24,33 +24,36 @@
 --
 -- Last updated: 2026-08-01
 -- Updated by:   Siegmund (regenerated fresh from the live database). Per
---               the handoff: the Era/POINT "Consecration of the Aleph
---               and the Twelve Amets" / "Consagração do Aleph e dos
---               Doze Amets" (EN 73192c9b-4b7f-45aa-93d4-cbd65026149e /
---               PT 1b0a3ea9-2c12-49eb-a678-dbd7036781a6) gained 4
---               outgoing entity_links (source_type = ERA, using the
---               2026-07-30 ERA-as-source exception): each language ->
---               its own "The Calling of Twelve Amets" and "The War for
---               the Lantern of True Light". Confirmed the Era's own
---               name/order_index/type/importance/description are
---               byte-identical to before -- only updated_at (save-cycle
---               side effect) and the 4 new links changed, exactly as
---               specified.
+--               the handoff: INSERT Faction "The Order of the White
+--               Flag" / "A Ordem da Bandeira Branca" (EN
+--               bc528952-0a2e-4725-9f08-0f06efb61132 / PT
+--               29d90741-4bd5-464f-8fe1-a7a8c2ef3658), CANON ORDER,
+--               Era of Heroes -> Era of Dust, no faction_members yet
+--               (empty, as specified), with image. INSERT lore
+--               "Lio-Tekari" (EN 622fe5c3-2a4c-44ce-b288-b29774a9c914 /
+--               PT 8a9012fa-2a39-4f13-a9f8-c9e04509c2a5), CANON
+--               HISTORY, Era of Encounters -> Era of Death, no
+--               outgoing links (as specified), with image. INSERT
+--               character Teo VII (EN
+--               39f88985-cf6f-479e-a3ed-dd1c64ea9353 / PT
+--               aae94127-91ca-4a76-8260-596bb66f74e0), CANON DEITY,
+--               single era Era of Vestiges (founded = destroyed), with
+--               4 images per language; entity_links to Verum, Valkari,
+--               Fnn plus the 3 standard deity links (Sexuality of the
+--               Gods, On the Word God, The Theosophy of Aniannoth), per
+--               language -- 12 new entity_links total, all verified
+--               directly, zero dropped. All timeline era assignments
+--               confirmed by name, not just id.
 --
--- ⚠  FLAGGED, NOT PART OF THIS HANDOFF: "vestiges-map" (added in a prior
---   commit, ea9026c, by a different session after my previous PR) is no
---   longer in the live database -- neither the map row nor its 2
---   map_eras associations (Era of Vestiges, both languages). Confirmed
---   clean: no orphaned map_pins or entity_links reference it either, so
---   this reads as a deliberate delete (same shape as the earlier
---   omniverse->primordial-map cleanup), not a partial/broken one. This
---   round's handoff never mentioned it -- reflected here because it's
---   live DB truth, flagged because its origin/intent is unconfirmed.
---   "primordial-map" remains the sole map, matching the pre-ea9026c
---   state.
+--               Note: "vestiges-map" (flagged as unexpectedly removed
+--               in the previous update) is back in the live database,
+--               same id/name/image/map_eras as before it briefly
+--               vanished -- reads as a transient editing state rather
+--               than a deliberate removal. Reflected here since it's
+--               current live truth.
 --
 --               Re-ran the full entity_links hidden-visibility
---               integrity sweep (538 rows): zero violations.
+--               integrity sweep (550 rows): zero violations.
 
 -- ============================================================
 -- TRUNCATE (join tables first, then parents, then root tables)
@@ -80,6 +83,7 @@ CASCADE;
 -- ============================================================
 
 INSERT INTO public.maps (id, name, map_type, image) VALUES ('primordial-map', 'Primordial Era Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/PrimordialEraMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('vestiges-map', 'Era of Vestiges Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/VesigesEraMap.png');
 
 -- ============================================================
 -- ERAS (timeline — ERA intervals and POINT moments, ordered by order_index)
@@ -196,6 +200,8 @@ INSERT INTO public.eras (id, name, order_index, type, importance, description, c
 
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('primordial-map', '48ed4b49-b7b5-4d4b-9715-00dcaa819209');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('primordial-map', '36d5e2a5-be00-456b-bf11-113c0b737904');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('vestiges-map', '49187d39-6121-44b9-8477-f19e16fac16b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('vestiges-map', 'eb903d2d-12a2-4e2b-9659-6d2243a8a70f');
 
 -- ============================================================
 -- CHARACTERS
@@ -402,6 +408,20 @@ Seu rosto está sempre oculto — às vezes sob elmos de metal, às vezes sob ca
 Aqueles que o desafiam logo descobrem o quanto isso é inútil. O Cavaleiro abate seus inimigos com facilidade, seja com armas sempre do mais fino corte, seja com magia. Sua presença é facilmente confundida com a de um fantasma — algo etéreo — e diz-se que ele dobra o tempo e as almas com a mesma facilidade com que um escritor dobra as palavras sobre a página.
 
 Ele vaga agora, obstinado, pelo horizonte de eventos do Fnn-816. Ali, onde o tempo não existe, encontra figuras de todas as eras — vivos e mortos, arrastados para dentro do buraco negro e agora presos para sempre naquele éter imóvel. Em seu caminho, encontra seu grande amigo, Valker Kane. Em um último gesto, arremessa-o para longe, lançando-o para fora daquela prisão. A força dessa ação-reação atira o próprio Cavaleiro na direção oposta, rumo ao fundo do buraco. Ali, ele pretende encontrar aquilo que sempre buscou: seu maior inimigo, o fim de sua longa jornada, e mais uma antiga alma que pretende salvar.', 'CANON', '2026-08-01 05:08:47.570283+00', '2026-08-01 05:08:47.570283+00', 'eb903d2d-12a2-4e2b-9659-6d2243a8a70f', 'eb903d2d-12a2-4e2b-9659-6d2243a8a70f', 'pt', 'c4939f45-4dc5-48d5-9bd6-c5bc729cfa5e', false, '6671adff-2357-4f90-a000-8bffb3c4a6d7');
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('39f88985-cf6f-479e-a3ed-dd1c64ea9353', 'Teo VII', 'Teo VII, Verum''s chosen valkari and seventh incarnation of the light of truth, drifts alone through the cosmos aboard her ship the Prima Dyson, searching for any sign of life near the black hole known as the Ender of Worlds.', 'Teo VII is the valkari chosen by Verum himself to carry the light of truth. She wanders the universe now in her seventh incarnation, wearing the form of a young woman with hair and eyes of crystal. Her iris holds the sacred sign of her lineage, and her face is marked with the ornaments common to the alephs.
+
+Teo finds herself alone in space, at the helm of her ship, the Prima Dyson. She is its captain — and its only crew. Lost within the senseless cosmos that surrounds the great black hole called the Ender of Worlds, she searches endlessly for any sign of life. Her only company is her own ship''s voice, which answers her commands with nothing more than "Affirmative," "Adjusting Course," or "Authorized." As she drifts through that stretch of eternity, those few words, spoken in the old Nealdric tongue, remain the only thread still tying her to her memory of a universe once full of life.
+
+And as she passes from planet to planet, sealed in her astronaut''s suit, one thought keeps hammering at her mind: the Great Sun of Lethra — the strongest star still burning before that event horizon. The longer she travels, the more inviting its glow seems to become. As if it were calling to her.
+
+But she must not lose hope. If she is still out there, still venturing through the universe, then surely someone else must be too — somewhere, waiting for her stories, and ready to share their own.', 'CANON', '2026-08-01 14:55:07.055472+00', '2026-08-01 14:55:07.055472+00', '49187d39-6121-44b9-8477-f19e16fac16b', '49187d39-6121-44b9-8477-f19e16fac16b', 'en', '39f88985-cf6f-479e-a3ed-dd1c64ea9353', false, '39f88985-cf6f-479e-a3ed-dd1c64ea9353');
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('aae94127-91ca-4a76-8260-596bb66f74e0', 'Teo VII', 'Teo VII, a valkari escolhida por Verum e sétima encarnação da luz da verdade, vagueia sozinha pelo cosmos a bordo de sua nave, a Prima Dyson, em busca de qualquer sinal de vida perto do buraco negro conhecido como o Encerrador de Mundos.', 'Teo VII é a valkari escolhida pelo próprio Verum para carregar a luz da verdade. Ela vaga agora pelo universo em sua sétima encarnação, vestindo a forma de uma jovem mulher, de cabelos e olhos cristalinos. Sua íris guarda o símbolo sagrado de sua linhagem, e seu rosto traz os ornamentos comuns aos alephs.
+
+Teo se vê sozinha no espaço, ao comando de sua nave, a Prima Dyson. É sua capitã — e também sua única tripulante. Perdida no cosmos sem sentido que envolve o grande buraco negro chamado de Encerrador de Mundos, ela busca sem cessar por qualquer sinal de vida. Sua única companhia é a própria voz de sua nave, que responde a seus comandos apenas com "Afirmativo", "Ajustando Rota" ou "Autorizado". Enquanto viaja à deriva por essa extensão da eternidade, essas poucas palavras, ditas no velho idioma nealdrico, permanecem o único fio que ainda a liga à memória de um universo que um dia esteve cheio de vida.
+
+E, ao passar de planeta em planeta, presa em seu traje de astronauta, um pensamento não para de martelar sua mente: o Grande Sol de Lethra — a estrela mais forte ainda a arder diante daquele horizonte de eventos. Quanto mais ela viaja, mais convidativo aquele brilho parece se tornar. Como se a chamasse.
+
+Mas ela não pode perder a esperança. Se ela ainda está ali, ainda se aventurando pelo universo, então certamente deve haver mais alguém em algum lugar — à espera de suas histórias, e disposto a compartilhar as suas próprias.', 'CANON', '2026-08-01 14:55:53.063144+00', '2026-08-01 14:55:53.063144+00', 'eb903d2d-12a2-4e2b-9659-6d2243a8a70f', 'eb903d2d-12a2-4e2b-9659-6d2243a8a70f', 'pt', '39f88985-cf6f-479e-a3ed-dd1c64ea9353', false, 'aae94127-91ca-4a76-8260-596bb66f74e0');
 INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('e5a5f4d2-ca44-45f1-a9b2-5cce46e69e30', 'Hexas', 'The goddess of Union and the Protection of Family, daughter of Tetros. Where her father endures alone, Hexas draws the circle that makes separation unnecessary — the deity of what remains after passion settles: the shared meal, the familiar face, the threshold crossed together.', 'Hexas is the goddess of number six, daughter of Tetros. She is the deity of union and of the protection of family and loved ones, and she bears her father''s gift for endurance without his isolation. Where Tetros stands alone, immovable, Hexas draws the circle that makes separation unnecessary. Her symbol is a hexagon ringed with circles at every vertex — each node distinct, each one touching two others, no point left without a neighbor.
 
 She is not a goddess of passion or of romance. She is the goddess of what remains after the fire settles: the shared meal, the threshold crossed together, the familiar face across the room. Her devotees keep small tokens of her symbol above doorways, believing she holds the boundary between home and the world — keeping the outside out, and the inside whole.', 'CANON', '2026-07-05 14:54:19.314512+00', '2026-07-16 03:16:59.454813+00', '48ed4b49-b7b5-4d4b-9715-00dcaa819209', NULL, 'en', 'e5a5f4d2-ca44-45f1-a9b2-5cce46e69e30', false, 'e5a5f4d2-ca44-45f1-a9b2-5cce46e69e30');
@@ -806,6 +826,8 @@ INSERT INTO public.character_categories (character_id, category) VALUES ('d01588
 INSERT INTO public.character_categories (character_id, category) VALUES ('49704c84-9e7a-460f-856b-6d644601498a', 'DEITY');
 INSERT INTO public.character_categories (character_id, category) VALUES ('c4939f45-4dc5-48d5-9bd6-c5bc729cfa5e', 'VILLAIN');
 INSERT INTO public.character_categories (character_id, category) VALUES ('6671adff-2357-4f90-a000-8bffb3c4a6d7', 'VILLAIN');
+INSERT INTO public.character_categories (character_id, category) VALUES ('39f88985-cf6f-479e-a3ed-dd1c64ea9353', 'DEITY');
+INSERT INTO public.character_categories (character_id, category) VALUES ('aae94127-91ca-4a76-8260-596bb66f74e0', 'DEITY');
 INSERT INTO public.character_categories (character_id, category) VALUES ('988bdd8a-04a5-4e34-9857-f72918bec3a0', 'DEITY');
 INSERT INTO public.character_categories (character_id, category) VALUES ('972854ca-dffb-4a2e-b7bc-759bd8bcb3a0', 'DEITY');
 INSERT INTO public.character_categories (character_id, category) VALUES ('32168a53-162c-4f6a-9fb9-8b3fd4cb3988', 'DEITY');
@@ -969,6 +991,24 @@ Isso não é uma falha do conhecimento que a paciência ou o estudo venham event
 - Aggraxæmon — Deus dos Horrores
 - Δrøx — Deusa da Convergência
 - Slronöir — Deus da Eternidade', 'CANON', '2026-07-30 02:16:57.403873+00', '2026-07-30 02:16:57.403873+00', '36d5e2a5-be00-456b-bf11-113c0b737904', NULL, 'pt', 'e70bccfd-8bbc-4aa3-bf1c-6d3d6078a389', false, 'd4c683ad-8d4f-4710-85e6-9a9b30676d3d');
+INSERT INTO public.factions (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('bc528952-0a2e-4725-9f08-0f06efb61132', 'The Order of the White Flag', 'Founded in the Age of Heroes after Profundiumbra''s fall, the Order of the White Flag (later the World Peacekeeping Federation) preaches Placidus Salda''s philosophy of chosen non-violence and works toward crowning a Solar King to unite the world in peace.', 'The Order of the White Flag — later renamed the World Peacekeeping Federation — was founded in the Age of Heroes, in the wake of Profundiumbra''s fall. With the greatest political and economic power of that age suddenly gone, a handful of sages and diplomats came together and resolved to join their efforts, building an organization charged with keeping the peace among every nation, in every world. Its leader in those early days was Placidus Salda, a former gladiator who had risen to become Lanista of the now-fallen Empire.
+
+Over the years, Placidus had come to understand that sport was among the finest ways to dissolve the violence and the natural rage that lives in every human heart, and from that understanding he built a philosophy: that a non-violent alternative should always be sought, in every situation. He argued there was no sense in denying one''s instincts or one''s emotions — that to accept them was itself part of the skill of mastering them. In the end, he held, the choice of how to act always belongs to the individual; it is society''s task to prepare that individual to face their own feelings, so that the right choice is the one they make.
+
+The Order took up devotion to Ramon, god of peace and benevolence, whose pacifist teachings fit its philosophy without friction. And yet not every member of the Order is a devout preacher — the Clergy of Ramon, with its own priestly structure, remains independent and separate, even as it stands firmly allied to the Order''s cause.
+
+Since then, the Order''s members have scattered across the world, working to preach their practices and to hold festivals of peace and celebration. They labor to spread healthy competition as an alternative to war, and impartial judgment as a way to close the door on cycles of hatred. Their aim is to raise up their own King — one they will name the Solar King — with political influence enough to shape the world''s institutions, mitigating conflict, spreading their methods, until, eventually, the whole world stands beneath his just and peaceful rule.
+
+Many attempts have been made over the years, but for one reason or another, the Solar King has never once been crowned. Some of the chosen fled the weight of the role. Others lacked the influence it demanded. Others still were struck down by acts of terror. And yet the Order endures — stubborn, resilient — carrying still its noble aim: to save the world from itself.', 'CANON', '2026-08-01 14:54:27.391634+00', '2026-08-01 14:54:27.391634+00', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e', 'en', 'bc528952-0a2e-4725-9f08-0f06efb61132', false, 'bc528952-0a2e-4725-9f08-0f06efb61132');
+INSERT INTO public.factions (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('29d90741-4bd5-464f-8fe1-a7a8c2ef3658', 'A Ordem da Bandeira Branca', 'Fundada na Era dos Heróis após a queda de Profundiumbra, a Ordem da Bandeira Branca (mais tarde Federação Pacificadora Mundial) prega a filosofia de não-violência escolhida de Placidus Salda e busca coroar um Rei Solar para unir o mundo em paz.', 'A Ordem da Bandeira Branca — mais tarde renomeada Federação Pacificadora Mundial — foi fundada na Era dos Heróis, logo após a queda da Profundiumbra. Com a maior potência política e econômica daquela era subitamente removida, um punhado de sábios e diplomatas se uniu e decidiu somar esforços, erguendo uma organização encarregada de manter a paz entre todas as nações, em todos os mundos. Seu líder, naqueles primeiros dias, foi Placidus Salda, um antigo gladiador que havia se tornado Lanista do Império, agora caído.
+
+Ao longo dos anos, Placidus compreendera que o esporte era uma das melhores formas de dissolver a violência e a ira natural que habita o coração humano, e dessa compreensão construiu uma filosofia: a de que se deveria sempre buscar uma alternativa não violenta para toda situação. Ele argumentava que não havia sentido em negar os próprios instintos ou emoções — que aceitá-los já era parte da habilidade de dominá-los. No fim, sustentava ele, a decisão de como agir sempre pertence ao indivíduo; cabe à sociedade prepará-lo para lidar com os próprios sentimentos, para que a escolha certa seja aquela que ele faz.
+
+A Ordem adotou a devoção a Ramon, deus da paz e da benevolência, cujos ensinamentos pacifistas se encaixam sem atrito em sua filosofia. Ainda assim, nem todo membro da Ordem é um pregador devoto — o Clero de Ramon, com sua própria estrutura sacerdotal, permanece independente e separado, ainda que firmemente aliado à causa da Ordem.
+
+Desde então, os membros da Ordem se espalharam pelo mundo, trabalhando para pregar suas práticas e promover celebrações de paz. Empenham-se em difundir a competição saudável como alternativa à guerra, e o julgamento imparcial como forma de encerrar ciclos de ódio. Seu objetivo é elevar seu próprio Rei — a quem chamarão de Rei Solar — com influência política suficiente para moldar as instituições do mundo, mitigando conflitos, espalhando seus métodos, até que, eventualmente, o mundo inteiro se erga sob seu reinado justo e pacífico.
+
+Muitas tentativas foram feitas ao longo dos anos, mas, por um motivo ou outro, o Rei Solar jamais foi sagrado. Alguns dos escolhidos fugiram do peso do papel. Outros não tinham a influência que ele exigia. Outros ainda foram derrubados por atos de terror. E, ainda assim, a Ordem persiste — teimosa, resiliente — carregando seu objetivo nobre: salvar o mundo de si mesmo.', 'CANON', '2026-08-01 14:54:35.29931+00', '2026-08-01 14:54:35.29931+00', '42ebd1d2-b526-427e-b912-c9d40fb78e8a', '3fdc7efb-17d8-4575-8106-146953843f09', 'pt', 'bc528952-0a2e-4725-9f08-0f06efb61132', false, '29d90741-4bd5-464f-8fe1-a7a8c2ef3658');
 
 -- ============================================================
 -- FACTION CATEGORIES
@@ -978,6 +1018,8 @@ INSERT INTO public.faction_categories (faction_id, category) VALUES ('c964a915-1
 INSERT INTO public.faction_categories (faction_id, category) VALUES ('186e1df4-226c-4a0c-b0ab-3520aad3f91f', 'DIVINE');
 INSERT INTO public.faction_categories (faction_id, category) VALUES ('e70bccfd-8bbc-4aa3-bf1c-6d3d6078a389', 'DIVINE');
 INSERT INTO public.faction_categories (faction_id, category) VALUES ('d4c683ad-8d4f-4710-85e6-9a9b30676d3d', 'DIVINE');
+INSERT INTO public.faction_categories (faction_id, category) VALUES ('bc528952-0a2e-4725-9f08-0f06efb61132', 'ORDER');
+INSERT INTO public.faction_categories (faction_id, category) VALUES ('29d90741-4bd5-464f-8fe1-a7a8c2ef3658', 'ORDER');
 
 -- ============================================================
 -- FACTION MEMBERS
@@ -1650,6 +1692,35 @@ E por tudo isso, silenciosamente, sem anúncio, ele espalhou a sua semente. Pelo
 Pelo que esperam, ele não revelou. Se há uma forma final para o que pretende, ou se a intenção é simplesmente a degradação lenta e total de tudo o que se sustenta, não se sabe. O que se sabe é que ele é paciente, que a sua paciência já sobreviveu à guerra que definiu a Era Primordial, e que tudo o que existe na paz que se seguiu àquela guerra existe sobre uma fundação que Punic tem ajustado silenciosamente, num movimento não detetado de cada vez, em direção ao dia em que cobrará tudo o que colocou.
 
 Nesse dia, diz-se, ele reduzirá toda a existência a fragmentos retalhados do que eram.', 'CANON', '2026-07-26 09:39:21.60494+00', '2026-08-01 05:07:59.607734+00', '36d5e2a5-be00-456b-bf11-113c0b737904', NULL, 'pt', '9fd9430d-88f4-457d-9b65-8e3f0b66e27e', true, '47173b14-2dab-492b-b594-f735f5b5652c');
+INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('8a9012fa-2a39-4f13-a9f8-c9e04509c2a5', 'Lio-Tekari', 'Os Lio-Tekari são uma espécie quase imortal que funde tecido orgânico e tecnologia, criada pela Dra. Constantia Niobe na cidade utópica de Nova-Singisdônia, organizada em cinco biotipos, cada um voltado a uma função social distinta.', 'Os Lio-Tekari se consideram os últimos valkani. A palavra Tekari pode ser grosseiramente traduzida como "aquele elevado pela tecnologia" — e é exatamente isso que são: mortais aperfeiçoados quase até o ponto da perfeição.
+
+Sua criadora foi a Dra. Constantia Niobe, especialista em robótica prostética e membro de alta patente da Federação Pacificadora Mundial. Os Lio-Tekari, porém, nunca foram sua obra final — apenas uma peça de um plano muito maior. Constantia pretendia erguer uma Utopia: uma sociedade ordenada até o último detalhe, na qual cada indivíduo tivesse uma função, e todo planejamento fosse traçado com tal precisão que jamais pudesse falhar.
+
+Ela deu a esse lugar o nome de Nova-Singisdônia, dito ter surgido em algum momento da Era dos Encontros. Sua magnitude passou para a lenda — aqueles que ainda contam sua história a chamam de a maior civilização de qualquer era. E a razão dessa grandeza foram os próprios Lio-Tekari, e o cuidado com que foram projetados.
+
+Todo indivíduo da espécie é uma fusão de tecido orgânico e tecnologia. A reprodução exige intervenção artificial: nenhum Lio-Tekari é capaz de iniciar sua própria gestação, ou de dar à luz, sem assistência especializada — e, mesmo que de alguma forma conseguisse, o recém-nascido não sobreviveria sem cuidados imediatos próprios. Em troca, os Lio-Tekari são feitos para durar. Suas células são, na prática, imortais, e notavelmente resistentes a falhas em cada divisão — o resultado é um povo que praticamente não envelhece nem adoece.
+
+Os Lio-Tekari não conhecem divisão em dois sexos. Em vez disso, se organizam em cinco biotipos distintos, cada um com sua própria arquitetura hormonal. O biotipo é escolhido no momento da concepção, e concede os traços que permitirão àquele indivíduo cumprir seu lugar na sociedade. Independentemente do biotipo, um Lio-Tekari pode apresentar-se feminino, masculino, ou algo entre os dois — não existe qualquer relação entre a forma exterior e a função biológica.
+
+Biotipo-1 é voltado para a força muscular, e seus indivíduos são selecionados para o trabalho físico e o treinamento militar. Nova-Singisdônia, apesar de constitucionalmente devotada à paz, ainda mantém uma força para se defender — enquanto isso continuar sendo necessário.
+
+Biotipo-2 é voltado para o intelecto, selecionado para a liderança estratégica e a educação. Decidem o caminho que a sociedade deve trilhar, e levam esse planejamento ao restante da comunidade.
+
+Biotipo-3 é voltado para a empatia — o único biotipo capaz de engravidar, com auxílio artificial — e demonstra talento particular para cuidar de crianças, de feridos e, em raros casos, de doentes ou idosos. Também atuam como diplomatas e facilitadores de relações além da cidade.
+
+Biotipo-4 é voltado para a criatividade, encarregado de entreter a população por meio da arte e da inovação.
+
+Biotipo-5 é voltado para a eficiência física — mais rápidos e ágeis que os demais — e cuida das patrulhas e de qualquer tarefa que exija esforço sustentado, além da coleta de dados para além das fronteiras da cidade.
+
+Os indivíduos são produzidos, assim, já com uma vocação ajustada à necessidade da comunidade, e criados para contribuir da melhor forma possível. A educação dos Lio-Tekari é inteiramente construída em torno do equilíbrio social: toda criança pertence à sociedade como um todo, jamais a uma única família — pertencem a todos, e todos pertencem a elas. Recursos e riquezas também são distribuídos de forma igualitária, para que nada recompense a individualidade em detrimento da colaboração voluntária.
+
+Seus corpos são moldados para diversas funções ao mesmo tempo. Um pequeno orifício na garganta permite que ingiram uma massa alimentar nutritiva; ao mesmo tempo, conectores neurais permitem que estimulem seus próprios sentidos e hormônios, disparando diretamente a sensação de saciedade. Em vez de comer algo saboroso, eles se nutrem dessa pasta e conectam um chip que lhes concede a experiência de terem provado algo delicioso. Esses mesmos estimuladores neurais podem simular quase tudo — a quietude da meditação, o prazer sexual, e tudo entre um e outro. Um Lio-Tekari está sempre no comando de suas próprias sensações.
+
+Sua pele tende, na maior parte, ao moreno profundo; cabelos e olhos costumam ser escuros também — herança de genes vindos da mistura de muitos povos daquela época, na qual a melanina passou a dominar. Sua tolerância ao calor, ao frio, à fome e à sede é notável, mesmo sem seus reguladores artificiais, o que reduz ainda mais as chances de sucumbirem a alguma fatalidade comum. Ainda que majoritariamente orgânicos, não é raro nem difícil que um Lio-Tekari receba próteses mecânicas adequadas à tarefa que lhe é designada. Após um acidente, um Lio-Tekari ferido pode receber tratamento e substituir partes danificadas do corpo sem grande dificuldade — sua biologia está naturalmente preparada para aceitar componentes mecânicos como parte de si mesma.
+
+Como já dito, os Lio-Tekari podem viver sem fim. Alguns demonstram, sim, fraqueza e sinais de idade ao longo dos anos, mas isso parece ser mais exceção que regra. Estudos sugerem que, em condições ideais, um Lio-Tekari é simplesmente imortal. Para lidar com o peso do acúmulo de memória, seus cérebros podem receber estímulo de ferramentas externas que restauram seu funcionamento e reorganizam memórias e experiências — poupando-os de qualquer doença degenerativa do tecido neural.
+
+E assim seguem: os valkani perfeitos, em corpo, em mente e em propósito social. Deveria ser, então, apenas uma questão de tempo até que se espalhem pelo universo como a verdadeira raça superior.', 'CANON', '2026-08-01 14:54:56.75836+00', '2026-08-01 14:54:56.75836+00', '7aba3c3a-c576-4efa-8684-c068177e0f3e', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', '622fe5c3-2a4c-44ce-b288-b29774a9c914', false, '8a9012fa-2a39-4f13-a9f8-c9e04509c2a5');
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('521ccad8-cbe0-46ac-823b-b874bd83aba1', 'The Calling of Twelve Amets', 'The myth of how the first concepts came to drift through the primordial eternity, and of the single request — made by Imaws and Ælime to twelve of their own children — that set the entire plot of the universe into motion, for better and for far worse.', 'The Amets
 Before there was a world to hold anything, there was the union of Imaws and Ælime — the architect and the impulse, the law and the want, working as the two halves of a single, undivided will. From that union came the Amets: the first concepts ever to exist, born not into a world but into the eternity that came before a world was possible. They had no ground to stand on and no sky to be measured against. They simply drifted, numberless and formless yet utterly real, through the primordial dark — concepts before there was anything for a concept to describe.
 
@@ -1775,6 +1846,35 @@ Por vezes, um deus desperta o desejo de presenciar o mundo material por si mesmo
 Outras vezes, é o valkani quem ascende. Muitos povos instituíram ritos culturais para isso — selecionam um de seus próprios filhos e o criam e educam desde cedo nos valores de um deus escolhido, até que chegue o dia do alinhamento, e a força divina seja invocada e feita carne nele. Mas também é possível que um indivíduo seja levado à ascensão apenas por suas próprias motivações, trilhando esse caminho sozinho — seja por ambição de poder, seja por um propósito mais nobre.
 
 Os elevani são adorados como deuses por direito próprio e, na maioria das vezes, formalmente contados entre eles. Um elevani nunca é uma cópia exata do deus do qual originalmente proveio — é algo novo, nascido da combinação entre um conceito antigo e uma personalidade nova, valores próprios e novos. É, assim, inteiramente possível que um elevani venha a assumir um novo domínio, um novo conceito por completo, diferente daquele que primeiro lhe concedeu seu poder. E é só justo, então, que essa nova entidade reivindique seu próprio lugar entre os divinos, e receba a adoração daqueles que a seguem.', 'CANON', '2026-08-01 04:56:57.434478+00', '2026-08-01 04:56:57.434478+00', 'eb903d2d-12a2-4e2b-9659-6d2243a8a70f', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', '9ab1acdd-10a1-4cf5-a263-12c6594fcf0c', false, '204e838e-5510-4b8e-8614-bf82787df2e0');
+INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id) VALUES ('622fe5c3-2a4c-44ce-b288-b29774a9c914', 'Lio-Tekari', 'The Lio-Tekari are a near-immortal species fusing organic tissue and technology, created by Dr. Constantia Niobe in the utopian city of Nova-Singisdônia, organized into five biotypes each bred for a distinct social function.', 'The Lio-Tekari consider themselves the last valkani. The word Tekari can be roughly rendered as "one elevated by technology" — and that is precisely what they are: mortals refined to something very near perfection.
+
+Their creator was Dr. Constantia Niobe, a specialist in prosthetic robotics and a high-ranking member of the World Peacekeeping Federation. The Lio-Tekari were never her final work, though — merely one piece of a far larger design. Constantia meant to build a Utopia: a society ordered down to its last detail, in which every individual held a function, and every plan was drawn so precisely it could never fail.
+
+She called that place Nova-Singisdônia, said to have risen at some point during the Age of Encounters. Its scale has passed into legend — those who still tell its story name it the greatest civilization of any era. And the reason for that greatness was the Lio-Tekari themselves, and the care with which they were designed.
+
+Every member of the species is a fusion of organic tissue and technology. Reproduction demands artificial intervention: no Lio-Tekari can begin their own gestation, or give birth, without specialized assistance — and even if they somehow could, the newborn would not survive without immediate care of its own. In exchange, the Lio-Tekari are built to endure. Their cells are, for practical purposes, immortal, and remarkably resistant to failure through every division — the result is a people who neither age nor sicken in any meaningful way.
+
+The Lio-Tekari know no division into two sexes. Instead, they fall into five distinct biotypes, each with its own hormonal architecture. A biotype is chosen at the moment of conception, and grants the traits that will let that individual fulfill their place in society. Whatever their biotype, a Lio-Tekari may present as feminine, masculine, or something between — there is no link at all between outward form and biological function.
+
+Biotype-1 is built for muscular strength, and its individuals are selected for physical labor and military training. Nova-Singisdônia, for all its constitutional devotion to peace, still keeps a force to defend itself — for as long as that remains necessary.
+
+Biotype-2 is built for intellect, selected for strategic leadership and education. They decide the path society should walk, and carry that plan to the rest of the community.
+
+Biotype-3 is built for empathy — the only biotype able to carry a pregnancy, with artificial assistance — and shows a particular gift for caring for children, the injured, and, on rare occasion, the sick or the aged. They also serve as diplomats, and as facilitators of relations beyond the city.
+
+Biotype-4 is built for creativity, tasked with entertaining the population through art and invention.
+
+Biotype-5 is built for physical efficiency — faster, more agile than the rest — and handles patrols and any task demanding sustained effort, along with the gathering of data beyond the city''s own borders.
+
+Individuals are produced, then, with a vocation already matched to the community''s need, and raised to contribute in whatever way serves best. The Lio-Tekari''s education is built entirely around social balance: every child belongs to the whole of society, never to a single family — they belong to all, and all belong to them. Resources and wealth are shared out equally as well, so that nothing rewards individuality over voluntary cooperation.
+
+Their bodies are shaped for many functions at once. A small opening at the throat lets them take in a nutrient paste; at the same time, neural connectors let them stimulate their own senses and hormones, triggering the sensation of satisfaction directly. Rather than eating something flavorful, they nourish themselves on the paste and plug in a chip that grants them the experience of having tasted something delicious. Those same neural stimulators can simulate almost anything — the stillness of meditation, sexual pleasure, and everything between. A Lio-Tekari is always in command of their own sensations.
+
+Their skin runs, most often, to deep brown; their hair and eyes tend dark as well — the legacy of genes drawn from a mixture of many peoples of that age, in which melanin came to dominate. Their tolerance for heat, cold, hunger, and thirst is remarkable, even without their artificial regulators, which further shrinks the odds of any of them falling to some ordinary fatality. Though mostly organic, it is neither rare nor difficult for a Lio-Tekari to receive mechanical prostheses suited to whatever task they are given. After an accident, an injured Lio-Tekari can receive treatment and exchange damaged parts of their body with little difficulty — their biology is naturally built to accept mechanical components as part of itself.
+
+As already said, the Lio-Tekari can live without end. Some do show weakness or the signs of age over the years, but these seem the exception rather than the rule. Studies suggest that, under ideal conditions, a Lio-Tekari is simply immortal. To manage the sheer weight of accumulated memory, their brains can take stimulus from external tools that restore their function and reorganize memory and experience — sparing them any degenerative disease of neural tissue.
+
+And so they carry on: the perfect valkani, in body, in mind, and in social purpose. It should, then, be only a matter of time before they spread across the universe as the true superior race.', 'CANON', '2026-08-01 14:54:49.49211+00', '2026-08-01 14:54:49.49211+00', '13bd8972-a1c3-4e37-82b1-6f05e4040566', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', '622fe5c3-2a4c-44ce-b288-b29774a9c914', false, '622fe5c3-2a4c-44ce-b288-b29774a9c914');
 
 -- ============================================================
 -- LORE CATEGORIES
@@ -1794,6 +1894,8 @@ INSERT INTO public.lore_categories (lore_id, category) VALUES ('86550df5-4d20-4b
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('a96e56ee-3b1e-46dd-90f0-2818379e3531', 'MYTH');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('9fd9430d-88f4-457d-9b65-8e3f0b66e27e', 'MYTH');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('47173b14-2dab-492b-b594-f735f5b5652c', 'MYTH');
+INSERT INTO public.lore_categories (lore_id, category) VALUES ('622fe5c3-2a4c-44ce-b288-b29774a9c914', 'HISTORY');
+INSERT INTO public.lore_categories (lore_id, category) VALUES ('8a9012fa-2a39-4f13-a9f8-c9e04509c2a5', 'HISTORY');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('ea292de9-5429-4ecb-b821-7e1e168ffbca', 'MYTH');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('ea292de9-5429-4ecb-b821-7e1e168ffbca', 'PHILOSOPHY');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('334b7fb3-31e3-4a10-a3ce-4c6afb791934', 'MYTH');
@@ -2349,6 +2451,18 @@ INSERT INTO public.entity_links (id, source_type, source_id, target_type, target
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('ba5e215c-d3aa-4a0a-9f7f-c5c45330c76b', 'CHARACTER', '9f7c3d96-e49b-4e98-bcd8-dc36d9f2ff3d', 'CHARACTER', '9f55b0ea-59fb-4ed9-b567-5ef28cdc5896', '2026-07-30 02:18:56.634732+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('aadd3f6d-a294-44cc-b492-b6b3a92fde71', 'CHARACTER', '9f7c3d96-e49b-4e98-bcd8-dc36d9f2ff3d', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', '2026-07-30 02:18:56.634732+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('2a5a996f-f0be-4cef-8ed8-d4927ae1803f', 'CHARACTER', '49644efa-26f1-498f-986a-bd5d2e83b7ab', 'CHARACTER', '91df7da3-f84f-4ad3-bf7b-73bf29289a07', '2026-08-01 05:03:34.47073+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('9ed158f4-c163-425f-b95b-4a3323281556', 'CHARACTER', '39f88985-cf6f-479e-a3ed-dd1c64ea9353', 'CHARACTER', 'e1d5f144-37f5-46fb-9f65-0d65f53e4b2c', '2026-08-01 14:55:07.140398+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('9e22c64e-b79f-4ee0-9676-4087c4a93436', 'CHARACTER', '39f88985-cf6f-479e-a3ed-dd1c64ea9353', 'LORE', '9ab1acdd-10a1-4cf5-a263-12c6594fcf0c', '2026-08-01 14:55:07.140398+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('0a50569e-5ad1-403c-89b9-588b58da9ab8', 'CHARACTER', '39f88985-cf6f-479e-a3ed-dd1c64ea9353', 'CHARACTER', '3aafd441-affa-44b6-a119-4c71f7e384c8', '2026-08-01 14:55:07.140398+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('5dae1cb9-4fe7-4d96-b81a-542854cf4074', 'CHARACTER', '39f88985-cf6f-479e-a3ed-dd1c64ea9353', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-08-01 14:55:07.140398+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('ffaab91a-deab-47b1-8107-e81a4f69bd79', 'CHARACTER', '39f88985-cf6f-479e-a3ed-dd1c64ea9353', 'LORE', 'ebd1073f-0a52-4c17-86c3-bfc1cb491a22', '2026-08-01 14:55:07.140398+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('735315d7-5fa0-43a8-af88-0755585988f5', 'CHARACTER', '39f88985-cf6f-479e-a3ed-dd1c64ea9353', 'LORE', 'c4ba4207-7857-49ab-8e22-5acc57ea2cd5', '2026-08-01 14:55:07.140398+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('59e87d9b-627d-44f0-a348-962f1991b72a', 'CHARACTER', 'aae94127-91ca-4a76-8260-596bb66f74e0', 'CHARACTER', 'fca2a9c8-fc22-4017-ab48-4d63ec6cbe4c', '2026-08-01 14:55:53.147711+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('63c01091-6a6e-4f3a-bfbc-f10b3e579035', 'CHARACTER', 'aae94127-91ca-4a76-8260-596bb66f74e0', 'LORE', '204e838e-5510-4b8e-8614-bf82787df2e0', '2026-08-01 14:55:53.147711+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('1ae4d381-8ce5-4c84-ae1f-c38bab69e6f8', 'CHARACTER', 'aae94127-91ca-4a76-8260-596bb66f74e0', 'CHARACTER', '49644efa-26f1-498f-986a-bd5d2e83b7ab', '2026-08-01 14:55:53.147711+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('c0d7f4b7-7241-40c7-8984-c1c59892c61f', 'CHARACTER', 'aae94127-91ca-4a76-8260-596bb66f74e0', 'LORE', '8986dc8b-69b3-4f61-bfac-1036d3ffba60', '2026-08-01 14:55:53.147711+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('e4863a58-ef45-4d27-85ff-e8d4c22de9c7', 'CHARACTER', 'aae94127-91ca-4a76-8260-596bb66f74e0', 'LORE', 'acf5d45d-2163-4918-a4dd-eaac675ba44e', '2026-08-01 14:55:53.147711+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('15889372-7f53-4e11-baee-0c5a7049e2d1', 'CHARACTER', 'aae94127-91ca-4a76-8260-596bb66f74e0', 'LORE', '91165b17-3214-40b5-bbf3-0f4432905570', '2026-08-01 14:55:53.147711+00');
 
 -- ============================================================
 -- IMAGES
@@ -2566,6 +2680,18 @@ INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) 
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('c4939f45-4dc5-48d5-9bd6-c5bc729cfa5e', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Kwan-2.png', 1);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('6671adff-2357-4f90-a000-8bffb3c4a6d7', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Kwan-1.png', 0);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('6671adff-2357-4f90-a000-8bffb3c4a6d7', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Kwan-2.png', 1);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('bc528952-0a2e-4725-9f08-0f06efb61132', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/WhiteFlagOrder.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('29d90741-4bd5-464f-8fe1-a7a8c2ef3658', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/WhiteFlagOrder.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('622fe5c3-2a4c-44ce-b288-b29774a9c914', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/LioTekari.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('8a9012fa-2a39-4f13-a9f8-c9e04509c2a5', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/LioTekari.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('39f88985-cf6f-479e-a3ed-dd1c64ea9353', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/TeoVII-1.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('39f88985-cf6f-479e-a3ed-dd1c64ea9353', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/TeoVII-2.png', 1);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('39f88985-cf6f-479e-a3ed-dd1c64ea9353', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/TeoVII-3.png', 2);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('39f88985-cf6f-479e-a3ed-dd1c64ea9353', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/TeoVII-4.png', 3);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('aae94127-91ca-4a76-8260-596bb66f74e0', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/TeoVII-1.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('aae94127-91ca-4a76-8260-596bb66f74e0', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/TeoVII-2.png', 1);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('aae94127-91ca-4a76-8260-596bb66f74e0', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/TeoVII-3.png', 2);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('aae94127-91ca-4a76-8260-596bb66f74e0', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/TeoVII-4.png', 3);
 
 -- ============================================================
 -- ARCHETYPES
