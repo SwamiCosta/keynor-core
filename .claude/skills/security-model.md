@@ -26,6 +26,10 @@ On the Resource Server side, `ResourceServerConfig#jwtAuthenticationConverter` r
 
 ---
 
+## Self-registration (2026-08-05)
+
+`POST /api/public/v1/auth/register { username, password }` (`AuthController`, `infrastructure.security`) — public, unauthenticated, always creates a `DEFAULT`-role user. There is no self-registration path to `ADMIN`; that role stays manually provisioned via the SQL insert in Step 2 below, per explicit user decision. 409 (`DuplicateEntityNameException`) if `username` already exists. Password is BCrypt-hashed with the existing `PasswordEncoder` bean before storage — same hash format Step 2's manual insert already required.
+
 ## Token flow
 
 - Authorization Server exposes `/oauth2/token`, `/oauth2/authorize`, OIDC discovery
