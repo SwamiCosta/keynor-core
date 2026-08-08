@@ -9,21 +9,26 @@
 | Role | Grantee | Grant type |
 |------|---------|------------|
 | `ADMIN` | Human users (admin panel / RPG integration) | `authorization_code` + PKCE, form login |
+| `DEFAULT` | Human users — regular player/reader accounts (2026-08-05, added for keynor-rpg's player login) | `authorization_code` + PKCE, form login |
 | `SYSTEM` | Service-to-service calls (keynor-rpg, aniannoth, etc.) | `client_credentials` |
 
-Both roles have full access to all `/api/**` endpoints by default. No hierarchy between them. **Exception:** a specific endpoint may be restricted to `ADMIN` only via `@PreAuthorize("hasRole('ADMIN')")` on the controller method (first used by `InternalMapPinController`'s create/delete, PR — map pins feature) — see "Role claim" below for how `ADMIN` becomes a checkable authority.
+`ADMIN` and `SYSTEM` have full access to all `/api/**` endpoints by default. `DEFAULT` is the same as `ADMIN` at the Resource Server level (an authenticated human, same JWT shape) — any endpoint-level distinction between `ADMIN` and `DEFAULT` (e.g. a future keynor-rpg endpoint that only an `ADMIN`-role token should reach) is enforced by the *consuming* service via the same `role` claim, not by keynor-core itself; keynor-core does not know or care what a caller does with the role it issues, beyond its own `ADMIN`-only endpoints below. **Exception, within keynor-core itself:** a specific endpoint may be restricted to `ADMIN` only via `@PreAuthorize("hasRole('ADMIN')")` on the controller method (first used by `InternalMapPinController`'s create/delete, PR — map pins feature) — `DEFAULT` tokens are rejected by these the same way `SYSTEM` tokens are, since they carry a different `ROLE_*` authority. See "Role claim" below for how any role value becomes a checkable authority.
 
 ---
 
 ## Role claim (ADMIN vs SYSTEM at the Resource Server)
 
-The `role` claim is not a built-in part of the JWT — it is added by a custom `OAuth2TokenCustomizer<JwtEncodingContext>` bean (`AuthorizationServerConfig#jwtTokenCustomizer`). It only fires for the `authorization_code` human login flow, where the token's principal is backed by `UserDetails` (from `UserDetailsServiceImpl`, which sets the Spring Security authority `ROLE_<UserRole>` from the `users.role` column — currently only `ADMIN` exists as a `UserRole` value). `client_credentials` tokens (SYSTEM) have no such `UserDetails` principal, so they never receive a `role` claim.
+The `role` claim is not a built-in part of the JWT — it is added by a custom `OAuth2TokenCustomizer<JwtEncodingContext>` bean (`AuthorizationServerConfig#jwtTokenCustomizer`). It only fires for the `authorization_code` human login flow, where the token's principal is backed by `UserDetails` (from `UserDetailsServiceImpl`, which sets the Spring Security authority `ROLE_<UserRole>` from the `users.role` column — `ADMIN` and `DEFAULT` are the two `UserRole` values that can be assigned to a human user row). `client_credentials` tokens (SYSTEM) have no such `UserDetails` principal, so they never receive a `role` claim.
 
 On the Resource Server side, `ResourceServerConfig#jwtAuthenticationConverter` reads the `role` claim (if present) and maps it to a `ROLE_<value>` `GrantedAuthority`; absent, it resolves to no authorities. This is what makes `@PreAuthorize("hasRole('ADMIN')")` reject SYSTEM tokens: they authenticate successfully (satisfying the blanket `.anyRequest().authenticated()`) but carry no `ROLE_ADMIN` authority.
 
 **Before this addition (pre map-pins feature), there was no way to distinguish an ADMIN request from a SYSTEM request at the Resource Server** — both were just "authenticated." Any future endpoint that needs to be ADMIN-only (or SYSTEM-only) should reuse this same `role` claim / `hasRole(...)` mechanism rather than inventing a new one.
 
 ---
+
+## Self-registration (2026-08-05)
+
+`POST /api/public/v1/auth/register { username, password }` (`AuthController`, `infrastructure.security`) — public, unauthenticated, always creates a `DEFAULT`-role user. There is no self-registration path to `ADMIN`; that role stays manually provisioned via the SQL insert in Step 2 below, per explicit user decision. 409 (`DuplicateEntityNameException`) if `username` already exists. Password is BCrypt-hashed with the existing `PasswordEncoder` bean before storage — same hash format Step 2's manual insert already required.
 
 ## Token flow
 
@@ -52,8 +57,8 @@ Spring Security evaluates filter chains in `@Order` sequence — the first chain
 ## CORS
 
 Allowed origins (configured in `ResourceServerConfig`'s `corsConfigurationSource` bean):
-- `http://localhost:5173` (aniannoth-overview dev server)
-- `http://localhost:4173` (aniannoth-overview preview)
+- `http://localhost:5173` — **corrected label, 2026-08-05:** this is `keynor-rpg-client`'s dev server, not `aniannoth-overview`'s. `aniannoth-overview` moved to a fixed port 4173 specifically because both projects default to Vite's 5173 (see `aniannoth-overview/.claude/CLAUDE.md` — "Local environment assumptions"); this origin already covers `keynor-rpg-client` without any CORS change needed for local dev.
+- `http://localhost:4173` (aniannoth-overview dev server and preview — both use this fixed port)
 
 The `CorsConfigurationSource` bean registers patterns for both `/api/**` and `/oauth2/**`, but **registering the pattern is not sufficient by itself** — CORS is enforced per Spring Security filter chain (see "Security filter chains" above), so `.cors(Customizer.withDefaults())` must also be called on every chain that serves an endpoint the browser calls cross-origin via `fetch()`/XHR. `resourceServerSecurityFilterChain` (`/api/**`) has always had this. `authorizationServerSecurityFilterChain` (`/oauth2/**`, including `POST /oauth2/token`) needed it added separately (map-pins PKCE login flow, aniannoth-overview) — `/oauth2/authorize` never needed it (full-page browser navigation, not subject to CORS), which is why the gap went unnoticed until the token exchange itself was exercised.
 
@@ -95,18 +100,24 @@ $2a$10$ncuvtKlGkqK/UGdm8ebus.aWGXCjF8D9STYDp7P8RpoVeTmkCK6GC
 
 Do NOT add any prefix. Store this value exactly as printed.
 
-### Step 2 — Insert the ADMIN user
+### Step 2 — Insert a human user (ADMIN or DEFAULT)
+
+**Corrected 2026-08-05 — the previous version of this example used `email`/`active` columns that do not exist on `users` (see `V1__create_users.sql`); it would fail with `column "email" does not exist` against the real schema.** The actual columns are `username`, `enabled`, and two required (`NOT NULL`, no default) timestamps.
 
 ```sql
-INSERT INTO users (id, email, password, role, active)
+INSERT INTO users (id, username, password, role, enabled, created_at, updated_at)
 VALUES (
     gen_random_uuid(),
     'admin@yourdomain.com',
     '$2a$10$<hash-generated-above>',
     'ADMIN',
-    true
+    true,
+    NOW(),
+    NOW()
 );
 ```
+
+`username` is free text — an email-shaped string works fine, but nothing enforces email format. For a regular player/reader account, use `'DEFAULT'` as the `role` value instead — same shape otherwise.
 
 ### Step 3 — Insert the SYSTEM client
 
@@ -134,7 +145,37 @@ VALUES (
 
 Keep the plaintext secret in a local `.env.local` file (gitignored) — it cannot be recovered from the database after hashing.
 
-### Step 4 — Obtain a token (client_credentials)
+### Step 4 — Register a browser PKCE client (human login for a frontend SPA)
+
+Used by any browser-based frontend doing the `authorization_code`+PKCE human login flow (`aniannoth-overview`'s `AuthContext.tsx`, and `keynor-rpg-client` from 2026-08-05 onward). This was previously undocumented — `aniannoth-overview/.claude/CLAUDE.md` flagged its own `aniannoth-admin` client as "not usable until registered... by the user" with no worked example to follow. Unlike the SYSTEM client, this is a **public client** — no secret, since a value embedded in browser-shipped JS cannot be kept confidential; PKCE (`require-proof-key: true`) is what protects the code exchange instead.
+
+```sql
+INSERT INTO oauth2_registered_client (
+    id, client_id, client_id_issued_at, client_secret, client_name,
+    client_authentication_methods, authorization_grant_types,
+    redirect_uris, post_logout_redirect_uris, scopes, client_settings, token_settings
+)
+VALUES (
+    gen_random_uuid()::text,
+    'rpg-client',
+    NOW(),
+    NULL,
+    'keynor-rpg-client',
+    'none',
+    'authorization_code',
+    'http://localhost:5173/auth/callback',
+    '',
+    'openid',
+    '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":true,"settings.client.require-authorization-consent":false}',
+    '{"@class":"java.util.Collections$UnmodifiableMap","settings.token.reuse-refresh-tokens":true,"settings.token.id-token-signature-algorithm":["org.springframework.security.oauth2.jose.jws.SignatureAlgorithm","RS256"],"settings.token.access-token-time-to-live":["java.time.Duration",3600.000000000],"settings.token.access-token-format":{"@class":"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat","value":"self-contained"},"settings.token.refresh-token-time-to-live":["java.time.Duration",86400.000000000],"settings.token.authorization-code-time-to-live":["java.time.Duration",300.000000000],"settings.token.device-code-time-to-live":["java.time.Duration",300.000000000]}'
+);
+```
+
+`redirect_uris` accepts a single URI here — for multiple environments (LAN hosting, a built/served bundle on a different port), either register additional rows with different `client_id`s, or update this row's `redirect_uris` to match wherever the frontend is actually reachable from. `client_id`s are app-scoped, not role-scoped: the same `rpg-client` row is used whether an `ADMIN` or a `DEFAULT` user logs in — the role comes from which `users` row authenticates during the form-login step, not from which OAuth2 client initiated the request.
+
+**LAN-hosting caveat:** if `keynor-rpg-client` is reached from another machine on the network (not `localhost`), both this row's `redirect_uris` and `ResourceServerConfig`'s CORS `allowedOrigins` must include the host machine's actual LAN-reachable origin, not just `localhost:5173`.
+
+### Step 5 — Obtain a token (client_credentials)
 
 Used by agents and services (Aroneus, keynor-rpg, etc.) for service-to-service calls.
 
@@ -156,14 +197,14 @@ The response includes an `access_token` (Bearer JWT). Use it in subsequent API c
 Authorization: Bearer <access_token>
 ```
 
-### Step 5 — Obtain a token (authorization_code — ADMIN human flow)
+### Step 6 — Obtain a token (authorization_code — human login flow)
 
-Used for the admin panel. Open a browser and navigate to:
+Used for the admin panel and any human-facing frontend (`aniannoth-overview`, `keynor-rpg-client`). Open a browser and navigate to:
 ```
-http://localhost:8080/oauth2/authorize?response_type=code&client_id=<admin-client-id>&redirect_uri=<redirect>&code_challenge=<pkce-challenge>&code_challenge_method=S256
+http://localhost:8080/oauth2/authorize?response_type=code&client_id=<registered-client-id>&redirect_uri=<redirect>&code_challenge=<pkce-challenge>&code_challenge_method=S256
 ```
 
-The Authorization Server redirects to `/login`. Submit ADMIN credentials. After login, the code is returned to the redirect URI and exchanged for a token via `POST /oauth2/token`.
+The Authorization Server redirects to `/login`. Submit the human user's credentials — an `ADMIN` or a `DEFAULT` user, whichever was inserted in Step 2; the resulting token's `role` claim reflects that user's actual `role`, not the client used to log in. After login, the code is returned to the redirect URI and exchanged for a token via `POST /oauth2/token`.
 
 ### Common errors
 
