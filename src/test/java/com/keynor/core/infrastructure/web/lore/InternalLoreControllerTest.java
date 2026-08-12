@@ -50,7 +50,7 @@ class InternalLoreControllerTest {
         Instant now = Instant.now();
         return new Lore(id, "The Age of Silence", "A period of stillness", "Body",
                 List.of(), List.of(LoreCategory.HISTORY),
-                EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
     }
 
     @BeforeEach
@@ -67,7 +67,7 @@ class InternalLoreControllerTest {
         when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
 
         var request = new CreateLoreRequest("The Age of Silence", "A period of stillness", "Body",
-                List.of(), List.of("HISTORY"), "era-1", null, null,"en", null, null, null, false, null, null);
+                List.of(), List.of("HISTORY"), "era-1", null, null,"en", null, null, null, false, null, null, false);
 
         var response = controller.create(request);
 
@@ -83,7 +83,7 @@ class InternalLoreControllerTest {
         when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
 
         var request = new CreateLoreRequest("The Age of Silence", null, null,
-                List.of(), List.of("HISTORY"), "era-1", null, null,"en", null, null, null, false, null, null);
+                List.of(), List.of("HISTORY"), "era-1", null, null,"en", null, null, null, false, null, null, false);
 
         controller.create(request);
 
@@ -100,7 +100,7 @@ class InternalLoreControllerTest {
         when(createLoreUseCase.create(any())).thenReturn(buildLore(id));
 
         var request = new CreateLoreRequest("The Age of Silence", null, null,
-                List.of(), List.of("HISTORY"), "era-1", null, null,"en", null, null, null, false, null, null);
+                List.of(), List.of("HISTORY"), "era-1", null, null,"en", null, null, null, false, null, null, false);
 
         controller.create(request);
 
@@ -115,11 +115,11 @@ class InternalLoreControllerTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Lore canonLore = new Lore(id, "The Age of Silence", null, null, List.of(),
-                List.of(LoreCategory.HISTORY), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(LoreCategory.HISTORY), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(createLoreUseCase.create(any())).thenReturn(canonLore);
 
         var request = new CreateLoreRequest("The Age of Silence", null, null,
-                List.of(), List.of("HISTORY"), "era-1", null, "CANON","en", null, null, null, false, null, null);
+                List.of(), List.of("HISTORY"), "era-1", null, "CANON","en", null, null, null, false, null, null, false);
 
         controller.create(request);
 
@@ -132,7 +132,7 @@ class InternalLoreControllerTest {
     @Test
     void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
         var request = new CreateLoreRequest("The Age of Silence", null, null,
-                List.of(), List.of("HISTORY"), "era-1", null, "DEPRECATED","en", null, null, null, false, null, null);
+                List.of(), List.of("HISTORY"), "era-1", null, "DEPRECATED","en", null, null, null, false, null, null, false);
 
         assertThatThrownBy(() -> controller.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -145,7 +145,7 @@ class InternalLoreControllerTest {
         when(updateLoreUseCase.update(eq(id), any())).thenReturn(buildLore(id));
 
         var request = new UpdateLoreRequest("Updated Lore", null, null,
-                List.of(), List.of("HISTORY"), "era-1", null, null, false, null, null);
+                List.of(), List.of("HISTORY"), "era-1", null, null, false, null, null, false);
 
         var response = controller.update(id, request);
 

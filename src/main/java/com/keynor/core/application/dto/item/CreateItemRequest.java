@@ -22,5 +22,6 @@ public record CreateItemRequest(
         List<EntityLinkRequest> links,
         boolean hidden,
         String riddleText,
-        String password) {
+        String password,
+        boolean common) {
 }

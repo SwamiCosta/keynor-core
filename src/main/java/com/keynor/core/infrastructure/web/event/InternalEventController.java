@@ -62,7 +62,7 @@ public class InternalEventController {
             @RequestParam(defaultValue = "20") int size) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList() : List.of();
-        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false);
+        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false, false);
         var result = findAllEventsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 event -> EventResponse.from(event, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, event.getId()))));
@@ -92,7 +92,8 @@ public class InternalEventController {
                 links,
                 request.hidden(),
                 request.riddleText(),
-                request.password());
+                request.password(),
+                request.common());
         var created = createEventUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(EventResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, created.getId())));
     }
@@ -108,7 +109,8 @@ public class InternalEventController {
                 request.name(), request.summary(), request.body(),
                 request.images() != null ? request.images() : List.of(),
                 categories, timeline, links,
-                request.hidden(), request.riddleText(), request.password());
+                request.hidden(), request.riddleText(), request.password(),
+                request.common());
         var updated = updateEventUseCase.update(id, command);
         return ResponseEntity.ok(EventResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.EVENT, updated.getId())));
     }

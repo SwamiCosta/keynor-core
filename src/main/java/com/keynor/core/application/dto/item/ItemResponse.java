@@ -24,7 +24,8 @@ public record ItemResponse(
         UUID translationGroupId,
         UUID versionGroupId,
         List<LinkedEntityResponse> links,
-        boolean hidden) {
+        boolean hidden,
+        boolean common) {
 
     public static ItemResponse from(Item item, List<EntityLinkSummary> links) {
         return new ItemResponse(
@@ -43,6 +44,7 @@ public record ItemResponse(
                 item.getTranslationGroupId(),
                 item.getVersionGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList(),
-                item.isHidden());
+                item.isHidden(),
+                item.isCommon());
     }
 }

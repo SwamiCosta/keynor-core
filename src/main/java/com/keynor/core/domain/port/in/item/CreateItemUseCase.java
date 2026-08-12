@@ -26,7 +26,8 @@ public interface CreateItemUseCase {
             List<EntityLinkRef> links,
             boolean hidden,
             String riddleText,
-            String password) {}
+            String password,
+            boolean common) {}
 
     Item create(Command command);
 }

@@ -21,7 +21,8 @@ public interface UpdateFactionUseCase {
             List<EntityLinkRef> links,
             boolean hidden,
             String riddleText,
-            String password) {}
+            String password,
+            boolean common) {}
 
     Faction update(UUID id, Command command);
 }

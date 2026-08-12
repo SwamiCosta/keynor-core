@@ -79,7 +79,7 @@ class PublicPlaceControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Place place = new Place(id, "Erevan", "A city", "Body",
-                List.of(), List.of(PlaceCategory.CITY), null, EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(), List.of(PlaceCategory.CITY), null, EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findAllPlacesUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(place), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
@@ -100,7 +100,7 @@ class PublicPlaceControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Place place = new Place(id, "Erevan", "A city", "Body",
-                List.of(), List.of(PlaceCategory.REGION), null, EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(), List.of(PlaceCategory.REGION), null, EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findPlaceByIdUseCase.findById(id)).thenReturn(place);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 

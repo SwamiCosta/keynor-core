@@ -22,7 +22,8 @@ public interface UpdatePlaceUseCase {
             List<EntityLinkRef> links,
             boolean hidden,
             String riddleText,
-            String password) {}
+            String password,
+            boolean common) {}
 
     Place update(UUID id, Command command);
 }

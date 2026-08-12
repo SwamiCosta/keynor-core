@@ -24,7 +24,8 @@ public record EventResponse(
         UUID translationGroupId,
         UUID versionGroupId,
         List<LinkedEntityResponse> links,
-        boolean hidden) {
+        boolean hidden,
+        boolean common) {
 
     public static EventResponse from(Event event, List<EntityLinkSummary> links) {
         return new EventResponse(
@@ -43,6 +44,7 @@ public record EventResponse(
                 event.getTranslationGroupId(),
                 event.getVersionGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList(),
-                event.isHidden());
+                event.isHidden(),
+                event.isCommon());
     }
 }

@@ -79,7 +79,7 @@ class PublicFactionControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Faction faction = new Faction(id, "The Iron Order", "A guild", "Body",
-                List.of(), List.of(FactionCategory.ORDER), List.of(), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(), List.of(FactionCategory.ORDER), List.of(), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findAllFactionsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(faction), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
@@ -100,7 +100,7 @@ class PublicFactionControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Faction faction = new Faction(id, "The Iron Order", "A guild", "Body",
-                List.of(), List.of(FactionCategory.GUILD), List.of(), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(), List.of(FactionCategory.GUILD), List.of(), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findFactionByIdUseCase.findById(id)).thenReturn(faction);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 

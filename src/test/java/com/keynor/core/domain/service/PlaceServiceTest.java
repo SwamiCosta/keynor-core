@@ -70,7 +70,7 @@ class PlaceServiceTest {
                 MapType.NAVIGABLE,
                 null,
                 null, Language.EN, null, null,
-                null, false, null, null);
+                null, false, null, null, false);
         when(placeRepository.existsByNameAndLanguage("Thornvale", Language.EN)).thenReturn(false);
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -92,7 +92,7 @@ class PlaceServiceTest {
                 MapType.NAVIGABLE,
                 null,
                 EntityStatus.CANON, Language.EN, null, null,
-                null, false, null, null);
+                null, false, null, null, false);
         when(placeRepository.existsByNameAndLanguage("Thornvale", Language.EN)).thenReturn(false);
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -106,7 +106,7 @@ class PlaceServiceTest {
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreatePlaceUseCase.Command(
                 "Thornvale", null, null, List.of(),
-                List.of(PlaceCategory.REGION), MapType.ABSTRACT, null, null, Language.EN, null, null, null, false, null, null);
+                List.of(PlaceCategory.REGION), MapType.ABSTRACT, null, null, Language.EN, null, null, null, false, null, null, false);
         when(placeRepository.existsByNameAndLanguage("Thornvale", Language.EN)).thenReturn(true);
 
         assertThatThrownBy(() -> placeService.create(command))
@@ -119,7 +119,7 @@ class PlaceServiceTest {
     void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
         var command = new CreatePlaceUseCase.Command(
                 "Thornvale", null, null, List.of(), List.of(PlaceCategory.CITY),
-                MapType.NAVIGABLE, new Timeline("Nonexistent Era", null), null, Language.EN, null, null, null, false, null, null);
+                MapType.NAVIGABLE, new Timeline("Nonexistent Era", null), null, Language.EN, null, null, null, false, null, null, false);
         when(placeRepository.existsByNameAndLanguage("Thornvale", Language.EN)).thenReturn(false);
         when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
 
@@ -134,7 +134,7 @@ class PlaceServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Place place = new Place(id, "Thornvale", null, null, List.of(),
-                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
 
         Place result = placeService.findById(id);
@@ -154,7 +154,7 @@ class PlaceServiceTest {
 
     @Test
     void findAll_shouldDelegateToRepository() {
-        EntityFilter filter = new EntityFilter(Language.EN, List.of(), List.of(), false);
+        EntityFilter filter = new EntityFilter(Language.EN, List.of(), List.of(), false, false);
         PageRequest pageRequest = new PageRequest(0, 10);
         when(placeRepository.findAll(filter, pageRequest))
                 .thenReturn(new PageResult<>(List.of(), 0, 10, 0));
@@ -170,7 +170,7 @@ class PlaceServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Place place = new Place(id, "Thornvale", null, null, List.of(),
-                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -184,7 +184,7 @@ class PlaceServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Place place = new Place(id, "Thornvale", null, null, List.of(),
-                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -198,7 +198,7 @@ class PlaceServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Place place = new Place(id, "Thornvale", null, null, List.of(),
-                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
 
         assertThatThrownBy(() -> placeService.changeStatus(id, EntityStatus.CANON))
@@ -229,13 +229,13 @@ class PlaceServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Place place = new Place(id, "Old Name", null, null, List.of(),
-                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(PlaceCategory.CITY), MapType.NAVIGABLE, EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(placeRepository.findById(id)).thenReturn(Optional.of(place));
         when(placeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         var command = new UpdatePlaceUseCase.Command(
                 "New Name", "New summary", "New body",
-                List.of(), List.of(PlaceCategory.REALM), MapType.ABSTRACT, null, null, false, null, null);
+                List.of(), List.of(PlaceCategory.REALM), MapType.ABSTRACT, null, null, false, null, null, false);
 
         Place result = placeService.update(id, command);
 

@@ -27,6 +27,9 @@ public class PlaceSpecifications {
         if (filter.excludeHidden()) {
             spec = spec.and((root, query, cb) -> cb.isFalse(root.get("hidden")));
         }
+        if (filter.excludeCommon()) {
+            spec = spec.and((root, query, cb) -> cb.isFalse(root.get("common")));
+        }
 
         return spec;
     }

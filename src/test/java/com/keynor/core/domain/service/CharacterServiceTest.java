@@ -68,7 +68,7 @@ class CharacterServiceTest {
                 List.of(CharacterCategory.HERO),
                 null,
                 null, Language.EN, null, null,
-                null, false, null, null);
+                null, false, null, null, false);
         when(characterRepository.existsByNameAndLanguage("Araveth", Language.EN)).thenReturn(false);
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -88,7 +88,7 @@ class CharacterServiceTest {
                 List.of(CharacterCategory.HERO),
                 null,
                 EntityStatus.CANON, Language.EN, null, null,
-                null, false, null, null);
+                null, false, null, null, false);
         when(characterRepository.existsByNameAndLanguage("Araveth", Language.EN)).thenReturn(false);
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -101,7 +101,7 @@ class CharacterServiceTest {
     @Test
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateCharacterUseCase.Command(
-                "Araveth", null, null, List.of(), List.of(CharacterCategory.NPC), null, null, Language.EN, null, null, null, false, null, null);
+                "Araveth", null, null, List.of(), List.of(CharacterCategory.NPC), null, null, Language.EN, null, null, null, false, null, null, false);
         when(characterRepository.existsByNameAndLanguage("Araveth", Language.EN)).thenReturn(true);
 
         assertThatThrownBy(() -> characterService.create(command))
@@ -125,7 +125,7 @@ class CharacterServiceTest {
         Instant now = Instant.now();
         Character character = new Character(
                 id, "Araveth", null, null, List.of(),
-                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(characterRepository.findById(id)).thenReturn(Optional.of(character));
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -140,7 +140,7 @@ class CharacterServiceTest {
         Instant now = Instant.now();
         Character character = new Character(
                 id, "Araveth", null, null, List.of(),
-                List.of(CharacterCategory.HERO), EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(CharacterCategory.HERO), EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(characterRepository.findById(id)).thenReturn(Optional.of(character));
 
         assertThatThrownBy(() -> characterService.changeStatus(id, EntityStatus.CANON))
@@ -163,13 +163,13 @@ class CharacterServiceTest {
         Instant now = Instant.now();
         Character character = new Character(
                 id, "Old Name", null, null, List.of(),
-                List.of(CharacterCategory.NPC), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(CharacterCategory.NPC), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(characterRepository.findById(id)).thenReturn(Optional.of(character));
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         var command = new UpdateCharacterUseCase.Command(
                 "New Name", "New summary", "New body",
-                List.of(), List.of(CharacterCategory.HERO, CharacterCategory.DEITY), null, null, false, null, null);
+                List.of(), List.of(CharacterCategory.HERO, CharacterCategory.DEITY), null, null, false, null, null, false);
 
         Character result = characterService.update(id, command);
 
@@ -181,7 +181,7 @@ class CharacterServiceTest {
     void create_shouldThrowUnknownEraNameException_whenTimelineEraDoesNotExist() {
         var command = new CreateCharacterUseCase.Command(
                 "Araveth", null, null, List.of(), List.of(CharacterCategory.HERO),
-                new Timeline("Nonexistent Era", null), null, Language.EN, null, null, null, false, null, null);
+                new Timeline("Nonexistent Era", null), null, Language.EN, null, null, null, false, null, null, false);
         when(characterRepository.existsByNameAndLanguage("Araveth", Language.EN)).thenReturn(false);
         when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
 
@@ -193,7 +193,7 @@ class CharacterServiceTest {
 
     @Test
     void findAll_shouldDelegateToRepository() {
-        EntityFilter filter = new EntityFilter(Language.EN, List.of(), List.of(), false);
+        EntityFilter filter = new EntityFilter(Language.EN, List.of(), List.of(), false, false);
         PageRequest pageRequest = new PageRequest(0, 10);
         when(characterRepository.findAll(filter, pageRequest))
                 .thenReturn(new PageResult<>(List.of(), 0, 10, 0));
@@ -209,7 +209,7 @@ class CharacterServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Character character = new Character(id, "Araveth", null, null, List.of(),
-                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(characterRepository.findAllByIds(List.of(id))).thenReturn(List.of(character));
 
         List<Character> result = characterService.findByIds(List.of(id));
@@ -222,7 +222,7 @@ class CharacterServiceTest {
         var command = new CreateCharacterUseCase.Command(
                 "Araveth", null, null,
                 List.of("https://example.com/araveth.png", "https://example.com/araveth2.png"),
-                List.of(CharacterCategory.HERO), null, null, Language.EN, null, null, null, false, null, null);
+                List.of(CharacterCategory.HERO), null, null, Language.EN, null, null, null, false, null, null, false);
         when(characterRepository.existsByNameAndLanguage("Araveth", Language.EN)).thenReturn(false);
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -236,7 +236,7 @@ class CharacterServiceTest {
     @Test
     void create_shouldReturnCharacterWithEmptyImages_whenNoImagesProvided() {
         var command = new CreateCharacterUseCase.Command(
-                "Araveth", null, null, List.of(), List.of(CharacterCategory.HERO), null, null, Language.EN, null, null, null, false, null, null);
+                "Araveth", null, null, List.of(), List.of(CharacterCategory.HERO), null, null, Language.EN, null, null, null, false, null, null, false);
         when(characterRepository.existsByNameAndLanguage("Araveth", Language.EN)).thenReturn(false);
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -252,14 +252,14 @@ class CharacterServiceTest {
         Character character = new Character(
                 id, "Araveth", null, null,
                 List.of("https://example.com/old.png"),
-                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(characterRepository.findById(id)).thenReturn(Optional.of(character));
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         var command = new UpdateCharacterUseCase.Command(
                 "Araveth", null, null,
                 List.of("https://example.com/new1.png", "https://example.com/new2.png"),
-                List.of(CharacterCategory.HERO), null, null, false, null, null);
+                List.of(CharacterCategory.HERO), null, null, false, null, null, false);
 
         Character result = characterService.update(id, command);
 

@@ -122,6 +122,22 @@ Every content table (`characters`/`places`/`factions`/`items`/`events`/`lore`, p
 - **`universe_entity_images` and `entity_links` must be duplicated alongside a duplicated entity**, remapped to point at the new row's id instead of the source row's id. A duplicated entity that mentions another entity via `entity_links` should only get a remapped link if that other entity *also* has a translation in the target language yet — otherwise flag the gap instead of linking across languages or silently dropping the link.
 - **`db/seed/universe-content.sql` regeneration must preserve `language`/`translation_group_id`** for every row exactly as they exist in the live database — these are not derived/computed columns, they're part of the row's real state.
 
+## Common content (`common` column)
+
+Every content table (`characters`/`places`/`factions`/`items`/`events`/`lore`) gained a `common BOOLEAN NOT NULL DEFAULT false` column (V19) — a visibility flag independent of `status` and orthogonal to `hidden`, excluding an entity from public browsing and map pins while leaving it reachable via `findById` and via another entity's `links` (no lock, no redaction — unlike `hidden`). See `.claude/skills/common-content-implementation.md` for the full concept.
+
+- **No dump procedure change needed.** `common` is just another plain column on an already-in-scope table — `pg_dump --column-inserts` captures it automatically as part of each row's `INSERT`, the same as `hidden`, `status`, or any other column. Nothing to add to the table list in `.claude/skills/universe-content-dump.md`.
+- **Relevant to data-quality checks:** a data-quality query worth running when asked to validate common content is confirming no `map_pins` row still targets a now-`common` entity (the API already filters this at read time in `PublicMapPinController`, but a stray pin in the seed/dump data is still worth flagging):
+  ```sql
+  SELECT mp.id, mp.entity_type, mp.entity_id
+  FROM map_pins mp
+  JOIN characters c ON mp.entity_type = 'CHARACTER' AND mp.entity_id = c.id
+  WHERE c.common = true
+  LIMIT 100;
+  -- repeat the JOIN per entity_type/table as needed
+  ```
+- **No new exclusion for `db/seed/universe-content.sql`** — common entities stay in the dump like any other row; `common` is a display-layer/API-layer filter, not a reason to omit data from the seed file.
+
 ## Cross-entity links (`entity_links` table)
 
 `entity_links` (added in migration V7) is a polymorphic join table holding cross-entity references — e.g. a `Lore` row that mentions two `Character` rows. Columns: `id`, `source_type`, `source_id`, `target_type`, `target_id`, `created_at`. `source_type`/`target_type` are one of `CHARACTER`, `PLACE`, `FACTION`, `ITEM`, `EVENT`, `LORE`. See `.claude/skills/entity-links-implementation.md` for the full schema, domain model, and the Lore reference implementation.
@@ -156,4 +172,4 @@ Before writing any data script:
 
 ---
 
-*Last updated: 2026-07-10 — added the multilingual (EN/PT) data model: `language`/`translation_group_id` on every content table, the missing-translation detection query, the duplication procedure (including `universe_entity_images`/`entity_links` remapping), and the rule to ask rather than assume when a handoff only covers one language. Previous entry, 2026-06-29: replaced the generic "consult the Reading guide by role table" closer with explicit per-skill trigger conditions in the Mandatory reading section; Skill 05 (Architect Review) is no longer in Siegmund's fixed core, per the corrected per-agent matrix*
+*Last updated: 2026-08-12 — added the "Common content (`common` column)" section: the new V19 `common` boolean on all 6 entity tables needs no dump-procedure change (captured automatically by `pg_dump --column-inserts`), plus a data-quality query for spotting a stray `map_pins` row still targeting a common entity. See keynor-core `.claude/skills/common-content-implementation.md`. Previous entry, 2026-07-10 — added the multilingual (EN/PT) data model: `language`/`translation_group_id` on every content table, the missing-translation detection query, the duplication procedure (including `universe_entity_images`/`entity_links` remapping), and the rule to ask rather than assume when a handoff only covers one language. Previous entry, 2026-06-29: replaced the generic "consult the Reading guide by role table" closer with explicit per-skill trigger conditions in the Mandatory reading section; Skill 05 (Architect Review) is no longer in Siegmund's fixed core, per the corrected per-agent matrix*

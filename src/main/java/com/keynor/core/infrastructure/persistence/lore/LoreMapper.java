@@ -41,7 +41,8 @@ public class LoreMapper {
                 entity.getLanguage(),
                 entity.getTranslationGroupId(),
                 entity.getVersionGroupId(),
-                entity.isHidden());
+                entity.isHidden(),
+                entity.isCommon());
     }
 
     public LoreEntity toEntity(Lore lore) {
@@ -60,6 +61,7 @@ public class LoreMapper {
         entity.setTranslationGroupId(lore.getTranslationGroupId());
         entity.setVersionGroupId(lore.getVersionGroupId());
         entity.setHidden(lore.isHidden());
+        entity.setCommon(lore.isCommon());
         return entity;
     }
 

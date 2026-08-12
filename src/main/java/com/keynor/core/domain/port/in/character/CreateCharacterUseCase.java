@@ -26,7 +26,8 @@ public interface CreateCharacterUseCase {
             List<EntityLinkRef> links,
             boolean hidden,
             String riddleText,
-            String password) {}
+            String password,
+            boolean common) {}
 
     Character create(Command command);
 }

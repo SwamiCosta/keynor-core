@@ -157,7 +157,7 @@ class PublicEraControllerTest {
         Era era = new Era(id, "Age of Creation", 1, EraType.ERA, null, "The first age", NOW, NOW, Language.EN, UUID.randomUUID());
         when(findEraByIdUseCase.findById(id)).thenReturn(era);
         when(findLinkedEntitiesUseCase.findLinks(EntityType.ERA, id)).thenReturn(
-                List.of(new EntityLinkSummary(EntityType.LORE, loreId, "On the Word God", EntityStatus.CANON, false)));
+                List.of(new EntityLinkSummary(EntityType.LORE, loreId, "On the Word God", EntityStatus.CANON, false, false)));
 
         var response = controller.findById(id);
 

@@ -20,7 +20,8 @@ public interface UpdateCharacterUseCase {
             List<EntityLinkRef> links,
             boolean hidden,
             String riddleText,
-            String password) {}
+            String password,
+            boolean common) {}
 
     Character update(UUID id, Command command);
 }

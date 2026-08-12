@@ -79,7 +79,7 @@ class PublicEventControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Event event = new Event(id, "The First Sundering", "A cataclysmic event", "Body",
-                List.of(), List.of(EventCategory.BATTLE), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(), List.of(EventCategory.BATTLE), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findAllEventsUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(event), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
@@ -100,7 +100,7 @@ class PublicEventControllerTest {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         Event event = new Event(id, "The First Sundering", "A cataclysmic event", "Body",
-                List.of(), List.of(EventCategory.DIVINE), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(), List.of(EventCategory.DIVINE), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findEventByIdUseCase.findById(id)).thenReturn(event);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 

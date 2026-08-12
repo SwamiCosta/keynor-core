@@ -73,7 +73,8 @@ public class EventService implements
                 command.language(),
                 translationGroupId,
                 versionGroupId,
-                command.hidden());
+                command.hidden(),
+                command.common());
         Event saved = eventRepository.save(event);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
@@ -95,6 +96,7 @@ public class EventService implements
         }
         event.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
         event.setHidden(command.hidden());
+        event.setCommon(command.common());
         Event saved = eventRepository.save(event);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);

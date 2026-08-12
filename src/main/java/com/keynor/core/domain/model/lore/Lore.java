@@ -28,8 +28,9 @@ public class Lore extends UniverseEntity {
             Language language,
             UUID translationGroupId,
             UUID versionGroupId,
-            boolean hidden) {
-        super(id, name, summary, body, images, status, timeline, createdAt, updatedAt, language, translationGroupId, versionGroupId, hidden);
+            boolean hidden,
+            boolean common) {
+        super(id, name, summary, body, images, status, timeline, createdAt, updatedAt, language, translationGroupId, versionGroupId, hidden, common);
         this.categories = new ArrayList<>(categories);
     }
 

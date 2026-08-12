@@ -24,7 +24,8 @@ public record LoreResponse(
         UUID translationGroupId,
         UUID versionGroupId,
         List<LinkedEntityResponse> links,
-        boolean hidden) {
+        boolean hidden,
+        boolean common) {
 
     public static LoreResponse from(Lore lore, List<EntityLinkSummary> links) {
         return new LoreResponse(
@@ -43,6 +44,7 @@ public record LoreResponse(
                 lore.getTranslationGroupId(),
                 lore.getVersionGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList(),
-                lore.isHidden());
+                lore.isHidden(),
+                lore.isCommon());
     }
 }

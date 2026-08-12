@@ -28,7 +28,8 @@ public interface CreatePlaceUseCase {
             List<EntityLinkRef> links,
             boolean hidden,
             String riddleText,
-            String password) {}
+            String password,
+            boolean common) {}
 
     Place create(Command command);
 }

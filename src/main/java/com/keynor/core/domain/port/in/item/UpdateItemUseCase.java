@@ -20,7 +20,8 @@ public interface UpdateItemUseCase {
             List<EntityLinkRef> links,
             boolean hidden,
             String riddleText,
-            String password) {}
+            String password,
+            boolean common) {}
 
     Item update(UUID id, Command command);
 }

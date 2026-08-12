@@ -22,5 +22,6 @@ public record CreateCharacterRequest(
         List<EntityLinkRequest> links,
         boolean hidden,
         String riddleText,
-        String password) {
+        String password,
+        boolean common) {
 }

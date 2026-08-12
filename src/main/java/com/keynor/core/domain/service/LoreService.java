@@ -73,7 +73,8 @@ public class LoreService implements
                 command.language(),
                 translationGroupId,
                 versionGroupId,
-                command.hidden());
+                command.hidden(),
+                command.common());
         Lore saved = loreRepository.save(lore);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
@@ -95,6 +96,7 @@ public class LoreService implements
         }
         lore.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
         lore.setHidden(command.hidden());
+        lore.setCommon(command.common());
         Lore saved = loreRepository.save(lore);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);

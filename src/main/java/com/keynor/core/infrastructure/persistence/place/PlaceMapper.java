@@ -42,7 +42,8 @@ public class PlaceMapper {
                 entity.getLanguage(),
                 entity.getTranslationGroupId(),
                 entity.getVersionGroupId(),
-                entity.isHidden());
+                entity.isHidden(),
+                entity.isCommon());
     }
 
     public PlaceEntity toEntity(Place place) {
@@ -62,6 +63,7 @@ public class PlaceMapper {
         entity.setTranslationGroupId(place.getTranslationGroupId());
         entity.setVersionGroupId(place.getVersionGroupId());
         entity.setHidden(place.isHidden());
+        entity.setCommon(place.isCommon());
         return entity;
     }
 

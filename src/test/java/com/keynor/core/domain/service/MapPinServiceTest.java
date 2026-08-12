@@ -57,7 +57,7 @@ class MapPinServiceTest {
     }
 
     private EntityLinkSummary aCharacterSummary() {
-        return new EntityLinkSummary(EntityType.CHARACTER, ENTITY_ID, "Aroneus", EntityStatus.CANON, false);
+        return new EntityLinkSummary(EntityType.CHARACTER, ENTITY_ID, "Aroneus", EntityStatus.CANON, false, false);
     }
 
     @Test

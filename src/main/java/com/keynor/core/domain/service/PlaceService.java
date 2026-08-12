@@ -74,7 +74,8 @@ public class PlaceService implements
                 command.language(),
                 translationGroupId,
                 versionGroupId,
-                command.hidden());
+                command.hidden(),
+                command.common());
         Place saved = placeRepository.save(place);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
@@ -96,6 +97,7 @@ public class PlaceService implements
         }
         place.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.mapType(), command.timeline());
         place.setHidden(command.hidden());
+        place.setCommon(command.common());
         Place saved = placeRepository.save(place);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
