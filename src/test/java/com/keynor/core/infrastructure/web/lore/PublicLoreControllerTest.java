@@ -80,7 +80,7 @@ class PublicLoreControllerTest {
         UUID id = UUID.randomUUID();
         Lore lore = new Lore(id, "The Great Myth", "A summary", "Body text",
                 List.of(), List.of(LoreCategory.MYTH),
-                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findAllLoreUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(lore), 0, 20, 1));
 
@@ -101,7 +101,7 @@ class PublicLoreControllerTest {
         UUID id = UUID.randomUUID();
         Lore lore = new Lore(id, "The Great Myth", "A summary", "Body text",
                 List.of(), List.of(LoreCategory.HISTORY),
-                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findLoreByIdUseCase.findById(id)).thenReturn(lore);
 
         var response = controller.findById(id);

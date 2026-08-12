@@ -69,7 +69,7 @@ class FactionServiceTest {
                 List.of(),
                 null,
                 null, Language.EN, null, null,
-                null, false, null, null);
+                null, false, null, null, false);
         when(factionRepository.existsByNameAndLanguage("The Silver Order", Language.EN)).thenReturn(false);
         when(factionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -90,7 +90,7 @@ class FactionServiceTest {
                 List.of(),
                 null,
                 EntityStatus.CANON, Language.EN, null, null,
-                null, false, null, null);
+                null, false, null, null, false);
         when(factionRepository.existsByNameAndLanguage("The Silver Order", Language.EN)).thenReturn(false);
         when(factionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -104,7 +104,7 @@ class FactionServiceTest {
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateFactionUseCase.Command(
                 "The Silver Order", null, null, List.of(),
-                List.of(FactionCategory.GUILD), List.of(), null, null, Language.EN, null, null, null, false, null, null);
+                List.of(FactionCategory.GUILD), List.of(), null, null, Language.EN, null, null, null, false, null, null, false);
         when(factionRepository.existsByNameAndLanguage("The Silver Order", Language.EN)).thenReturn(true);
 
         assertThatThrownBy(() -> factionService.create(command))
@@ -118,7 +118,7 @@ class FactionServiceTest {
         var command = new CreateFactionUseCase.Command(
                 "The Silver Order", null, null, List.of(), List.of(FactionCategory.ORDER),
                 List.of(),
-                new Timeline("Nonexistent Era", null), null, Language.EN, null, null, null, false, null, null);
+                new Timeline("Nonexistent Era", null), null, Language.EN, null, null, null, false, null, null, false);
         when(factionRepository.existsByNameAndLanguage("The Silver Order", Language.EN)).thenReturn(false);
         when(eraRepository.findByName("Nonexistent Era")).thenReturn(Optional.empty());
 
@@ -133,7 +133,7 @@ class FactionServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Faction faction = new Faction(id, "The Silver Order", null, null, List.of(),
-                List.of(FactionCategory.ORDER), List.of(), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(FactionCategory.ORDER), List.of(), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(factionRepository.findById(id)).thenReturn(Optional.of(faction));
 
         Faction result = factionService.findById(id);
@@ -152,7 +152,7 @@ class FactionServiceTest {
 
     @Test
     void findAll_shouldDelegateToRepository() {
-        EntityFilter filter = new EntityFilter(Language.EN, List.of(), List.of(), false);
+        EntityFilter filter = new EntityFilter(Language.EN, List.of(), List.of(), false, false);
         PageRequest pageRequest = new PageRequest(0, 10);
         when(factionRepository.findAll(filter, pageRequest))
                 .thenReturn(new PageResult<>(List.of(), 0, 10, 0));
@@ -168,7 +168,7 @@ class FactionServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Faction faction = new Faction(id, "The Silver Order", null, null, List.of(),
-                List.of(FactionCategory.ORDER), List.of(), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(FactionCategory.ORDER), List.of(), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(factionRepository.findById(id)).thenReturn(Optional.of(faction));
         when(factionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -182,7 +182,7 @@ class FactionServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Faction faction = new Faction(id, "The Silver Order", null, null, List.of(),
-                List.of(FactionCategory.ORDER), List.of(), EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(FactionCategory.ORDER), List.of(), EntityStatus.DEPRECATED, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(factionRepository.findById(id)).thenReturn(Optional.of(faction));
 
         assertThatThrownBy(() -> factionService.changeStatus(id, EntityStatus.CANON))
@@ -213,14 +213,14 @@ class FactionServiceTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Faction faction = new Faction(id, "Old Name", null, null, List.of(),
-                List.of(FactionCategory.GUILD), List.of(), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(FactionCategory.GUILD), List.of(), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(factionRepository.findById(id)).thenReturn(Optional.of(faction));
         when(factionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         var command = new UpdateFactionUseCase.Command(
                 "New Name", "New summary", "New body",
                 List.of(),
-                List.of(FactionCategory.EMPIRE, FactionCategory.ORDER), List.of(), null, null, false, null, null);
+                List.of(FactionCategory.EMPIRE, FactionCategory.ORDER), List.of(), null, null, false, null, null, false);
 
         Faction result = factionService.update(id, command);
 

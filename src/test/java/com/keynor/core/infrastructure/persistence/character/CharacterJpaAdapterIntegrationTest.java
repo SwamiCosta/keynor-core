@@ -47,11 +47,15 @@ class CharacterJpaAdapterIntegrationTest {
     }
 
     private Character buildCharacter(String name, EntityStatus status, CharacterCategory category) {
+        return buildCharacter(name, status, category, false);
+    }
+
+    private Character buildCharacter(String name, EntityStatus status, CharacterCategory category, boolean common) {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         return new Character(id, name, "Summary of " + name, "Body text",
                 List.of(),
-                List.of(category), status, new Timeline(eraName, null), now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(category), status, new Timeline(eraName, null), now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, common);
     }
 
     @Test
@@ -78,7 +82,7 @@ class CharacterJpaAdapterIntegrationTest {
     void findAll_shouldReturnOnlyMatchingStatus_whenStatusFilterApplied() {
         characterRepository.save(buildCharacter("Araveth", EntityStatus.DRAFT, CharacterCategory.HERO));
         characterRepository.save(buildCharacter("Morken", EntityStatus.CANON, CharacterCategory.VILLAIN));
-        EntityFilter canonFilter = new EntityFilter(Language.EN, List.of(EntityStatus.CANON), List.of(), false);
+        EntityFilter canonFilter = new EntityFilter(Language.EN, List.of(EntityStatus.CANON), List.of(), false, false);
 
         PageResult<Character> result = characterRepository.findAll(canonFilter, new PageRequest(0, 10));
 
@@ -86,11 +90,33 @@ class CharacterJpaAdapterIntegrationTest {
     }
 
     @Test
+    void findAll_shouldExcludeCommonEntities_whenExcludeCommonIsTrue() {
+        characterRepository.save(buildCharacter("Ordinary Villager", EntityStatus.CANON, CharacterCategory.NPC, true));
+        characterRepository.save(buildCharacter("Araveth", EntityStatus.CANON, CharacterCategory.HERO, false));
+        EntityFilter excludeCommonFilter = new EntityFilter(Language.EN, List.of(EntityStatus.CANON), List.of(), false, true);
+
+        PageResult<Character> result = characterRepository.findAll(excludeCommonFilter, new PageRequest(0, 10));
+
+        assertThat(result.content()).extracting(Character::getName).doesNotContain("Ordinary Villager");
+        assertThat(result.content()).extracting(Character::getName).contains("Araveth");
+    }
+
+    @Test
+    void findAll_shouldIncludeCommonEntities_whenExcludeCommonIsFalse() {
+        characterRepository.save(buildCharacter("Ordinary Villager", EntityStatus.CANON, CharacterCategory.NPC, true));
+        EntityFilter includeCommonFilter = new EntityFilter(Language.EN, List.of(EntityStatus.CANON), List.of(), false, false);
+
+        PageResult<Character> result = characterRepository.findAll(includeCommonFilter, new PageRequest(0, 10));
+
+        assertThat(result.content()).extracting(Character::getName).contains("Ordinary Villager");
+    }
+
+    @Test
     void findAll_shouldReturnPaginatedResults_whenPageSizeLimited() {
         for (int i = 1; i <= 5; i++) {
             characterRepository.save(buildCharacter("Character " + i, EntityStatus.DRAFT, CharacterCategory.NPC));
         }
-        EntityFilter emptyFilter = new EntityFilter(Language.EN, List.of(), List.of(), false);
+        EntityFilter emptyFilter = new EntityFilter(Language.EN, List.of(), List.of(), false, false);
 
         PageResult<Character> firstPage = characterRepository.findAll(emptyFilter, new PageRequest(0, 2));
         PageResult<Character> secondPage = characterRepository.findAll(emptyFilter, new PageRequest(1, 2));

@@ -49,7 +49,7 @@ class InternalCharacterControllerTest {
     private Character buildCharacter(UUID id) {
         Instant now = Instant.now();
         return new Character(id, "Araveth", "A hero", "Body",
-                List.of(), List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(), List.of(CharacterCategory.HERO), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
     }
 
     @BeforeEach
@@ -68,7 +68,7 @@ class InternalCharacterControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of(), List.of("HERO"), "era-1", null, null,"en", null, null, null, false, null, null);
+                List.of(), List.of("HERO"), "era-1", null, null,"en", null, null, null, false, null, null, false);
 
         var response = controller.create(request);
 
@@ -85,7 +85,7 @@ class InternalCharacterControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of("img.png"), List.of("HERO"), "era-1", null, null,"en", null, null, null, false, null, null);
+                List.of("img.png"), List.of("HERO"), "era-1", null, null,"en", null, null, null, false, null, null, false);
 
         controller.create(request);
 
@@ -103,7 +103,7 @@ class InternalCharacterControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of(), List.of("HERO"), "era-1", null, null,"en", null, null, null, false, null, null);
+                List.of(), List.of("HERO"), "era-1", null, null,"en", null, null, null, false, null, null, false);
 
         controller.create(request);
 
@@ -118,12 +118,12 @@ class InternalCharacterControllerTest {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         Character canonCharacter = new Character(id, "Araveth", null, null, List.of(),
-                List.of(CharacterCategory.HERO), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(CharacterCategory.HERO), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(createCharacterUseCase.create(any())).thenReturn(canonCharacter);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of(), List.of("HERO"), "era-1", null, "CANON","en", null, null, null, false, null, null);
+                List.of(), List.of("HERO"), "era-1", null, "CANON","en", null, null, null, false, null, null, false);
 
         controller.create(request);
 
@@ -136,7 +136,7 @@ class InternalCharacterControllerTest {
     @Test
     void create_shouldThrowIllegalArgumentException_whenStatusIsDeprecated() {
         var request = new CreateCharacterRequest("Araveth", "A hero", "Body",
-                List.of(), List.of("HERO"), "era-1", null, "DEPRECATED","en", null, null, null, false, null, null);
+                List.of(), List.of("HERO"), "era-1", null, "DEPRECATED","en", null, null, null, false, null, null, false);
 
         assertThatThrownBy(() -> controller.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -151,7 +151,7 @@ class InternalCharacterControllerTest {
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
         var request = new UpdateCharacterRequest("Araveth Updated", "New summary", "New body",
-                List.of(), List.of("HERO"), "era-1", null, null, false, null, null);
+                List.of(), List.of("HERO"), "era-1", null, null, false, null, null, false);
 
         var response = controller.update(id, request);
 
@@ -213,6 +213,18 @@ class InternalCharacterControllerTest {
         ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
         verify(findAllCharactersUseCase).findAll(filterCaptor.capture(), any());
         assertThat(filterCaptor.getValue().statuses()).isEmpty();
+    }
+
+    @Test
+    void findAll_shouldNotExcludeCommonEntities_soContentManagementCanStillListThem() {
+        when(findAllCharactersUseCase.findAll(any(), any()))
+                .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
+
+        controller.findAll("en", null, null, 0, 20);
+
+        ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
+        verify(findAllCharactersUseCase).findAll(filterCaptor.capture(), any());
+        assertThat(filterCaptor.getValue().excludeCommon()).isFalse();
     }
 
     @Test

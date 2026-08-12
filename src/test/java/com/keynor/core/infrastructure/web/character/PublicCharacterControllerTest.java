@@ -4,6 +4,7 @@ import com.keynor.core.application.dto.character.CharacterResponse;
 import com.keynor.core.application.dto.shared.PagedResponse;
 import com.keynor.core.domain.model.character.Character;
 import com.keynor.core.domain.model.character.CharacterCategory;
+import com.keynor.core.domain.model.shared.EntityFilter;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.Language;
 import com.keynor.core.domain.model.shared.PageResult;
@@ -14,6 +15,7 @@ import com.keynor.core.domain.port.in.shared.FindLinkedEntitiesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -59,7 +61,7 @@ class PublicCharacterControllerTest {
                 id, "Araveth", "A wandering hero", "Body",
                 images,
                 List.of(CharacterCategory.HERO),
-                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(character), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
@@ -84,7 +86,7 @@ class PublicCharacterControllerTest {
                 id, "Araveth", "A wandering hero", "Body",
                 images,
                 List.of(CharacterCategory.HERO),
-                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findCharacterByIdUseCase.findById(id)).thenReturn(character);
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
 
@@ -105,7 +107,7 @@ class PublicCharacterControllerTest {
                 id, "Araveth", null, null,
                 List.of(),
                 List.of(CharacterCategory.NPC),
-                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(character), 0, 20, 1));
         when(findLinkedEntitiesUseCase.findLinks(any(), any())).thenReturn(List.of());
@@ -115,6 +117,18 @@ class PublicCharacterControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().content().get(0).images()).isEmpty();
+    }
+
+    @Test
+    void findAll_shouldAlwaysExcludeCommonEntities() {
+        when(findAllCharactersUseCase.findAll(any(), any()))
+                .thenReturn(new PageResult<>(List.of(), 0, 20, 0));
+
+        controller.findAll("en", null, 0, 20);
+
+        ArgumentCaptor<EntityFilter> filterCaptor = ArgumentCaptor.forClass(EntityFilter.class);
+        verify(findAllCharactersUseCase).findAll(filterCaptor.capture(), any());
+        assertThat(filterCaptor.getValue().excludeCommon()).isTrue();
     }
 
     @Test
@@ -134,9 +148,9 @@ class PublicCharacterControllerTest {
         UUID canonId = UUID.randomUUID();
         UUID draftId = UUID.randomUUID();
         Character canonCharacter = new Character(canonId, "Araveth", null, null, List.of(),
-                List.of(CharacterCategory.HERO), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(CharacterCategory.HERO), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         Character draftCharacter = new Character(draftId, "Unfinished One", null, null, List.of(),
-                List.of(CharacterCategory.NPC), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false);
+                List.of(CharacterCategory.NPC), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findCharactersByIdsUseCase.findByIds(List.of(canonId, draftId)))
                 .thenReturn(List.of(canonCharacter, draftCharacter));
 
