@@ -23,5 +23,6 @@ public record CreatePlaceRequest(
         List<EntityLinkRequest> links,
         boolean hidden,
         String riddleText,
-        String password) {
+        String password,
+        boolean common) {
 }

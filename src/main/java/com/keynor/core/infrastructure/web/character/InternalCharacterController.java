@@ -90,7 +90,8 @@ public class InternalCharacterController {
                 links,
                 request.hidden(),
                 request.riddleText(),
-                request.password());
+                request.password(),
+                request.common());
         var created = createCharacterUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CharacterResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, created.getId())));
@@ -107,7 +108,8 @@ public class InternalCharacterController {
                 parseCategories(request.categories()),
                 buildTimeline(request.timelineFoundedEra(), request.timelineDestroyedEra()),
                 links,
-                request.hidden(), request.riddleText(), request.password());
+                request.hidden(), request.riddleText(), request.password(),
+                request.common());
         var updated = updateCharacterUseCase.update(id, command);
         return ResponseEntity.ok(CharacterResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.CHARACTER, updated.getId())));
     }
@@ -138,7 +140,7 @@ public class InternalCharacterController {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList()
                 : List.of();
-        return new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false);
+        return new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false, false);
     }
 
     private List<CharacterCategory> parseCategories(List<String> categories) {

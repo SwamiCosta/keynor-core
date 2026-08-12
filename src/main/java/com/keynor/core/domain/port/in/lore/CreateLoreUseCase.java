@@ -26,7 +26,8 @@ public interface CreateLoreUseCase {
             List<EntityLinkRef> links,
             boolean hidden,
             String riddleText,
-            String password) {}
+            String password,
+            boolean common) {}
 
     Lore create(Command command);
 }

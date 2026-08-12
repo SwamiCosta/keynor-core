@@ -42,7 +42,8 @@ public class FactionMapper {
                 entity.getLanguage(),
                 entity.getTranslationGroupId(),
                 entity.getVersionGroupId(),
-                entity.isHidden());
+                entity.isHidden(),
+                entity.isCommon());
     }
 
     public FactionEntity toEntity(Faction faction) {
@@ -62,6 +63,7 @@ public class FactionMapper {
         entity.setTranslationGroupId(faction.getTranslationGroupId());
         entity.setVersionGroupId(faction.getVersionGroupId());
         entity.setHidden(faction.isHidden());
+        entity.setCommon(faction.isCommon());
         return entity;
     }
 

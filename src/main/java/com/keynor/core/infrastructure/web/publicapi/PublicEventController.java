@@ -43,6 +43,7 @@ public class PublicEventController {
                 LanguageRequestParser.parse(language),
                 List.of(EntityStatus.CANON),
                 categories != null ? categories : List.of(),
+                true,
                 true);
         var result = findAllEventsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,

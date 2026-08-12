@@ -26,6 +26,7 @@ public abstract class UniverseEntity {
     private final UUID translationGroupId;
     private final UUID versionGroupId;
     private boolean hidden;
+    private boolean common;
 
     protected UniverseEntity(
             UUID id,
@@ -40,7 +41,8 @@ public abstract class UniverseEntity {
             Language language,
             UUID translationGroupId,
             UUID versionGroupId,
-            boolean hidden) {
+            boolean hidden,
+            boolean common) {
         if (hidden && status != EntityStatus.CANON) {
             throw new IllegalArgumentException("Hidden content must always have status CANON");
         }
@@ -57,6 +59,7 @@ public abstract class UniverseEntity {
         this.translationGroupId = translationGroupId;
         this.versionGroupId = versionGroupId;
         this.hidden = hidden;
+        this.common = common;
     }
 
     public void changeStatus(EntityStatus newStatus) {
@@ -94,6 +97,18 @@ public abstract class UniverseEntity {
         this.updatedAt = Instant.now();
     }
 
+    /**
+     * Toggles whether this entity is "common" -- excluded from every public
+     * list/browse endpoint and from map pin rendering, but still reachable
+     * via findById and via another entity's resolved links (no lock, unlike
+     * hidden). No status invariant, unlike hidden: a common entity may be
+     * DRAFT, CANON, or DEPRECATED.
+     */
+    public void setCommon(boolean common) {
+        this.common = common;
+        this.updatedAt = Instant.now();
+    }
+
     private boolean isValidTransition(EntityStatus from, EntityStatus to) {
         return switch (from) {
             case DRAFT -> to == EntityStatus.CANON || to == EntityStatus.DEPRECATED;
@@ -115,4 +130,5 @@ public abstract class UniverseEntity {
     public UUID getTranslationGroupId() { return translationGroupId; }
     public UUID getVersionGroupId() { return versionGroupId; }
     public boolean isHidden() { return hidden; }
+    public boolean isCommon() { return common; }
 }

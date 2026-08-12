@@ -27,12 +27,19 @@ public class CharacterSpecifications {
         if (filter.excludeHidden()) {
             spec = spec.and(isNotHidden());
         }
+        if (filter.excludeCommon()) {
+            spec = spec.and(isNotCommon());
+        }
 
         return spec;
     }
 
     private static Specification<CharacterEntity> isNotHidden() {
         return (root, query, cb) -> cb.isFalse(root.get("hidden"));
+    }
+
+    private static Specification<CharacterEntity> isNotCommon() {
+        return (root, query, cb) -> cb.isFalse(root.get("common"));
     }
 
     private static Specification<CharacterEntity> hasLanguage(Language language) {

@@ -24,7 +24,8 @@ public record CharacterResponse(
         UUID translationGroupId,
         UUID versionGroupId,
         List<LinkedEntityResponse> links,
-        boolean hidden) {
+        boolean hidden,
+        boolean common) {
 
     public static CharacterResponse from(Character character, List<EntityLinkSummary> links) {
         return new CharacterResponse(
@@ -43,6 +44,7 @@ public record CharacterResponse(
                 character.getTranslationGroupId(),
                 character.getVersionGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList(),
-                character.isHidden());
+                character.isHidden(),
+                character.isCommon());
     }
 }

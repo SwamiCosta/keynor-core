@@ -27,7 +27,8 @@ public interface CreateFactionUseCase {
             List<EntityLinkRef> links,
             boolean hidden,
             String riddleText,
-            String password) {}
+            String password,
+            boolean common) {}
 
     Faction create(Command command);
 }

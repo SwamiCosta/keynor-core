@@ -25,8 +25,13 @@ public class PublicMapPinController {
 
     @GetMapping
     public ResponseEntity<List<MapPinResponse>> findByMap(@PathVariable String mapId) {
+        // A pin whose target is common=true is dropped entirely, not just
+        // downgraded to a black pin like hidden -- common content has no
+        // route to discovery via the map at all, only via another entity's
+        // resolved links (see common-content-implementation.md).
         List<MapPinResponse> pins = findMapPinsUseCase.findByMapId(mapId).stream()
                 .flatMap(pin -> findEntitySummaryUseCase.findSummary(pin.getEntityType(), pin.getEntityId())
+                        .filter(summary -> !summary.common())
                         .map(summary -> MapPinResponse.from(pin, summary))
                         .stream())
                 .toList();

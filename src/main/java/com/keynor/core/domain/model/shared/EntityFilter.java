@@ -6,7 +6,8 @@ public record EntityFilter(
         Language language,
         List<EntityStatus> statuses,
         List<String> categories,
-        boolean excludeHidden
+        boolean excludeHidden,
+        boolean excludeCommon
 ) {
 
     public boolean hasStatusFilter() {

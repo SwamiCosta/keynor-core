@@ -25,7 +25,8 @@ public record FactionResponse(
         UUID translationGroupId,
         UUID versionGroupId,
         List<LinkedEntityResponse> links,
-        boolean hidden) {
+        boolean hidden,
+        boolean common) {
 
     public static FactionResponse from(Faction faction, List<EntityLinkSummary> links) {
         return new FactionResponse(
@@ -45,6 +46,7 @@ public record FactionResponse(
                 faction.getTranslationGroupId(),
                 faction.getVersionGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList(),
-                faction.isHidden());
+                faction.isHidden(),
+                faction.isCommon());
     }
 }

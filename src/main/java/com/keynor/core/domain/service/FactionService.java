@@ -74,7 +74,8 @@ public class FactionService implements
                 command.language(),
                 translationGroupId,
                 versionGroupId,
-                command.hidden());
+                command.hidden(),
+                command.common());
         Faction saved = factionRepository.save(faction);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
@@ -96,6 +97,7 @@ public class FactionService implements
         }
         faction.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.members(), command.timeline());
         faction.setHidden(command.hidden());
+        faction.setCommon(command.common());
         Faction saved = factionRepository.save(faction);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);

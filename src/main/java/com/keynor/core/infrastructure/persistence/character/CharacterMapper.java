@@ -41,7 +41,8 @@ public class CharacterMapper {
                 entity.getLanguage(),
                 entity.getTranslationGroupId(),
                 entity.getVersionGroupId(),
-                entity.isHidden());
+                entity.isHidden(),
+                entity.isCommon());
     }
 
     public CharacterEntity toEntity(Character character) {
@@ -60,6 +61,7 @@ public class CharacterMapper {
         entity.setTranslationGroupId(character.getTranslationGroupId());
         entity.setVersionGroupId(character.getVersionGroupId());
         entity.setHidden(character.isHidden());
+        entity.setCommon(character.isCommon());
         return entity;
     }
 

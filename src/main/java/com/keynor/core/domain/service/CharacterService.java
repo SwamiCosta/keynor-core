@@ -74,7 +74,8 @@ public class CharacterService implements
                 command.language(),
                 translationGroupId,
                 versionGroupId,
-                command.hidden());
+                command.hidden(),
+                command.common());
         Character saved = characterRepository.save(character);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
@@ -96,6 +97,7 @@ public class CharacterService implements
         }
         character.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
         character.setHidden(command.hidden());
+        character.setCommon(command.common());
         Character saved = characterRepository.save(character);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);

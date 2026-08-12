@@ -62,7 +62,7 @@ public class InternalFactionController {
             @RequestParam(defaultValue = "20") int size) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList() : List.of();
-        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false);
+        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false, false);
         var result = findAllFactionsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 faction -> FactionResponse.from(faction, findLinkedEntitiesUseCase.findLinks(EntityType.FACTION, faction.getId()))));
@@ -94,7 +94,8 @@ public class InternalFactionController {
                 links,
                 request.hidden(),
                 request.riddleText(),
-                request.password());
+                request.password(),
+                request.common());
         var created = createFactionUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(FactionResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.FACTION, created.getId())));
     }
@@ -112,7 +113,8 @@ public class InternalFactionController {
                 categories,
                 request.members() != null ? request.members() : List.of(),
                 timeline, links,
-                request.hidden(), request.riddleText(), request.password());
+                request.hidden(), request.riddleText(), request.password(),
+                request.common());
         var updated = updateFactionUseCase.update(id, command);
         return ResponseEntity.ok(FactionResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.FACTION, updated.getId())));
     }

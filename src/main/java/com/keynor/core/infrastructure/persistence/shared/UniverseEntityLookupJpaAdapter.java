@@ -43,17 +43,17 @@ public class UniverseEntityLookupJpaAdapter implements UniverseEntityLookupRepos
     public Optional<EntityLinkSummary> findSummary(EntityType type, UUID id) {
         return switch (type) {
             case CHARACTER -> characterJpaRepository.findById(id)
-                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
+                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden(), e.isCommon()));
             case PLACE -> placeJpaRepository.findById(id)
-                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
+                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden(), e.isCommon()));
             case FACTION -> factionJpaRepository.findById(id)
-                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
+                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden(), e.isCommon()));
             case ITEM -> itemJpaRepository.findById(id)
-                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
+                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden(), e.isCommon()));
             case EVENT -> eventJpaRepository.findById(id)
-                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
+                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden(), e.isCommon()));
             case LORE -> loreJpaRepository.findById(id)
-                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden()));
+                    .map(e -> new EntityLinkSummary(type, e.getId(), e.getName(), e.getStatus(), e.isHidden(), e.isCommon()));
             // Era only ever appears as an entity_links source (see EntityType.ERA) --
             // nothing in this codebase ever creates a link with target_type = ERA.
             case ERA -> throw new UnsupportedOperationException(

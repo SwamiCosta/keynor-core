@@ -64,7 +64,7 @@ public class InternalPlaceController {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList()
                 : List.of();
-        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false);
+        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false, false);
         var result = findAllPlacesUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 place -> PlaceResponse.from(place, findLinkedEntitiesUseCase.findLinks(EntityType.PLACE, place.getId()))));
@@ -95,7 +95,8 @@ public class InternalPlaceController {
                 links,
                 request.hidden(),
                 request.riddleText(),
-                request.password());
+                request.password(),
+                request.common());
         var created = createPlaceUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(PlaceResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.PLACE, created.getId())));
     }
@@ -112,7 +113,8 @@ public class InternalPlaceController {
                 request.name(), request.summary(), request.body(),
                 request.images() != null ? request.images() : List.of(),
                 categories, mapType, timeline, links,
-                request.hidden(), request.riddleText(), request.password());
+                request.hidden(), request.riddleText(), request.password(),
+                request.common());
         var updated = updatePlaceUseCase.update(id, command);
         return ResponseEntity.ok(PlaceResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.PLACE, updated.getId())));
     }

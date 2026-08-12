@@ -20,7 +20,8 @@ public interface UpdateLoreUseCase {
             List<EntityLinkRef> links,
             boolean hidden,
             String riddleText,
-            String password) {}
+            String password,
+            boolean common) {}
 
     Lore update(UUID id, Command command);
 }

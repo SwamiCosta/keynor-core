@@ -41,7 +41,8 @@ public class EventMapper {
                 entity.getLanguage(),
                 entity.getTranslationGroupId(),
                 entity.getVersionGroupId(),
-                entity.isHidden());
+                entity.isHidden(),
+                entity.isCommon());
     }
 
     public EventEntity toEntity(Event event) {
@@ -60,6 +61,7 @@ public class EventMapper {
         entity.setTranslationGroupId(event.getTranslationGroupId());
         entity.setVersionGroupId(event.getVersionGroupId());
         entity.setHidden(event.isHidden());
+        entity.setCommon(event.isCommon());
         return entity;
     }
 

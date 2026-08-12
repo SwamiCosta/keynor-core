@@ -73,7 +73,8 @@ public class ItemService implements
                 command.language(),
                 translationGroupId,
                 versionGroupId,
-                command.hidden());
+                command.hidden(),
+                command.common());
         Item saved = itemRepository.save(item);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);
@@ -95,6 +96,7 @@ public class ItemService implements
         }
         item.update(command.name(), command.summary(), command.body(), command.images(), command.categories(), command.timeline());
         item.setHidden(command.hidden());
+        item.setCommon(command.common());
         Item saved = itemRepository.save(item);
         List<com.keynor.core.domain.model.shared.EntityLinkRef> links = command.links() != null ? command.links() : List.of();
         HiddenLinkDirectionValidator.validate(saved.isHidden(), links, universeEntityLookupRepository);

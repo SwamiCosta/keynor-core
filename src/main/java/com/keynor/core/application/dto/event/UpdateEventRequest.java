@@ -7,10 +7,11 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * `hidden` must be explicitly resent with every update to preserve an
- * already-hidden entity's state -- full-replacement semantics like every
- * other field on this record, not a partial patch. Omitting it is
- * interpreted as {@code false} and will un-hide the entity.
+ * `hidden` and `common` must both be explicitly resent with every update to
+ * preserve an already-hidden/already-common entity's state -- full-replacement
+ * semantics like every other field on this record, not a partial patch.
+ * Omitting either is interpreted as {@code false} and will un-hide / un-mark
+ * the entity as common.
  */
 public record UpdateEventRequest(
         @NotBlank String name,
@@ -23,5 +24,6 @@ public record UpdateEventRequest(
         List<EntityLinkRequest> links,
         boolean hidden,
         String riddleText,
-        String password) {
+        String password,
+        boolean common) {
 }

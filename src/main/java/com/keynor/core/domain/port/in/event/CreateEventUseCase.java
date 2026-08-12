@@ -26,7 +26,8 @@ public interface CreateEventUseCase {
             List<EntityLinkRef> links,
             boolean hidden,
             String riddleText,
-            String password) {}
+            String password,
+            boolean common) {}
 
     Event create(Command command);
 }

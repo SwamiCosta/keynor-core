@@ -62,7 +62,7 @@ public class InternalItemController {
             @RequestParam(defaultValue = "20") int size) {
         List<EntityStatus> parsedStatuses = statuses != null
                 ? statuses.stream().map(s -> EntityStatus.valueOf(s.toUpperCase())).toList() : List.of();
-        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false);
+        EntityFilter filter = new EntityFilter(LanguageRequestParser.parse(language), parsedStatuses, categories != null ? categories : List.of(), false, false);
         var result = findAllItemsUseCase.findAll(filter, new PageRequest(page, size));
         return ResponseEntity.ok(PagedResponse.from(result,
                 item -> ItemResponse.from(item, findLinkedEntitiesUseCase.findLinks(EntityType.ITEM, item.getId()))));
@@ -92,7 +92,8 @@ public class InternalItemController {
                 links,
                 request.hidden(),
                 request.riddleText(),
-                request.password());
+                request.password(),
+                request.common());
         var created = createItemUseCase.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(ItemResponse.from(created, findLinkedEntitiesUseCase.findLinks(EntityType.ITEM, created.getId())));
     }
@@ -108,7 +109,8 @@ public class InternalItemController {
                 request.name(), request.summary(), request.body(),
                 request.images() != null ? request.images() : List.of(),
                 categories, timeline, links,
-                request.hidden(), request.riddleText(), request.password());
+                request.hidden(), request.riddleText(), request.password(),
+                request.common());
         var updated = updateItemUseCase.update(id, command);
         return ResponseEntity.ok(ItemResponse.from(updated, findLinkedEntitiesUseCase.findLinks(EntityType.ITEM, updated.getId())));
     }

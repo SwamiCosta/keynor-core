@@ -41,7 +41,8 @@ public class ItemMapper {
                 entity.getLanguage(),
                 entity.getTranslationGroupId(),
                 entity.getVersionGroupId(),
-                entity.isHidden());
+                entity.isHidden(),
+                entity.isCommon());
     }
 
     public ItemEntity toEntity(Item item) {
@@ -60,6 +61,7 @@ public class ItemMapper {
         entity.setTranslationGroupId(item.getTranslationGroupId());
         entity.setVersionGroupId(item.getVersionGroupId());
         entity.setHidden(item.isHidden());
+        entity.setCommon(item.isCommon());
         return entity;
     }
 

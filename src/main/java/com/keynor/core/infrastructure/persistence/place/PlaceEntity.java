@@ -59,6 +59,9 @@ public class PlaceEntity {
     @Column(nullable = false)
     private boolean hidden;
 
+    @Column(nullable = false)
+    private boolean common;
+
     @Embedded
     private TimelineEmbeddable timeline;
 
@@ -92,6 +95,8 @@ public class PlaceEntity {
     public void setVersionGroupId(UUID versionGroupId) { this.versionGroupId = versionGroupId; }
     public boolean isHidden() { return hidden; }
     public void setHidden(boolean hidden) { this.hidden = hidden; }
+    public boolean isCommon() { return common; }
+    public void setCommon(boolean common) { this.common = common; }
     public TimelineEmbeddable getTimeline() { return timeline; }
     public void setTimeline(TimelineEmbeddable timeline) { this.timeline = timeline; }
     public Instant getCreatedAt() { return createdAt; }

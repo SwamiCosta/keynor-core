@@ -25,7 +25,8 @@ public record PlaceResponse(
         UUID translationGroupId,
         UUID versionGroupId,
         List<LinkedEntityResponse> links,
-        boolean hidden) {
+        boolean hidden,
+        boolean common) {
 
     public static PlaceResponse from(Place place, List<EntityLinkSummary> links) {
         return new PlaceResponse(
@@ -45,6 +46,7 @@ public record PlaceResponse(
                 place.getTranslationGroupId(),
                 place.getVersionGroupId(),
                 links.stream().map(LinkedEntityResponse::from).toList(),
-                place.isHidden());
+                place.isHidden(),
+                place.isCommon());
     }
 }
