@@ -24,7 +24,30 @@
 -- How to apply:
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
--- Last updated: 2026-08-13
+-- Last updated: 2026-08-14
+-- Updated by:   Imaws (hand-authored, not a live-DB regeneration -- this
+--               data does not exist in any database yet since `maps` has
+--               no create/update API; the seed file is the only route to
+--               add it). Per user request: added 18 new map rows and 178
+--               map_eras associations for 4 image groups spanning 14 ERA
+--               entries (Matter..Wrath, Pristine..War, Heroes..Law,
+--               Technology..Death). 'boreas-map' and 'athlassia-map' are
+--               each a single shared row spanning both the Heroes..Law
+--               and Technology..Death era ranges (18 era ids each) since
+--               the same image is reused unchanged across both groups --
+--               a deliberate decision, not an oversight (confirmed with
+--               the user rather than assumed, since it affects whether
+--               the two ranges can independently swap that image later).
+--               All other maps in the Heroes..Law / Technology..Death
+--               groups are one row per era-range (10 / 8 era ids). Every
+--               map links to both the EN and PT id of each covered era,
+--               matching the pre-existing primordial-map/vestiges-map
+--               convention. The "switch between maps in the UI" part of
+--               the request is aniannoth-overview frontend work, out of
+--               keynor-core/Imaws's scope -- not done here, no contract
+--               change needed for it (GET /api/public/v1/maps?eraId
+--               already returns a list).
+-- Previous entry, 2026-08-13:
 -- Updated by:   Siegmund (regenerated fresh from the live database). Per
 --               Aroneus's handoff: set common = true on 3 Lore entities,
 --               both language rows each (6 rows total) -- The Theosophy
@@ -81,6 +104,24 @@ CASCADE;
 
 INSERT INTO public.maps (id, name, map_type, image) VALUES ('primordial-map', 'Primordial Era Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/PrimordialEraMap.png');
 INSERT INTO public.maps (id, name, map_type, image) VALUES ('vestiges-map', 'Era of Vestiges Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/VesigesEraMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('primal-land-map', 'Primal Land Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/PrimalLandMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('pristine-land-map', 'Pristine Land Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/PristineLandMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('boreas-map', 'Boreas Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/BoreasMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('iren-map', 'Iren Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/IrenMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('rarsheams-map', 'Rarsheams Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/RarsheamsMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('artalion-map', 'Artalion Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/ArtalionMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('simaria-map', 'Simaria Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/SimariaMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('athlassia-map', 'Athlassia Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/AthlassiaMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('zanj-dara-map', 'Zanj-Dara Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Zanj-DaraMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('exados-map', 'Éxados Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/ÉxadosMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('tian-annoth-map', 'Tian-Annoth Map', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Tian-AnnothMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('iren-corrupted-map', 'Iren Map (Corrupted)', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/IrenCorruptedMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('rarsheams-corrupted-map', 'Rarsheams Map (Corrupted)', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/RarsheamsCorruptedMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('artalion-corrupted-map', 'Artalion Map (Corrupted)', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/ArtalionCorruptedMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('simaria-corrupted-map', 'Simaria Map (Corrupted)', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/SimariaCorruptedMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('zanj-dara-corrupted-map', 'Zanj-Dara Map (Corrupted)', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Zanj-DaraCorruptedMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('exados-corrupted-map', 'Éxados Map (Corrupted)', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/ÉxadosCorruptedMap.png');
+INSERT INTO public.maps (id, name, map_type, image) VALUES ('tian-annoth-corrupted-map', 'Tian-Annoth Map (Corrupted)', 'NAVIGABLE', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Tian-AnnothCorruptedMap.png');
 
 -- ============================================================
 -- ERAS (timeline — ERA intervals and POINT moments, ordered by order_index)
@@ -199,6 +240,184 @@ INSERT INTO public.map_eras (map_id, era_id) VALUES ('primordial-map', '48ed4b49
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('primordial-map', '36d5e2a5-be00-456b-bf11-113c0b737904');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('vestiges-map', '49187d39-6121-44b9-8477-f19e16fac16b');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('vestiges-map', 'eb903d2d-12a2-4e2b-9659-6d2243a8a70f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('primal-land-map', '2f0b14b1-2db2-4b78-a15b-d91b9344c26b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('primal-land-map', 'f9c63136-a825-4124-99cf-c385cdf745ee');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('primal-land-map', '0d158843-7145-460d-b504-ca8b31e7d162');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('primal-land-map', 'a06c58b5-052e-47a1-90ea-a61a07d24f0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('primal-land-map', '1cef56ea-c063-423d-8116-02abd1b4ee17');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('primal-land-map', 'cd99be38-1806-4b69-a911-dc4b58759a57');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('primal-land-map', '4a645394-65ca-4cba-a559-93762db9122a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('primal-land-map', 'e110ad97-d085-46b3-8db9-8a4b11e24be9');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('primal-land-map', 'a5218652-50e5-4a59-8730-befe8589d2cf');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('primal-land-map', 'ea606f67-f995-4bab-ac9a-9dabd85046ec');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('pristine-land-map', '79f695b4-dd5d-468c-8040-8dd8acecd700');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('pristine-land-map', 'f2cc734b-4d24-457e-8f21-4560900588eb');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('pristine-land-map', 'bbfd36f0-8c02-414b-bf65-6377c9cd6d45');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('pristine-land-map', 'ebb5d48a-0cef-4478-b6cf-b9db991be6b2');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('pristine-land-map', '1096732a-5c98-48b1-85af-25f5e70580e6');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('pristine-land-map', '5833e617-071c-4e5a-a52e-077ff991d4da');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
 
 -- ============================================================
 -- CHARACTERS
