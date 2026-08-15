@@ -69,7 +69,7 @@ class MapPinServiceTest {
                 .thenReturn(false);
         when(mapPinRepository.save(any(MapPin.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        var command = new CreateMapPinUseCase.Command(MAP_ID, EntityType.CHARACTER, ENTITY_ID, 0.5, 0.5);
+        var command = new CreateMapPinUseCase.Command(MAP_ID, EntityType.CHARACTER, ENTITY_ID, null, 0.5, 0.5);
         MapPin result = mapPinService.create(command);
 
         assertThat(result.getMapId()).isEqualTo(MAP_ID);
@@ -86,7 +86,7 @@ class MapPinServiceTest {
         when(mapPinRepository.existsByMapIdAndEntityTypeAndEntityId(MAP_ID, EntityType.CHARACTER, ENTITY_ID))
                 .thenReturn(true);
 
-        var command = new CreateMapPinUseCase.Command(MAP_ID, EntityType.CHARACTER, ENTITY_ID, 0.5, 0.5);
+        var command = new CreateMapPinUseCase.Command(MAP_ID, EntityType.CHARACTER, ENTITY_ID, null, 0.5, 0.5);
 
         assertThatThrownBy(() -> mapPinService.create(command))
                 .isInstanceOf(DuplicateEntityNameException.class);
@@ -98,20 +98,43 @@ class MapPinServiceTest {
         when(universeEntityLookupRepository.findSummary(EntityType.CHARACTER, ENTITY_ID))
                 .thenReturn(Optional.empty());
 
-        var command = new CreateMapPinUseCase.Command(MAP_ID, EntityType.CHARACTER, ENTITY_ID, 0.5, 0.5);
+        var command = new CreateMapPinUseCase.Command(MAP_ID, EntityType.CHARACTER, ENTITY_ID, null, 0.5, 0.5);
 
         assertThatThrownBy(() -> mapPinService.create(command))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
+    void create_shouldReturnSavedPin_whenNoEntityGivenButNamePresent() {
+        when(mapRepository.findById(MAP_ID)).thenReturn(Optional.of(aMap()));
+        when(mapPinRepository.save(any(MapPin.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var command = new CreateMapPinUseCase.Command(MAP_ID, null, null, "Uncharted Ruins", 0.4, 0.6);
+        MapPin result = mapPinService.create(command);
+
+        assertThat(result.getEntityType()).isNull();
+        assertThat(result.getEntityId()).isNull();
+        assertThat(result.getName()).isEqualTo("Uncharted Ruins");
+    }
+
+    @Test
+    void create_shouldThrow_whenNoEntityAndNoNameGiven() {
+        when(mapRepository.findById(MAP_ID)).thenReturn(Optional.of(aMap()));
+
+        var command = new CreateMapPinUseCase.Command(MAP_ID, null, null, null, 0.4, 0.6);
+
+        assertThatThrownBy(() -> mapPinService.create(command))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void update_shouldRepositionPin_whenPinBelongsToGivenMap() {
         UUID pinId = UUID.randomUUID();
-        MapPin pin = new MapPin(pinId, MAP_ID, EntityType.CHARACTER, ENTITY_ID, 0.1, 0.1, Instant.now());
+        MapPin pin = new MapPin(pinId, MAP_ID, EntityType.CHARACTER, ENTITY_ID, null, 0.1, 0.1, Instant.now());
         when(mapPinRepository.findById(pinId)).thenReturn(Optional.of(pin));
         when(mapPinRepository.save(any(MapPin.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        MapPin result = mapPinService.update(MAP_ID, pinId, new UpdateMapPinUseCase.Command(0.8, 0.9));
+        MapPin result = mapPinService.update(MAP_ID, pinId, new UpdateMapPinUseCase.Command(0.8, 0.9, null, null, null));
 
         assertThat(result.getNormalizedX()).isEqualTo(0.8);
         assertThat(result.getNormalizedY()).isEqualTo(0.9);
@@ -119,19 +142,61 @@ class MapPinServiceTest {
     }
 
     @Test
-    void update_shouldThrow_whenPinBelongsToDifferentMap() {
+    void update_shouldSetCustomName_whenNameProvided() {
         UUID pinId = UUID.randomUUID();
-        MapPin pin = new MapPin(pinId, "other-map", EntityType.CHARACTER, ENTITY_ID, 0.1, 0.1, Instant.now());
+        MapPin pin = new MapPin(pinId, MAP_ID, EntityType.CHARACTER, ENTITY_ID, null, 0.1, 0.1, Instant.now());
+        when(mapPinRepository.findById(pinId)).thenReturn(Optional.of(pin));
+        when(mapPinRepository.save(any(MapPin.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        MapPin result = mapPinService.update(MAP_ID, pinId,
+                new UpdateMapPinUseCase.Command(0.1, 0.1, "Renamed Landmark", null, null));
+
+        assertThat(result.getName()).isEqualTo("Renamed Landmark");
+    }
+
+    @Test
+    void update_shouldAttachEntity_whenPinHadNoEntityAndEntityGivenInCommand() {
+        UUID pinId = UUID.randomUUID();
+        MapPin pin = new MapPin(pinId, MAP_ID, null, null, "Unmarked Spot", 0.2, 0.2, Instant.now());
+        when(mapPinRepository.findById(pinId)).thenReturn(Optional.of(pin));
+        when(universeEntityLookupRepository.findSummary(EntityType.CHARACTER, ENTITY_ID))
+                .thenReturn(Optional.of(aCharacterSummary()));
+        when(mapPinRepository.existsByMapIdAndEntityTypeAndEntityIdAndIdNot(MAP_ID, EntityType.CHARACTER, ENTITY_ID, pinId))
+                .thenReturn(false);
+        when(mapPinRepository.save(any(MapPin.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        MapPin result = mapPinService.update(MAP_ID, pinId,
+                new UpdateMapPinUseCase.Command(0.2, 0.2, "Unmarked Spot", EntityType.CHARACTER, ENTITY_ID));
+
+        assertThat(result.getEntityType()).isEqualTo(EntityType.CHARACTER);
+        assertThat(result.getEntityId()).isEqualTo(ENTITY_ID);
+    }
+
+    @Test
+    void update_shouldThrow_whenEntityTypeGivenWithoutEntityId() {
+        UUID pinId = UUID.randomUUID();
+        MapPin pin = new MapPin(pinId, MAP_ID, null, null, "Unmarked Spot", 0.2, 0.2, Instant.now());
         when(mapPinRepository.findById(pinId)).thenReturn(Optional.of(pin));
 
-        assertThatThrownBy(() -> mapPinService.update(MAP_ID, pinId, new UpdateMapPinUseCase.Command(0.8, 0.9)))
+        assertThatThrownBy(() -> mapPinService.update(MAP_ID, pinId,
+                new UpdateMapPinUseCase.Command(0.2, 0.2, null, EntityType.CHARACTER, null)))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void update_shouldThrow_whenPinBelongsToDifferentMap() {
+        UUID pinId = UUID.randomUUID();
+        MapPin pin = new MapPin(pinId, "other-map", EntityType.CHARACTER, ENTITY_ID, null, 0.1, 0.1, Instant.now());
+        when(mapPinRepository.findById(pinId)).thenReturn(Optional.of(pin));
+
+        assertThatThrownBy(() -> mapPinService.update(MAP_ID, pinId, new UpdateMapPinUseCase.Command(0.8, 0.9, null, null, null)))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
     void delete_shouldRemovePin_whenPinBelongsToGivenMap() {
         UUID pinId = UUID.randomUUID();
-        MapPin pin = new MapPin(pinId, MAP_ID, EntityType.CHARACTER, ENTITY_ID, 0.5, 0.5, Instant.now());
+        MapPin pin = new MapPin(pinId, MAP_ID, EntityType.CHARACTER, ENTITY_ID, null, 0.5, 0.5, Instant.now());
         when(mapPinRepository.findById(pinId)).thenReturn(Optional.of(pin));
 
         mapPinService.delete(MAP_ID, pinId);
@@ -142,7 +207,7 @@ class MapPinServiceTest {
     @Test
     void delete_shouldThrow_whenPinBelongsToDifferentMap() {
         UUID pinId = UUID.randomUUID();
-        MapPin pin = new MapPin(pinId, "other-map", EntityType.CHARACTER, ENTITY_ID, 0.5, 0.5, Instant.now());
+        MapPin pin = new MapPin(pinId, "other-map", EntityType.CHARACTER, ENTITY_ID, null, 0.5, 0.5, Instant.now());
         when(mapPinRepository.findById(pinId)).thenReturn(Optional.of(pin));
 
         assertThatThrownBy(() -> mapPinService.delete(MAP_ID, pinId))
@@ -152,7 +217,7 @@ class MapPinServiceTest {
     @Test
     void findByMapId_shouldReturnPins_whenMapExists() {
         UUID pinId = UUID.randomUUID();
-        MapPin pin = new MapPin(pinId, MAP_ID, EntityType.CHARACTER, ENTITY_ID, 0.5, 0.5, Instant.now());
+        MapPin pin = new MapPin(pinId, MAP_ID, EntityType.CHARACTER, ENTITY_ID, null, 0.5, 0.5, Instant.now());
         when(mapRepository.findById(MAP_ID)).thenReturn(Optional.of(aMap()));
         when(mapPinRepository.findByMapId(MAP_ID)).thenReturn(List.of(pin));
 

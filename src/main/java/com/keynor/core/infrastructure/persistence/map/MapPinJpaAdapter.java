@@ -36,6 +36,11 @@ public class MapPinJpaAdapter implements MapPinRepository {
     }
 
     @Override
+    public boolean existsByMapIdAndEntityTypeAndEntityIdAndIdNot(String mapId, EntityType entityType, UUID entityId, UUID excludedPinId) {
+        return jpaRepository.existsByMapIdAndEntityTypeAndEntityIdAndIdNot(mapId, entityType, entityId, excludedPinId);
+    }
+
+    @Override
     public MapPin save(MapPin pin) {
         MapPinEntity saved = jpaRepository.save(mapper.toEntity(pin));
         return mapper.toDomain(saved);

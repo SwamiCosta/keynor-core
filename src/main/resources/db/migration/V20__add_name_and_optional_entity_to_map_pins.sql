@@ -1,0 +1,8 @@
+ALTER TABLE map_pins
+    ADD COLUMN name VARCHAR(255);
+
+ALTER TABLE map_pins
+    ALTER COLUMN entity_type DROP NOT NULL;
+
+ALTER TABLE map_pins
+    ALTER COLUMN entity_id DROP NOT NULL;

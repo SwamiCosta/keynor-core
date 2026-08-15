@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/public/v1/maps/{mapId}/pins")
@@ -28,12 +29,16 @@ public class PublicMapPinController {
         // A pin whose target is common=true is dropped entirely, not just
         // downgraded to a black pin like hidden -- common content has no
         // route to discovery via the map at all, only via another entity's
-        // resolved links (see common-content-implementation.md).
+        // resolved links (see common-content-implementation.md). A pin with
+        // no linked entity has no such target to check and is always
+        // included.
         List<MapPinResponse> pins = findMapPinsUseCase.findByMapId(mapId).stream()
-                .flatMap(pin -> findEntitySummaryUseCase.findSummary(pin.getEntityType(), pin.getEntityId())
-                        .filter(summary -> !summary.common())
-                        .map(summary -> MapPinResponse.from(pin, summary))
-                        .stream())
+                .flatMap(pin -> pin.getEntityType() == null
+                        ? Stream.of(MapPinResponse.from(pin, null))
+                        : findEntitySummaryUseCase.findSummary(pin.getEntityType(), pin.getEntityId())
+                                .filter(summary -> !summary.common())
+                                .map(summary -> MapPinResponse.from(pin, summary))
+                                .stream())
                 .toList();
         return ResponseEntity.ok(pins);
     }

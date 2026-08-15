@@ -40,7 +40,7 @@ class PublicMapPinControllerTest {
     }
 
     private MapPin aPin(UUID entityId) {
-        return new MapPin(UUID.randomUUID(), MAP_ID, EntityType.CHARACTER, entityId, 0.5, 0.5, Instant.now());
+        return new MapPin(UUID.randomUUID(), MAP_ID, EntityType.CHARACTER, entityId, null, 0.5, 0.5, Instant.now());
     }
 
     @Test
@@ -57,6 +57,7 @@ class PublicMapPinControllerTest {
         assertThat(body).isNotNull();
         assertThat(body).hasSize(1);
         assertThat(body.get(0).entity().name()).isEqualTo("Araveth");
+        assertThat(body.get(0).name()).isEqualTo("Araveth");
     }
 
     @Test
@@ -71,5 +72,36 @@ class PublicMapPinControllerTest {
 
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).isEmpty();
+    }
+
+    @Test
+    void findByMap_shouldIncludePinWithItsOwnName_whenPinHasNoLinkedEntity() {
+        MapPin pin = new MapPin(UUID.randomUUID(), MAP_ID, null, null, "Uncharted Ruins", 0.3, 0.7, Instant.now());
+        when(findMapPinsUseCase.findByMapId(MAP_ID)).thenReturn(List.of(pin));
+
+        var response = controller.findByMap(MAP_ID);
+
+        List<MapPinResponse> body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body).hasSize(1);
+        assertThat(body.get(0).name()).isEqualTo("Uncharted Ruins");
+        assertThat(body.get(0).entity()).isNull();
+    }
+
+    @Test
+    void findByMap_shouldSuppressName_whenTargetIsHiddenAndStillLocked() {
+        UUID entityId = UUID.randomUUID();
+        MapPin pin = new MapPin(UUID.randomUUID(), MAP_ID, EntityType.CHARACTER, entityId, "A curious marker", 0.5, 0.5, Instant.now());
+        EntityLinkSummary hiddenSummary = new EntityLinkSummary(EntityType.CHARACTER, entityId, "Secret Vault", EntityStatus.CANON, true, false);
+        when(findMapPinsUseCase.findByMapId(MAP_ID)).thenReturn(List.of(pin));
+        when(findEntitySummaryUseCase.findSummary(EntityType.CHARACTER, entityId)).thenReturn(Optional.of(hiddenSummary));
+
+        var response = controller.findByMap(MAP_ID);
+
+        List<MapPinResponse> body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body).hasSize(1);
+        assertThat(body.get(0).name()).isNull();
+        assertThat(body.get(0).entity().hidden()).isTrue();
     }
 }

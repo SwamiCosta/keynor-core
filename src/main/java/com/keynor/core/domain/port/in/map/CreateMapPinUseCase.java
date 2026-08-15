@@ -9,6 +9,6 @@ public interface CreateMapPinUseCase {
 
     MapPin create(Command command);
 
-    record Command(String mapId, EntityType entityType, UUID entityId, double normalizedX, double normalizedY) {
+    record Command(String mapId, EntityType entityType, UUID entityId, String name, double normalizedX, double normalizedY) {
     }
 }

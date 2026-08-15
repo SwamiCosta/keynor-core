@@ -22,11 +22,14 @@ public class MapPinEntity {
     private String mapId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "entity_type", nullable = false)
+    @Column(name = "entity_type")
     private EntityType entityType;
 
-    @Column(name = "entity_id", nullable = false)
+    @Column(name = "entity_id")
     private UUID entityId;
+
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "normalized_x", nullable = false)
     private double normalizedX;
@@ -45,6 +48,8 @@ public class MapPinEntity {
     public void setEntityType(EntityType entityType) { this.entityType = entityType; }
     public UUID getEntityId() { return entityId; }
     public void setEntityId(UUID entityId) { this.entityId = entityId; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
     public double getNormalizedX() { return normalizedX; }
     public void setNormalizedX(double normalizedX) { this.normalizedX = normalizedX; }
     public double getNormalizedY() { return normalizedY; }
