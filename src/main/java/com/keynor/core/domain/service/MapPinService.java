@@ -82,8 +82,11 @@ public class MapPinService implements CreateMapPinUseCase, UpdateMapPinUseCase, 
             entityId = command.entityId();
         }
 
+        boolean hasNewName = command.name() != null && !command.name().isBlank();
+        String name = hasNewName ? command.name() : pin.getName();
+
         MapPin repositioned = new MapPin(
-                pin.getId(), mapId, entityType, entityId, command.name(),
+                pin.getId(), mapId, entityType, entityId, name,
                 command.normalizedX(), command.normalizedY(), pin.getCreatedAt());
         return mapPinRepository.save(repositioned);
     }

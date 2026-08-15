@@ -141,6 +141,25 @@ class MapPinServiceTest {
         assertThat(result.getId()).isEqualTo(pinId);
     }
 
+    // Regression: a drag-only reposition never resends `name` (see
+    // MapArea.tsx's handleMovePin). Before this fix, an omitted name was
+    // treated as "clear the override" -- fatal for an entity-less pin, whose
+    // name is its only identifier, and a silent data-loss bug for any
+    // entity-linked pin with a custom name.
+    @Test
+    void update_shouldPreserveExistingName_whenNameOmittedOnPinWithNoEntity() {
+        UUID pinId = UUID.randomUUID();
+        MapPin pin = new MapPin(pinId, MAP_ID, null, null, "Uncharted Ruins", 0.2, 0.2, Instant.now());
+        when(mapPinRepository.findById(pinId)).thenReturn(Optional.of(pin));
+        when(mapPinRepository.save(any(MapPin.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        MapPin result = mapPinService.update(MAP_ID, pinId, new UpdateMapPinUseCase.Command(0.7, 0.8, null, null, null));
+
+        assertThat(result.getName()).isEqualTo("Uncharted Ruins");
+        assertThat(result.getNormalizedX()).isEqualTo(0.7);
+        assertThat(result.getNormalizedY()).isEqualTo(0.8);
+    }
+
     @Test
     void update_shouldSetCustomName_whenNameProvided() {
         UUID pinId = UUID.randomUUID();
