@@ -4,7 +4,6 @@ import com.keynor.core.application.dto.map.CreateMapPinRequest;
 import com.keynor.core.application.dto.map.MapPinResponse;
 import com.keynor.core.application.dto.map.UpdateMapPinRequest;
 import com.keynor.core.domain.model.map.MapPin;
-import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.port.in.map.CreateMapPinUseCase;
 import com.keynor.core.domain.port.in.map.DeleteMapPinUseCase;
 import com.keynor.core.domain.port.in.map.UpdateMapPinUseCase;
@@ -22,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
+
+import static com.keynor.core.infrastructure.web.map.MapPinRequestSupport.parseEntityType;
 
 @RestController
 @RequestMapping("/api/v1/maps/{mapId}/pins")
@@ -48,13 +49,15 @@ public class InternalMapPinController {
     public ResponseEntity<MapPinResponse> create(@PathVariable String mapId, @Valid @RequestBody CreateMapPinRequest request) {
         var command = new CreateMapPinUseCase.Command(
                 mapId,
-                EntityType.valueOf(request.entityType().toUpperCase()),
+                parseEntityType(request.entityType()),
                 request.entityId(),
+                request.name(),
                 request.normalizedX(),
                 request.normalizedY());
         MapPin created = createMapPinUseCase.create(command);
-        var summary = findEntitySummaryUseCase.findSummary(created.getEntityType(), created.getEntityId())
-                .orElseThrow();
+        var summary = created.getEntityType() == null
+                ? null
+                : findEntitySummaryUseCase.findSummary(created.getEntityType(), created.getEntityId()).orElseThrow();
         return ResponseEntity.status(HttpStatus.CREATED).body(MapPinResponse.from(created, summary));
     }
 
@@ -62,10 +65,16 @@ public class InternalMapPinController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MapPinResponse> update(
             @PathVariable String mapId, @PathVariable UUID pinId, @Valid @RequestBody UpdateMapPinRequest request) {
-        var command = new UpdateMapPinUseCase.Command(request.normalizedX(), request.normalizedY());
+        var command = new UpdateMapPinUseCase.Command(
+                request.normalizedX(),
+                request.normalizedY(),
+                request.name(),
+                parseEntityType(request.entityType()),
+                request.entityId());
         MapPin updated = updateMapPinUseCase.update(mapId, pinId, command);
-        var summary = findEntitySummaryUseCase.findSummary(updated.getEntityType(), updated.getEntityId())
-                .orElseThrow();
+        var summary = updated.getEntityType() == null
+                ? null
+                : findEntitySummaryUseCase.findSummary(updated.getEntityType(), updated.getEntityId()).orElseThrow();
         return ResponseEntity.ok(MapPinResponse.from(updated, summary));
     }
 

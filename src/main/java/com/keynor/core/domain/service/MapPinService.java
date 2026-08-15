@@ -3,6 +3,7 @@ package com.keynor.core.domain.service;
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.map.MapPin;
+import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.port.in.map.CreateMapPinUseCase;
 import com.keynor.core.domain.port.in.map.DeleteMapPinUseCase;
 import com.keynor.core.domain.port.in.map.FindMapPinsUseCase;
@@ -35,12 +36,14 @@ public class MapPinService implements CreateMapPinUseCase, UpdateMapPinUseCase, 
         mapRepository.findById(command.mapId())
                 .orElseThrow(() -> new EntityNotFoundException("GameMap", command.mapId()));
 
-        universeEntityLookupRepository.findSummary(command.entityType(), command.entityId())
-                .orElseThrow(() -> new EntityNotFoundException(command.entityType().name(), command.entityId()));
+        if (command.entityType() != null) {
+            universeEntityLookupRepository.findSummary(command.entityType(), command.entityId())
+                    .orElseThrow(() -> new EntityNotFoundException(command.entityType().name(), command.entityId()));
 
-        if (mapPinRepository.existsByMapIdAndEntityTypeAndEntityId(command.mapId(), command.entityType(), command.entityId())) {
-            throw new DuplicateEntityNameException("MapPin",
-                    command.entityType() + ":" + command.entityId() + " on map " + command.mapId());
+            if (mapPinRepository.existsByMapIdAndEntityTypeAndEntityId(command.mapId(), command.entityType(), command.entityId())) {
+                throw new DuplicateEntityNameException("MapPin",
+                        command.entityType() + ":" + command.entityId() + " on map " + command.mapId());
+            }
         }
 
         MapPin pin = new MapPin(
@@ -48,6 +51,7 @@ public class MapPinService implements CreateMapPinUseCase, UpdateMapPinUseCase, 
                 command.mapId(),
                 command.entityType(),
                 command.entityId(),
+                command.name(),
                 command.normalizedX(),
                 command.normalizedY(),
                 Instant.now());
@@ -61,8 +65,25 @@ public class MapPinService implements CreateMapPinUseCase, UpdateMapPinUseCase, 
         if (!pin.getMapId().equals(mapId)) {
             throw new EntityNotFoundException("MapPin", pinId);
         }
+        if ((command.entityType() == null) != (command.entityId() == null)) {
+            throw new IllegalArgumentException("entityType and entityId must both be present or both be absent");
+        }
+
+        EntityType entityType = pin.getEntityType();
+        UUID entityId = pin.getEntityId();
+        if (command.entityType() != null) {
+            universeEntityLookupRepository.findSummary(command.entityType(), command.entityId())
+                    .orElseThrow(() -> new EntityNotFoundException(command.entityType().name(), command.entityId()));
+            if (mapPinRepository.existsByMapIdAndEntityTypeAndEntityIdAndIdNot(mapId, command.entityType(), command.entityId(), pinId)) {
+                throw new DuplicateEntityNameException("MapPin",
+                        command.entityType() + ":" + command.entityId() + " on map " + mapId);
+            }
+            entityType = command.entityType();
+            entityId = command.entityId();
+        }
+
         MapPin repositioned = new MapPin(
-                pin.getId(), pin.getMapId(), pin.getEntityType(), pin.getEntityId(),
+                pin.getId(), mapId, entityType, entityId, command.name(),
                 command.normalizedX(), command.normalizedY(), pin.getCreatedAt());
         return mapPinRepository.save(repositioned);
     }

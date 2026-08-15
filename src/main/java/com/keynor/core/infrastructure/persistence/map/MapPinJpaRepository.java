@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface MapPinJpaRepository extends JpaRepository<MapPinEntity, UUID> {
     List<MapPinEntity> findByMapId(String mapId);
     boolean existsByMapIdAndEntityTypeAndEntityId(String mapId, EntityType entityType, UUID entityId);
+    boolean existsByMapIdAndEntityTypeAndEntityIdAndIdNot(String mapId, EntityType entityType, UUID entityId, UUID excludedPinId);
 }

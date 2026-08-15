@@ -11,6 +11,7 @@ public interface MapPinRepository {
     List<MapPin> findByMapId(String mapId);
     Optional<MapPin> findById(UUID id);
     boolean existsByMapIdAndEntityTypeAndEntityId(String mapId, EntityType entityType, UUID entityId);
+    boolean existsByMapIdAndEntityTypeAndEntityIdAndIdNot(String mapId, EntityType entityType, UUID entityId, UUID excludedPinId);
     MapPin save(MapPin pin);
     void deleteById(UUID id);
 }
