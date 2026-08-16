@@ -15,65 +15,46 @@
 --   history (formally documented in universe-content-dump.md).
 --
 -- ⚠  Destructive: TRUNCATE removes all existing universe content before reinserting.
--- ⚠  Apply only after Flyway migrations are fully up to date (V1–V19 at minimum,
---   including V19 which adds `common` to all 6 UniverseEntity tables -- this file
---   will fail to apply against a database still on V18 or earlier).
+-- ⚠  Apply only after Flyway migrations are fully up to date (V1–V19 at minimum).
 -- ⚠  NOT idempotent — do not apply twice on the same database.
 -- ⚠  Requires user authorization before execution. Agents never run this directly.
 --
 -- How to apply:
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
--- Last updated: 2026-08-14
--- Updated by:   Imaws (hand-authored, not a live-DB regeneration -- this
---               data does not exist in any database yet since `maps` has
---               no create/update API; the seed file is the only route to
---               add it). Per user request: added 18 new map rows and 178
---               map_eras associations for 4 image groups spanning 14 ERA
---               entries (Matter..Wrath, Pristine..War, Heroes..Law,
---               Technology..Death). 'boreas-map' and 'athlassia-map' are
---               each a single shared row spanning both the Heroes..Law
---               and Technology..Death era ranges (18 era ids each) since
---               the same image is reused unchanged across both groups --
---               a deliberate decision, not an oversight (confirmed with
---               the user rather than assumed, since it affects whether
---               the two ranges can independently swap that image later).
---               All other maps in the Heroes..Law / Technology..Death
---               groups are one row per era-range (10 / 8 era ids). Every
---               map links to both the EN and PT id of each covered era,
---               matching the pre-existing primordial-map/vestiges-map
---               convention. The "switch between maps in the UI" part of
---               the request is aniannoth-overview frontend work, out of
---               keynor-core/Imaws's scope -- not done here, no contract
---               change needed for it (GET /api/public/v1/maps?eraId
---               already returns a list).
--- Previous entry, 2026-08-13:
+-- Last updated: 2026-08-16
 -- Updated by:   Siegmund (regenerated fresh from the live database). Per
---               Aroneus's handoff: set common = true on 3 Lore entities,
---               both language rows each (6 rows total) -- The Theosophy
---               of Aniannoth (EN ebd1073f-0a52-4c17-86c3-bfc1cb491a22 /
---               PT acf5d45d-2163-4918-a4dd-eaac675ba44e), Sexuality of
---               the Gods (EN 4f205e4a-01bb-4094-81c5-b49b7fe142c6 / PT
---               8986dc8b-69b3-4f61-bfac-1036d3ffba60), On the Word God
---               (EN c4ba4207-7857-49ab-8e22-5acc57ea2cd5 / PT
---               91165b17-3214-40b5-bbf3-0f4432905570). Verified this is
---               the ONLY change: diffed each row's full data (not just
---               the boolean) against the previous file, field by field
---               -- the sole difference anywhere is updated_at (expected
---               save-cycle side effect); name/summary/body/status/
---               timeline/hidden/version_group_id all byte-identical.
---               Confirmed zero unexpected common=true rows in any other
---               table (characters/factions/items spot-checked), and
---               zero map_pins targeting a LORE entity at all (so no
---               stray pin on a newly-common entity, per the
---               data-quality check in common-content-implementation.md).
+--               Aroneus's handoff: INSERT character Valker Kane, CANON
+--               COMPANION (EN d60bfc3c-6911-4934-b910-56b774d66b8b / PT
+--               780f52ca-bbf3-4c13-bd98-3d310a97aec6), Era of Vestiges
+--               -> Era of Death, with image, unidirectional link to
+--               Knight Without a Name / Cavaleiro sem Nome per language.
+--               INSERT the FIRST-EVER Place, "Nova-Singisdônia", CANON
+--               CITY (EN 01fda78b-f422-48d5-8e94-3036b2a1b355 / PT
+--               55f90169-2b35-4b36-ae32-795aab9abd58), Era of
+--               Encounters -> Era of Death, with image, bidirectional
+--               link with the lore "Lio-Tekari" per language. Confirmed
+--               Lio-Tekari's own EN/PT rows are otherwise byte-identical
+--               to the previous dump -- the reciprocal-link PUT changed
+--               only updated_at, exactly as specified. 6 new
+--               entity_links and 4 new images, all verified directly,
+--               zero dropped.
 --
---               This is the first regeneration since migration V19
---               (`common` flag) actually took effect on the live
---               database -- confirmed via flyway_schema_history (now at
---               V19, was V18 as of the previous update). Every row in
---               this file now carries the column; all rows other than
---               the 6 above have common = false.
+-- ⚠  MAJOR, UNREPORTED CONTENT DISCOVERED DURING THIS REGENERATION: the
+--   maps/map_eras/map_pins tables grew far beyond anything any handoff
+--   this session described -- maps 2->20 (18 new NAVIGABLE maps, one
+--   per named land/region, several with a "(Corrupted)" counterpart --
+--   e.g. artalion-map / artalion-corrupted-map), map_eras 4->182, and
+--   map_pins 13->22. Thematically consistent naming, no orphaned
+--   references found, reads as a legitimate large world-building push
+--   (analogous to the earlier primordial-map/vestiges-map additions,
+--   just far larger) rather than corruption -- but it wasn't
+--   communicated in any handoff reaching Siegmund, so flagging
+--   prominently rather than silently absorbing it. Recommend confirming
+--   with Aroneus/the user that this was intentional.
+--
+--               Re-ran the full entity_links hidden-visibility
+--               integrity sweep (584 rows): zero violations.
 
 -- ============================================================
 -- TRUNCATE (join tables first, then parents, then root tables)
@@ -236,10 +217,16 @@ INSERT INTO public.eras (id, name, order_index, type, importance, description, c
 -- MAP ↔ ERA ASSOCIATIONS
 -- ============================================================
 
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('primordial-map', '48ed4b49-b7b5-4d4b-9715-00dcaa819209');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('primordial-map', '36d5e2a5-be00-456b-bf11-113c0b737904');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('vestiges-map', '49187d39-6121-44b9-8477-f19e16fac16b');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('vestiges-map', 'eb903d2d-12a2-4e2b-9659-6d2243a8a70f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('primal-land-map', '2f0b14b1-2db2-4b78-a15b-d91b9344c26b');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('primal-land-map', 'f9c63136-a825-4124-99cf-c385cdf745ee');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('primal-land-map', '0d158843-7145-460d-b504-ca8b31e7d162');
@@ -259,6 +246,8 @@ INSERT INTO public.map_eras (map_id, era_id) VALUES ('pristine-land-map', '5833e
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
@@ -275,149 +264,141 @@ INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', '3fdc7efb-17d
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('boreas-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '3fdc7efb-17d8-4575-8106-146953843f09');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
-INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
 INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-corrupted-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('tian-annoth-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('exados-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('simaria-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('zanj-dara-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('artalion-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('rarsheams-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '2eff7424-b158-43f9-a8a7-8992b3042295');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '648c844e-8c7e-4724-8a34-fe4b7c1083ea');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', 'ebd3f220-f0bb-4073-a6f9-ed790e245679');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '95e57557-a3e0-4bec-a998-c11c10f7c09e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', 'b33d7a47-cf46-4aa1-a6c5-b7527ec0de37');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '1fac2c4b-0967-4699-945f-f05d9c769252');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', 'e54477b9-c9f8-4c51-9bf6-41d3802daf3b');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', '42ebd1d2-b526-427e-b912-c9d40fb78e8a');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('iren-map', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'fd791fd4-6951-4fa8-957e-5979bff9427f');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '3fdc7efb-17d8-4575-8106-146953843f09');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'ff3d5bed-6438-4fdb-8919-0a41250ff71e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '7aba3c3a-c576-4efa-8684-c068177e0f3e');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '13bd8972-a1c3-4e37-82b1-6f05e4040566');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '5ae11af6-d394-48f6-bb05-0e68fd241084');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', 'fe965866-a03a-4287-b4a8-b6d9eac9acb8');
+INSERT INTO public.map_eras (map_id, era_id) VALUES ('athlassia-map', '747bfdd2-8ec9-4416-976d-4051bf90276b');
 
 -- ============================================================
 -- CHARACTERS
@@ -811,6 +792,28 @@ Por quê? A pergunta não tem resposta satisfatória. Ele parece movido por uma 
 E ainda assim ele quase nunca é visto. Para a maioria dos que ouviram o seu nome, ele é folclore — uma figura inventada para dar forma ao medo inespecífico, algo contado para ensinar o terror que chega sem razão no meio da noite. Perguntam como os outros Amets poderiam permitir que tal coisa existisse. Perguntam para qual finalidade. São perguntas razoáveis sem respostas disponíveis, e talvez seja assim que devam permanecer.
 
 A possibilidade mais perturbadora — a que circula entre aqueles que o levam a sério — é que ele simplesmente tenha sido cauteloso demais para ser encontrado. Que as aparições esparsas e aparentemente sem propósito não sejam o quadro completo. Que por trás da aparente ausência de motivação exista um intelecto que opera há mais tempo do que qualquer um tem estado a observar, e que o seu plano para o que pretende fazer ao mundo não seja uma série de momentos isolados de crueldade, mas algo muito mais composto, muito mais paciente, e muito mais completo do que algum dos que o dispensam como lenda chegou a temer.', 'CANON', '2026-07-26 07:23:45.194752+00', '2026-07-26 09:47:28.413984+00', '36d5e2a5-be00-456b-bf11-113c0b737904', NULL, 'pt', '1a45079b-3a0e-4f21-9c71-4c024a03048c', true, 'cb869fcd-8a2a-4948-b209-53a85601d875', false);
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('d60bfc3c-6911-4934-b910-56b774d66b8b', 'Valker Kane', 'The notorious trader of souls — patriarch of a slain family who bargained his soul to the Nameless Knight in exchange for eternal life and merciless vengeance, becoming the Knight''s first and most loyal follower.', 'The notorious trader of souls, Valker was born into an ancient clan. The Kanes descend from a line of individuals gifted with a deep spiritual sensitivity, one that had won them favor at the courts of many kingdoms across many ages. For generation upon generation, the Kanes managed their own descendants with a cold precision: those born with the gift of mediumship were set aside for priestly positions of great worth. Those without that gift were steered instead toward marriages with other names of equal standing, so as to breed new generations and preserve the legacy and prestige of their blood.
+
+Valker, like many before him, lied on his tests. He had always had visions, from a very early age — tormented by them, in truth. By his own family''s account, he likely carried the potential to become one of the greatest clerics of his age. But that was never what he wanted. To surrender himself to celibacy, and abandon every worldly dream he held, was not a fate Valker longed for. And so, however raw or tormenting his visions grew, he kept them hidden. He could have been trained to face them — to understand them, and turn them to his advantage. Instead, he stayed silent, and carried on with his life in torment, but free.
+
+By adulthood, Valker had learned to ignore the signs with such determination that he had become almost blind to them entirely. He married, and rose to become patriarch of a county, overseeing its trade and its politics alike. On the day his estate was attacked, Valker was away, traveling with his guard. Had he been paying attention, he would have received the signs: the messages of the guides around him, calling him to turn back, to return and defend his wife and his children. Had his eyes remained open to the beyond, he would have saved his family. But he had chosen blindness for so long that, once again, he saw nothing at all.
+
+By the time he finally returned home that evening, it was already too late. Valker set out after the killers — a military company from a rival nation. But now dug in within their own village, that company proved too much for Valker''s forces to overcome. He would meet his death there, before the stone floor of a temple he had spent his whole life rejecting. And at the very end of it, one last entity placed itself between him and that death. No longer a god, nor any being of the heavens. No longer some ethereal spirit offering to guide him. No — something else entirely. And still, something only Valker, with his pure and sensitive blood, could ever see.
+
+The Nameless Knight revealed himself, and made an offer: surrender his soul, for all eternity, and place himself in the Knight''s service. Together, they would seek out others who, like Valker, had been wronged by the circumstances of their lives, and raise them up in resistance and rebellion against the very nature of the world. In exchange, Valker would escape death — living on in defiance of it. His soul would be eternal, in every sense that mattered. And Valker, ever the shrewd dealmaker, insisted on one clause of his own: if the Knight would rid the world of the soldiers who had killed his wife and his children, Valker would stand ready to serve him.
+
+Before that night was out, not a single soul still drew breath in that village. And Valker Kane became the Knight''s first follower, walking beside him ever since, through every era of time and every field of space, recruiting — or rather, negotiating for — soul after soul for his growing army.', 'CANON', '2026-08-16 04:31:42.79091+00', '2026-08-16 04:31:42.79091+00', '49187d39-6121-44b9-8477-f19e16fac16b', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', 'd60bfc3c-6911-4934-b910-56b774d66b8b', false, 'd60bfc3c-6911-4934-b910-56b774d66b8b', false);
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('780f52ca-bbf3-4c13-bd98-3d310a97aec6', 'Valker Kane', 'O notório negociante de almas — patriarca de uma família assassinada que trocou sua alma com o Cavaleiro sem Nome em troca de vida eterna e vingança implacável, tornando-se o primeiro e mais fiel seguidor do Cavaleiro.', 'O notório negociante de almas, Valker nasceu em um clã antigo. Os Kane descendem de uma linhagem de indivíduos dotados de grande sensibilidade espiritual, o que lhes garantiu as graças de diversas cortes ao longo de muitas eras. Por geração após geração, os Kane administraram seus próprios descendentes com uma precisão fria: aqueles nascidos com o dom da mediunidade eram reservados para cargos sacerdotais de grande valor. Já os que não possuíam tal dom eram direcionados a casamentos com outros nomes de igual prestígio, de modo a gerar novas gerações e preservar o legado e o prestígio de seu sangue.
+
+Valker, como muitos antes dele, mentiu em seus testes. Sempre teve visões, desde muito cedo — atormentado por elas, na verdade. Segundo o relato de sua própria família, ele provavelmente carregava o potencial para se tornar um dos maiores clérigos de sua era. Mas nunca foi isso o que quis. Entregar-se ao celibato, e abandonar todos os seus sonhos mundanos, não era um destino que Valker desejava. E assim, por mais cruas ou atormentadoras que suas visões se tornassem, ele as manteve em segredo. Poderia ter sido treinado a enfrentá-las — a compreendê-las, e a usá-las a seu favor. Em vez disso, manteve-se em silêncio, e seguiu sua vida em tormento, mas livre.
+
+Na vida adulta, Valker aprendera a ignorar os sinais com tamanha determinação que se tornara quase completamente cego a eles. Casou-se, e ascendeu a patriarca de um condado, administrando tanto o comércio quanto a política. No dia em que sua propriedade foi atacada, Valker estava fora, viajando com sua guarda. Se estivesse atento, teria recebido os sinais: as mensagens dos guias ao seu redor, chamando-o de volta, pedindo que retornasse para defender sua esposa e seus filhos. Se seus olhos tivessem permanecido abertos para o além, teria salvado sua família. Mas escolhera a cegueira por tanto tempo que, mais uma vez, nada enxergou.
+
+Quando finalmente voltou para casa naquela noite, já era tarde demais. Valker partiu atrás dos assassinos — uma companhia militar de uma nação rival. Mas, já entrincheirada em sua própria vila, essa companhia se mostrou forte demais para as forças de Valker superarem. Encontraria ali sua morte, diante do chão de pedra de um templo que rejeitara a vida inteira. E, bem no fim, uma última entidade se colocou entre ele e essa morte. Já não um deus, nem qualquer ser dos céus. Já não um espírito etéreo a oferecer-lhe guia. Não. Algo inteiramente diferente. E, ainda assim, algo que só Valker, com seu sangue puro e sensível, seria capaz de ver.
+
+O Cavaleiro sem Nome se revelou a ele, e lhe fez uma oferta: entregar sua alma, por toda a eternidade, e colocar-se a serviço do Cavaleiro. Juntos, buscariam outros que, como Valker, houvessem sido injustiçados pelas circunstâncias da vida, e os ergueriam em resistência e rebeldia contra a própria natureza do mundo. Em troca, Valker escaparia da morte — vivendo em desafio a ela. Sua alma seria eterna, em todo sentido que importasse. E Valker, sempre o negociante astuto, insistiu em uma cláusula própria: se o Cavaleiro livrasse o mundo dos soldados que mataram sua esposa e seus filhos, Valker estaria pronto para servi-lo.
+
+Antes que aquela noite terminasse, nenhuma alma ainda respirava naquela vila. E Valker Kane tornou-se o primeiro seguidor do Cavaleiro, caminhando ao seu lado desde então, por todas as eras do tempo e por todos os campos do espaço, recrutando — ou melhor, negociando — alma após alma para seu exército em crescimento.', 'CANON', '2026-08-16 04:31:55.148562+00', '2026-08-16 04:31:55.148562+00', 'eb903d2d-12a2-4e2b-9659-6d2243a8a70f', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', 'd60bfc3c-6911-4934-b910-56b774d66b8b', false, '780f52ca-bbf3-4c13-bd98-3d310a97aec6', false);
 INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('b5b92b46-4bc9-4e58-8ff7-31cfd77a19c1', 'Hexas', 'A deusa da União e da Proteção da Família, filha de Tetros. Onde seu pai suporta sozinho, Hexas traça o círculo que torna a separação desnecessária — a divindade do que resta depois que a paixão se assenta: a refeição compartilhada, o rosto familiar, a soleira cruzada em conjunto.', 'Hexas é a deusa do número seis, filha de Tetros. É a divindade da união e da proteção da família e dos entes queridos, e carrega o dom de seu pai para a resistência, sem seu isolamento. Onde Tetros permanece sozinho, imóvel, Hexas traça o círculo que torna a separação desnecessária. Seu símbolo é um hexágono cercado por círculos em cada vértice — cada nó distinto, cada um tocando dois outros, nenhum ponto deixado sem um vizinho.
 
 Ela não é uma deusa da paixão ou do romance. É a deusa daquilo que resta depois que o fogo se assenta: a refeição compartilhada, a soleira cruzada em conjunto, o rosto familiar do outro lado do cômodo. Seus devotos guardam pequenos símbolos seus acima das portas, acreditando que ela sustenta a fronteira entre o lar e o mundo — mantendo o exterior fora, e o interior inteiro.', 'CANON', '2026-07-10 19:24:28.09794+00', '2026-07-16 03:17:35.770731+00', '36d5e2a5-be00-456b-bf11-113c0b737904', NULL, 'pt', 'e5a5f4d2-ca44-45f1-a9b2-5cce46e69e30', false, 'b5b92b46-4bc9-4e58-8ff7-31cfd77a19c1', false);
@@ -1244,6 +1247,54 @@ INSERT INTO public.character_categories (character_id, category) VALUES ('f526a8
 INSERT INTO public.character_categories (character_id, category) VALUES ('60c5b3b5-fcaa-495e-9551-89c3e0c55152', 'DEITY');
 INSERT INTO public.character_categories (character_id, category) VALUES ('16f14c7e-983d-4216-999d-c3b88c0797ed', 'HERO');
 INSERT INTO public.character_categories (character_id, category) VALUES ('3f6179eb-7ce1-4a32-9c7d-fd74d02e9c3f', 'HERO');
+INSERT INTO public.character_categories (character_id, category) VALUES ('d60bfc3c-6911-4934-b910-56b774d66b8b', 'COMPANION');
+INSERT INTO public.character_categories (character_id, category) VALUES ('780f52ca-bbf3-4c13-bd98-3d310a97aec6', 'COMPANION');
+
+-- ============================================================
+-- PLACES
+-- ============================================================
+
+INSERT INTO public.places (id, name, summary, body, status, map_type, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('01fda78b-f422-48d5-8e94-3036b2a1b355', 'Nova-Singisdônia', 'A meticulously engineered utopian city built by Dr. Constantia Niobe, home to the Lio-Tekari and hailed as the greatest civilization of its age — before vanishing without a trace, its fall a mystery and its true fate still debated.', 'The Greatest Empire of All Ages. That title has fallen to countless cities across the past — the City of Platinum, Profundiumbra, ÚltimoTrevo. And now, at last, it passes to the Utopia known as Nova-Singisdônia, whose very name calls to mind the legends of the Sacred and Perfect Kingdom of the gods.
+
+And, by every indication, the title fits the reality perfectly. Nova-Singisdônia was designed for success, its architecture, its laws, and its culture all planned out from the moment of its founding. Constantia Niobe and her team spent their entire lives documenting every piece of it and setting it into place. They raised up its first residents — a body of workers, leaders, and supporters — and passed on to them the idea, and the plans behind it. As the years went by, everything took shape, and the city began, at last, to rise on its own.
+
+No one knows exactly when the Doctor passed away, or how much of her creation''s greatness she lived to witness. But the truth is that Constantia had never planned to enjoy it herself. Nova-Singisdônia''s design was a long one, built to sustain and evolve on its own, without her. She always knew the city would outlive her. Far outlive her. And that was exactly how she wanted it.
+
+But the Lio-Tekari honored her memory. They preserved a virtual image of Constantia within their city — a holographic presence, granted access to every guideline and rule of the community. That hologram serves as guide and teacher to anyone willing to listen, explaining how each district functions, what purpose it serves, and what history it carries. These recordings were mass-produced and distributed, both within the city and beyond it, so that the whole world might witness the greatness and the perfection of the ideal city.
+
+And it was through those same recordings that the world came to learn of its fall.
+
+When, and how, Nova-Singisdônia fell remains a mystery to this day. Many point to an attack from neighboring nations, fearful of the young nation''s rapid growth. Others argue it was a natural disaster. Others still claim it was internal sabotage, one that shook its social structures until industrial catastrophe followed. Whatever the truth may be, one thing is known: Nova-Singisdônia ended, and not a single trace of it remains.
+
+Years later, no one even knows where it once stood. Many ruins present themselves as possible candidates, but the truth is that so many civilizations collapsed during the Age of Encounters that certainty is nearly impossible now. All that remains are the holographic records — data discs that carry the voice and the likeness of Constantia Niobe, recounting the wonders of a place the world has otherwise forgotten.
+
+But not everyone takes so bleak a view. A number of clues drawn from those records reveal that Nova-Singisdônia always practiced a certain caution, a certain discretion. Many believe it never truly fell at all — that it lies hidden somewhere still, still growing, still flourishing, waiting for the day it can reveal itself to the world and claim its rightful place as the true nation destined to govern the universe.
+
+Driven by that very curiosity, several bands of explorers now hunt for these holographic discs, searching for anything more they might reveal. Most of these explorers are the Lio-Tekari themselves — the lost race of valkani-cyborgs who once called that Utopia home. Cut off now from the neural support systems that once sustained them, these near-immortal beings wander unable to reach their oldest memories, and so feed on whatever clue they can find, trying to weave the information back together within their own minds. Whether driven by the hope of returning to their promised home, or simply by the need for closure, the Lio-Tekari travel from planet to planet, city to city, desert to desert — always searching for answers... and for purpose.', 'CANON', 'ABSTRACT', '2026-08-16 04:32:02.073561+00', '2026-08-16 04:32:02.073561+00', '13bd8972-a1c3-4e37-82b1-6f05e4040566', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', '01fda78b-f422-48d5-8e94-3036b2a1b355', false, '01fda78b-f422-48d5-8e94-3036b2a1b355', false);
+INSERT INTO public.places (id, name, summary, body, status, map_type, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('55f90169-2b35-4b36-ae32-795aab9abd58', 'Nova-Singisdônia', 'Uma cidade utópica meticulosamente projetada pela Dra. Constantia Niobe, lar dos Lio-Tekari e aclamada como a maior civilização de sua era — antes de desaparecer sem deixar vestígios, sua queda um mistério e seu destino real ainda debatido.', 'O Maior Império de Todas as Eras. Esse título já recaiu sobre inúmeras cidades ao longo do passado — a Cidade de Platina, Profundiumbra, ÚltimoTrevo. E agora, finalmente, é entregue à Utopia conhecida como Nova-Singisdônia, cujo próprio nome evoca as lendas do Reino Sagrado e Perfeito dos deuses.
+
+E, segundo tudo indica, o título condiz perfeitamente com a realidade. Nova-Singisdônia foi projetada para o sucesso, com toda a sua arquitetura, suas leis e sua cultura planejadas desde a fundação. Constantia Niobe e sua equipe passaram a vida inteira documentando cada peça e colocando-a em seu devido lugar. Ergueram seus primeiros habitantes — um corpo de operários, líderes e apoiadores — e lhes transmitiram a ideia, e os planos por trás dela. Com o passar dos anos, tudo foi ganhando forma, e a cidade, enfim, passou a se erguer por conta própria.
+
+Ninguém sabe ao certo quando a Doutora faleceu, nem quanto da grandeza de sua criação chegou a testemunhar. Mas a verdade é que Constantia jamais planejara desfrutar dela. O projeto de Nova-Singisdônia era de longo prazo, feito para se sustentar e evoluir por conta própria, sem ela. Ela sempre soube que a cidade lhe sobreviveria. Por muito, muito tempo. E era exatamente assim que ela desejava.
+
+Mas os Lio-Tekari honraram sua memória. Preservaram uma imagem virtual de Constantia dentro da própria cidade — uma presença holográfica, com acesso a todas as diretrizes e regras da comunidade. Esse holograma funciona como guia e professora para quem quiser ouvir, explicando como cada setor funciona, qual seu propósito e sua história. Esses registros foram produzidos em massa e distribuídos, tanto dentro quanto fora da cidade, para que o mundo inteiro pudesse testemunhar a grandeza e a perfeição da cidade ideal.
+
+E foi por meio desses mesmos registros que o mundo veio a saber de sua queda.
+
+Quando, e como, Nova-Singisdônia caiu permanece um mistério até hoje. Muitos apontam para um ataque de nações vizinhas, temerosas do crescimento acelerado da jovem nação. Outros defendem que foi um desastre natural. Outros ainda afirmam que foi uma sabotagem interna, que abalou suas estruturas sociais até que catástrofes industriais se seguissem. Seja qual for a verdade, uma coisa se sabe: Nova-Singisdônia chegou ao fim, e não restou dela um único vestígio sequer.
+
+Anos depois, ninguém sequer sabe onde um dia ela se ergueu. Muitas ruínas se apresentam como possíveis candidatas, mas a verdade é que tantas civilizações ruíram durante a Era dos Encontros que a certeza se tornou quase impossível. Tudo o que resta são os registros holográficos — discos de dados que carregam a voz e a aparência de Constantia Niobe, narrando as maravilhas de um lugar que o mundo, de resto, esqueceu.
+
+Mas nem todos veem a questão de forma tão sombria. Diversos indícios extraídos desses registros revelam que Nova-Singisdônia sempre praticou certa cautela, certa discrição. Muitos acreditam que ela nunca de fato caiu — que permanece escondida em algum lugar, ainda crescendo, ainda florescendo, esperando o dia em que poderá se revelar ao mundo e reivindicar seu lugar de direito como a verdadeira nação destinada a governar o universo.
+
+Movidos por essa mesma curiosidade, diversos bandos de exploradores agora caçam esses discos holográficos, em busca de qualquer coisa a mais que possam revelar. A maioria desses exploradores são os próprios Lio-Tekari — a raça perdida de valkani-ciborgues que um dia chamou aquela Utopia de lar. Cortados agora dos sistemas de suporte neural que um dia os sustentaram, esses seres quase imortais vagam incapazes de alcançar suas memórias mais antigas, e por isso se alimentam de qualquer pista que encontrem, tentando entrelaçar a informação de volta dentro de suas próprias mentes. Seja movidos pela esperança de retornar ao seu lar prometido, seja apenas pela necessidade de um encerramento, os Lio-Tekari viajam de planeta em planeta, de cidade em cidade, de deserto em deserto — sempre em busca de respostas... e de um propósito.', 'CANON', 'ABSTRACT', '2026-08-16 04:32:11.78953+00', '2026-08-16 04:32:11.78953+00', '7aba3c3a-c576-4efa-8684-c068177e0f3e', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', '01fda78b-f422-48d5-8e94-3036b2a1b355', false, '55f90169-2b35-4b36-ae32-795aab9abd58', false);
+
+-- ============================================================
+-- PLACE CATEGORIES
+-- ============================================================
+
+INSERT INTO public.place_categories (place_id, category) VALUES ('01fda78b-f422-48d5-8e94-3036b2a1b355', 'CITY');
+INSERT INTO public.place_categories (place_id, category) VALUES ('55f90169-2b35-4b36-ae32-795aab9abd58', 'CITY');
 
 -- ============================================================
 -- FACTIONS
@@ -1977,6 +2028,35 @@ Diz-se que nenhum valkani está vinculado a um único Signo. O Signo sob o qual 
 Na cidade sagrada de Singisdônia, cada um dos doze Signos encontrou um vaso vivo: um cavaleiro, um para cada Signo, os Doze Cavaleiros Originais. Não são deuses, e ainda assim recebem a mesma reverência que se ofereceria a um deus, pois diz-se que carregam o próprio poder do divino em suas formas, e permanecem como verdadeiros representantes do próprio valor. Para os valkani, não são mito, mas modelo — o ponto mais distante ao qual uma vida mortal poderia ascender, o ápice daquilo que se poderia aspirar a se tornar.
 
 Mas o ano não se divide igualmente em estações, e um punhado de dias permanece a cada ciclo, não pertencendo a estação alguma. É desses dias excedentes que nasce o décimo terceiro Signo: a Fenda, governada não por elemento ou naipe, mas apenas pela Obsessão, e pelo vazio que a Obsessão eternamente tenta, e eternamente falha em preencher. E assim como com os doze, também com a Fenda — pois até ela reivindica um campeão entre os Cavaleiros. Ele, sozinho, não carrega nome, nem cor de vida, nem triunfo esculpido em sua armadura. Permanece como prova de que nem tudo o que nasce no mundo nasce em sua ordem — e que certo vazio pode produzir tanto ruína quanto grandeza, em igual e terrível medida.', 'CANON', '2026-07-10 19:24:29.306087+00', '2026-07-10 19:24:29.306087+00', '36d5e2a5-be00-456b-bf11-113c0b737904', NULL, 'pt', 'ea292de9-5429-4ecb-b821-7e1e168ffbca', false, 'a8032617-5a1b-4ff9-8f65-83f08333888f', false);
+INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('8a9012fa-2a39-4f13-a9f8-c9e04509c2a5', 'Lio-Tekari', 'Os Lio-Tekari são uma espécie quase imortal que funde tecido orgânico e tecnologia, criada pela Dra. Constantia Niobe na cidade utópica de Nova-Singisdônia, organizada em cinco biotipos, cada um voltado a uma função social distinta.', 'Os Lio-Tekari se consideram os últimos valkani. A palavra Tekari pode ser grosseiramente traduzida como "aquele elevado pela tecnologia" — e é exatamente isso que são: mortais aperfeiçoados quase até o ponto da perfeição.
+
+Sua criadora foi a Dra. Constantia Niobe, especialista em robótica prostética e membro de alta patente da Federação Pacificadora Mundial. Os Lio-Tekari, porém, nunca foram sua obra final — apenas uma peça de um plano muito maior. Constantia pretendia erguer uma Utopia: uma sociedade ordenada até o último detalhe, na qual cada indivíduo tivesse uma função, e todo planejamento fosse traçado com tal precisão que jamais pudesse falhar.
+
+Ela deu a esse lugar o nome de Nova-Singisdônia, dito ter surgido em algum momento da Era dos Encontros. Sua magnitude passou para a lenda — aqueles que ainda contam sua história a chamam de a maior civilização de qualquer era. E a razão dessa grandeza foram os próprios Lio-Tekari, e o cuidado com que foram projetados.
+
+Todo indivíduo da espécie é uma fusão de tecido orgânico e tecnologia. A reprodução exige intervenção artificial: nenhum Lio-Tekari é capaz de iniciar sua própria gestação, ou de dar à luz, sem assistência especializada — e, mesmo que de alguma forma conseguisse, o recém-nascido não sobreviveria sem cuidados imediatos próprios. Em troca, os Lio-Tekari são feitos para durar. Suas células são, na prática, imortais, e notavelmente resistentes a falhas em cada divisão — o resultado é um povo que praticamente não envelhece nem adoece.
+
+Os Lio-Tekari não conhecem divisão em dois sexos. Em vez disso, se organizam em cinco biotipos distintos, cada um com sua própria arquitetura hormonal. O biotipo é escolhido no momento da concepção, e concede os traços que permitirão àquele indivíduo cumprir seu lugar na sociedade. Independentemente do biotipo, um Lio-Tekari pode apresentar-se feminino, masculino, ou algo entre os dois — não existe qualquer relação entre a forma exterior e a função biológica.
+
+Biotipo-1 é voltado para a força muscular, e seus indivíduos são selecionados para o trabalho físico e o treinamento militar. Nova-Singisdônia, apesar de constitucionalmente devotada à paz, ainda mantém uma força para se defender — enquanto isso continuar sendo necessário.
+
+Biotipo-2 é voltado para o intelecto, selecionado para a liderança estratégica e a educação. Decidem o caminho que a sociedade deve trilhar, e levam esse planejamento ao restante da comunidade.
+
+Biotipo-3 é voltado para a empatia — o único biotipo capaz de engravidar, com auxílio artificial — e demonstra talento particular para cuidar de crianças, de feridos e, em raros casos, de doentes ou idosos. Também atuam como diplomatas e facilitadores de relações além da cidade.
+
+Biotipo-4 é voltado para a criatividade, encarregado de entreter a população por meio da arte e da inovação.
+
+Biotipo-5 é voltado para a eficiência física — mais rápidos e ágeis que os demais — e cuida das patrulhas e de qualquer tarefa que exija esforço sustentado, além da coleta de dados para além das fronteiras da cidade.
+
+Os indivíduos são produzidos, assim, já com uma vocação ajustada à necessidade da comunidade, e criados para contribuir da melhor forma possível. A educação dos Lio-Tekari é inteiramente construída em torno do equilíbrio social: toda criança pertence à sociedade como um todo, jamais a uma única família — pertencem a todos, e todos pertencem a elas. Recursos e riquezas também são distribuídos de forma igualitária, para que nada recompense a individualidade em detrimento da colaboração voluntária.
+
+Seus corpos são moldados para diversas funções ao mesmo tempo. Um pequeno orifício na garganta permite que ingiram uma massa alimentar nutritiva; ao mesmo tempo, conectores neurais permitem que estimulem seus próprios sentidos e hormônios, disparando diretamente a sensação de saciedade. Em vez de comer algo saboroso, eles se nutrem dessa pasta e conectam um chip que lhes concede a experiência de terem provado algo delicioso. Esses mesmos estimuladores neurais podem simular quase tudo — a quietude da meditação, o prazer sexual, e tudo entre um e outro. Um Lio-Tekari está sempre no comando de suas próprias sensações.
+
+Sua pele tende, na maior parte, ao moreno profundo; cabelos e olhos costumam ser escuros também — herança de genes vindos da mistura de muitos povos daquela época, na qual a melanina passou a dominar. Sua tolerância ao calor, ao frio, à fome e à sede é notável, mesmo sem seus reguladores artificiais, o que reduz ainda mais as chances de sucumbirem a alguma fatalidade comum. Ainda que majoritariamente orgânicos, não é raro nem difícil que um Lio-Tekari receba próteses mecânicas adequadas à tarefa que lhe é designada. Após um acidente, um Lio-Tekari ferido pode receber tratamento e substituir partes danificadas do corpo sem grande dificuldade — sua biologia está naturalmente preparada para aceitar componentes mecânicos como parte de si mesma.
+
+Como já dito, os Lio-Tekari podem viver sem fim. Alguns demonstram, sim, fraqueza e sinais de idade ao longo dos anos, mas isso parece ser mais exceção que regra. Estudos sugerem que, em condições ideais, um Lio-Tekari é simplesmente imortal. Para lidar com o peso do acúmulo de memória, seus cérebros podem receber estímulo de ferramentas externas que restauram seu funcionamento e reorganizam memórias e experiências — poupando-os de qualquer doença degenerativa do tecido neural.
+
+E assim seguem: os valkani perfeitos, em corpo, em mente e em propósito social. Deveria ser, então, apenas uma questão de tempo até que se espalhem pelo universo como a verdadeira raça superior.', 'CANON', '2026-08-01 14:54:56.75836+00', '2026-08-16 04:33:28.016243+00', '7aba3c3a-c576-4efa-8684-c068177e0f3e', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', '622fe5c3-2a4c-44ce-b288-b29774a9c914', false, '8a9012fa-2a39-4f13-a9f8-c9e04509c2a5', false);
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('c06772b0-4d74-4812-a697-bfd32116e964', 'The March of the Erased', 'The Erased are a spreading, unkillable-seeming corruption that removes valkani from existence entirely rather than killing them — leaving no bodies, no memory, and no record of loss, and whose unstoppable advance across the universe is the true cause of the War of the Hexagon.', 'Over the passing years, a spreading corruption crept across the universe. They came to be called "the Erased." Where they came from, or when they first began to spread, no one can say — though historical record shows what appears to be their presence as far back as the earliest valkani civilizations. If "presence" is even the right word for them. The Erased are more absence than presence. More anomaly than creature.
 
 At best, they resemble the valkani — but with grey, wasted bodies, and faces left empty. At worst... well... it grows difficult even to describe. The Erased seem, on occasion, to merge into one another, giving rise to every kind of monstrosity: creatures with too many arms, too many legs, deformities scattered through their bodies, parts missing or reassembled in configurations that follow no pattern at all. They come always trailed by a dark essence that hovers above them, like a puppeteer above its puppet. These are no ordinary black ghosts — they resemble, more than anything, holes torn into reality itself, places where light simply ceases to exist. A darkness of the kind that drains the color from everything around it.
@@ -2072,35 +2152,6 @@ E por tudo isso, silenciosamente, sem anúncio, ele espalhou a sua semente. Pelo
 Pelo que esperam, ele não revelou. Se há uma forma final para o que pretende, ou se a intenção é simplesmente a degradação lenta e total de tudo o que se sustenta, não se sabe. O que se sabe é que ele é paciente, que a sua paciência já sobreviveu à guerra que definiu a Era Primordial, e que tudo o que existe na paz que se seguiu àquela guerra existe sobre uma fundação que Punic tem ajustado silenciosamente, num movimento não detetado de cada vez, em direção ao dia em que cobrará tudo o que colocou.
 
 Nesse dia, diz-se, ele reduzirá toda a existência a fragmentos retalhados do que eram.', 'CANON', '2026-07-26 09:39:21.60494+00', '2026-08-01 05:07:59.607734+00', '36d5e2a5-be00-456b-bf11-113c0b737904', NULL, 'pt', '9fd9430d-88f4-457d-9b65-8e3f0b66e27e', true, '47173b14-2dab-492b-b594-f735f5b5652c', false);
-INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('8a9012fa-2a39-4f13-a9f8-c9e04509c2a5', 'Lio-Tekari', 'Os Lio-Tekari são uma espécie quase imortal que funde tecido orgânico e tecnologia, criada pela Dra. Constantia Niobe na cidade utópica de Nova-Singisdônia, organizada em cinco biotipos, cada um voltado a uma função social distinta.', 'Os Lio-Tekari se consideram os últimos valkani. A palavra Tekari pode ser grosseiramente traduzida como "aquele elevado pela tecnologia" — e é exatamente isso que são: mortais aperfeiçoados quase até o ponto da perfeição.
-
-Sua criadora foi a Dra. Constantia Niobe, especialista em robótica prostética e membro de alta patente da Federação Pacificadora Mundial. Os Lio-Tekari, porém, nunca foram sua obra final — apenas uma peça de um plano muito maior. Constantia pretendia erguer uma Utopia: uma sociedade ordenada até o último detalhe, na qual cada indivíduo tivesse uma função, e todo planejamento fosse traçado com tal precisão que jamais pudesse falhar.
-
-Ela deu a esse lugar o nome de Nova-Singisdônia, dito ter surgido em algum momento da Era dos Encontros. Sua magnitude passou para a lenda — aqueles que ainda contam sua história a chamam de a maior civilização de qualquer era. E a razão dessa grandeza foram os próprios Lio-Tekari, e o cuidado com que foram projetados.
-
-Todo indivíduo da espécie é uma fusão de tecido orgânico e tecnologia. A reprodução exige intervenção artificial: nenhum Lio-Tekari é capaz de iniciar sua própria gestação, ou de dar à luz, sem assistência especializada — e, mesmo que de alguma forma conseguisse, o recém-nascido não sobreviveria sem cuidados imediatos próprios. Em troca, os Lio-Tekari são feitos para durar. Suas células são, na prática, imortais, e notavelmente resistentes a falhas em cada divisão — o resultado é um povo que praticamente não envelhece nem adoece.
-
-Os Lio-Tekari não conhecem divisão em dois sexos. Em vez disso, se organizam em cinco biotipos distintos, cada um com sua própria arquitetura hormonal. O biotipo é escolhido no momento da concepção, e concede os traços que permitirão àquele indivíduo cumprir seu lugar na sociedade. Independentemente do biotipo, um Lio-Tekari pode apresentar-se feminino, masculino, ou algo entre os dois — não existe qualquer relação entre a forma exterior e a função biológica.
-
-Biotipo-1 é voltado para a força muscular, e seus indivíduos são selecionados para o trabalho físico e o treinamento militar. Nova-Singisdônia, apesar de constitucionalmente devotada à paz, ainda mantém uma força para se defender — enquanto isso continuar sendo necessário.
-
-Biotipo-2 é voltado para o intelecto, selecionado para a liderança estratégica e a educação. Decidem o caminho que a sociedade deve trilhar, e levam esse planejamento ao restante da comunidade.
-
-Biotipo-3 é voltado para a empatia — o único biotipo capaz de engravidar, com auxílio artificial — e demonstra talento particular para cuidar de crianças, de feridos e, em raros casos, de doentes ou idosos. Também atuam como diplomatas e facilitadores de relações além da cidade.
-
-Biotipo-4 é voltado para a criatividade, encarregado de entreter a população por meio da arte e da inovação.
-
-Biotipo-5 é voltado para a eficiência física — mais rápidos e ágeis que os demais — e cuida das patrulhas e de qualquer tarefa que exija esforço sustentado, além da coleta de dados para além das fronteiras da cidade.
-
-Os indivíduos são produzidos, assim, já com uma vocação ajustada à necessidade da comunidade, e criados para contribuir da melhor forma possível. A educação dos Lio-Tekari é inteiramente construída em torno do equilíbrio social: toda criança pertence à sociedade como um todo, jamais a uma única família — pertencem a todos, e todos pertencem a elas. Recursos e riquezas também são distribuídos de forma igualitária, para que nada recompense a individualidade em detrimento da colaboração voluntária.
-
-Seus corpos são moldados para diversas funções ao mesmo tempo. Um pequeno orifício na garganta permite que ingiram uma massa alimentar nutritiva; ao mesmo tempo, conectores neurais permitem que estimulem seus próprios sentidos e hormônios, disparando diretamente a sensação de saciedade. Em vez de comer algo saboroso, eles se nutrem dessa pasta e conectam um chip que lhes concede a experiência de terem provado algo delicioso. Esses mesmos estimuladores neurais podem simular quase tudo — a quietude da meditação, o prazer sexual, e tudo entre um e outro. Um Lio-Tekari está sempre no comando de suas próprias sensações.
-
-Sua pele tende, na maior parte, ao moreno profundo; cabelos e olhos costumam ser escuros também — herança de genes vindos da mistura de muitos povos daquela época, na qual a melanina passou a dominar. Sua tolerância ao calor, ao frio, à fome e à sede é notável, mesmo sem seus reguladores artificiais, o que reduz ainda mais as chances de sucumbirem a alguma fatalidade comum. Ainda que majoritariamente orgânicos, não é raro nem difícil que um Lio-Tekari receba próteses mecânicas adequadas à tarefa que lhe é designada. Após um acidente, um Lio-Tekari ferido pode receber tratamento e substituir partes danificadas do corpo sem grande dificuldade — sua biologia está naturalmente preparada para aceitar componentes mecânicos como parte de si mesma.
-
-Como já dito, os Lio-Tekari podem viver sem fim. Alguns demonstram, sim, fraqueza e sinais de idade ao longo dos anos, mas isso parece ser mais exceção que regra. Estudos sugerem que, em condições ideais, um Lio-Tekari é simplesmente imortal. Para lidar com o peso do acúmulo de memória, seus cérebros podem receber estímulo de ferramentas externas que restauram seu funcionamento e reorganizam memórias e experiências — poupando-os de qualquer doença degenerativa do tecido neural.
-
-E assim seguem: os valkani perfeitos, em corpo, em mente e em propósito social. Deveria ser, então, apenas uma questão de tempo até que se espalhem pelo universo como a verdadeira raça superior.', 'CANON', '2026-08-01 14:54:56.75836+00', '2026-08-01 14:54:56.75836+00', '7aba3c3a-c576-4efa-8684-c068177e0f3e', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', '622fe5c3-2a4c-44ce-b288-b29774a9c914', false, '8a9012fa-2a39-4f13-a9f8-c9e04509c2a5', false);
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('7870fbc2-0991-405f-8944-f9d18226d3db', 'The War of the Hexagon', 'The War of the Hexagon is the valkani world''s last great conflict, born from the encroaching exodus of the Erased and fought among six ideological cores — Conservationists, Nihilists, Regressionists, Evolutionists, Correctionists, and Salvationists — each convinced only their path can save the world.', 'The War of the Hexagon did not begin with any single event. No attack, no political scheme served as its spark. It built instead by degrees, gradually, and for that very reason the valkani found themselves, at some point, caught up in conflicts whose origin — whose reason for being — they could not even name.
 
 Its true cause was, without question, the great exodus of the Erased. As they spread across countless planets, across countless galaxies, the space still open to mortals shrank, and with it their access to resources. In time, the obvious became impossible to ignore: they stood at the edge of the end of days. It was that understanding that gave birth to the war.
@@ -2378,7 +2429,7 @@ Their skin runs, most often, to deep brown; their hair and eyes tend dark as wel
 
 As already said, the Lio-Tekari can live without end. Some do show weakness or the signs of age over the years, but these seem the exception rather than the rule. Studies suggest that, under ideal conditions, a Lio-Tekari is simply immortal. To manage the sheer weight of accumulated memory, their brains can take stimulus from external tools that restore their function and reorganize memory and experience — sparing them any degenerative disease of neural tissue.
 
-And so they carry on: the perfect valkani, in body, in mind, and in social purpose. It should, then, be only a matter of time before they spread across the universe as the true superior race.', 'CANON', '2026-08-01 14:54:49.49211+00', '2026-08-01 14:54:49.49211+00', '13bd8972-a1c3-4e37-82b1-6f05e4040566', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', '622fe5c3-2a4c-44ce-b288-b29774a9c914', false, '622fe5c3-2a4c-44ce-b288-b29774a9c914', false);
+And so they carry on: the perfect valkani, in body, in mind, and in social purpose. It should, then, be only a matter of time before they spread across the universe as the true superior race.', 'CANON', '2026-08-01 14:54:49.49211+00', '2026-08-16 04:33:22.346266+00', '13bd8972-a1c3-4e37-82b1-6f05e4040566', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', '622fe5c3-2a4c-44ce-b288-b29774a9c914', false, '622fe5c3-2a4c-44ce-b288-b29774a9c914', false);
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('c4ba4207-7857-49ab-8e22-5acc57ea2cd5', 'On the Word God', 'A philosophical inquiry into the concept of divinity — arguing that the word god is a valkani invention: a name large enough to hold all that exceeds mortal grasp, but never theirs to give.', 'There is no god.
 
 Or rather: the very notion of a god is something the valkani made.
@@ -2430,8 +2481,6 @@ INSERT INTO public.lore_categories (lore_id, category) VALUES ('86550df5-4d20-4b
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('a96e56ee-3b1e-46dd-90f0-2818379e3531', 'MYTH');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('9fd9430d-88f4-457d-9b65-8e3f0b66e27e', 'MYTH');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('47173b14-2dab-492b-b594-f735f5b5652c', 'MYTH');
-INSERT INTO public.lore_categories (lore_id, category) VALUES ('622fe5c3-2a4c-44ce-b288-b29774a9c914', 'HISTORY');
-INSERT INTO public.lore_categories (lore_id, category) VALUES ('8a9012fa-2a39-4f13-a9f8-c9e04509c2a5', 'HISTORY');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('ea292de9-5429-4ecb-b821-7e1e168ffbca', 'MYTH');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('ea292de9-5429-4ecb-b821-7e1e168ffbca', 'PHILOSOPHY');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('c06772b0-4d74-4812-a697-bfd32116e964', 'HISTORY');
@@ -2449,6 +2498,8 @@ INSERT INTO public.lore_categories (lore_id, category) VALUES ('c4ba4207-7857-49
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('a8032617-5a1b-4ff9-8f65-83f08333888f', 'MYTH');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('a8032617-5a1b-4ff9-8f65-83f08333888f', 'PHILOSOPHY');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('91165b17-3214-40b5-bbf3-0f4432905570', 'PHILOSOPHY');
+INSERT INTO public.lore_categories (lore_id, category) VALUES ('622fe5c3-2a4c-44ce-b288-b29774a9c914', 'HISTORY');
+INSERT INTO public.lore_categories (lore_id, category) VALUES ('8a9012fa-2a39-4f13-a9f8-c9e04509c2a5', 'HISTORY');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('7bbaa3f3-0029-4679-9ba7-4f1df291c98b', 'MYTH');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('47ecb08d-8306-498f-ab69-57b0e1660af1', 'MYTH');
 INSERT INTO public.lore_categories (lore_id, category) VALUES ('47ecb08d-8306-498f-ab69-57b0e1660af1', 'LAW');
@@ -2512,6 +2563,12 @@ INSERT INTO public.entity_links (id, source_type, source_id, target_type, target
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('1bbf06f1-ca2c-4d0a-9ba5-7078bdcc6e1f', 'CHARACTER', '73370eec-b3a9-41eb-b822-02d8a80c02e3', 'LORE', '27ddff92-0140-42eb-889e-a0310f12ac92', '2026-07-23 23:26:05.637574+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('bd113d39-58a5-437d-9eab-fa057cfb0bbf', 'CHARACTER', '73370eec-b3a9-41eb-b822-02d8a80c02e3', 'ITEM', '370ed4fa-38ad-429e-9702-8f89c81b755c', '2026-07-23 23:26:05.637574+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('837ef50c-04fe-440c-a5bb-e6bd4475ebf4', 'CHARACTER', '8810e3a1-0f3b-472a-9c91-400c9045dae8', 'LORE', '91165b17-3214-40b5-bbf3-0f4432905570', '2026-08-01 05:04:53.544116+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('00726fbc-88d1-4a58-b212-0876e2b3a2cf', 'CHARACTER', 'd60bfc3c-6911-4934-b910-56b774d66b8b', 'CHARACTER', 'c4939f45-4dc5-48d5-9bd6-c5bc729cfa5e', '2026-08-16 04:31:42.961496+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('4877ea1a-8297-4668-8493-2f927d5b849d', 'CHARACTER', '780f52ca-bbf3-4c13-bd98-3d310a97aec6', 'CHARACTER', '6671adff-2357-4f90-a000-8bffb3c4a6d7', '2026-08-16 04:31:55.356088+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('d6b91665-5b01-4660-aca9-c84111ad50ca', 'PLACE', '01fda78b-f422-48d5-8e94-3036b2a1b355', 'LORE', '622fe5c3-2a4c-44ce-b288-b29774a9c914', '2026-08-16 04:32:02.592577+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('9c1cf4a9-ac02-434c-8353-03dc3873957e', 'PLACE', '55f90169-2b35-4b36-ae32-795aab9abd58', 'LORE', '8a9012fa-2a39-4f13-a9f8-c9e04509c2a5', '2026-08-16 04:32:11.829014+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('06ae5981-8639-4909-ac1d-5e2cb9996b23', 'LORE', '622fe5c3-2a4c-44ce-b288-b29774a9c914', 'PLACE', '01fda78b-f422-48d5-8e94-3036b2a1b355', '2026-08-16 04:33:22.452019+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('fd91236d-7d4e-491d-922b-765cbcf3e949', 'LORE', '8a9012fa-2a39-4f13-a9f8-c9e04509c2a5', 'PLACE', '55f90169-2b35-4b36-ae32-795aab9abd58', '2026-08-16 04:33:28.06763+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('373cad1c-ae83-440c-8c2a-2337495dc6aa', 'CHARACTER', '4603fa7a-52a7-4c36-87f4-828cfe9c986e', 'LORE', 'ebd1073f-0a52-4c17-86c3-bfc1cb491a22', '2026-07-23 23:26:06.932139+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('ce19ddcd-c9d2-4fc6-9d0f-f02ceeaef1fb', 'CHARACTER', '4603fa7a-52a7-4c36-87f4-828cfe9c986e', 'LORE', 'c4ba4207-7857-49ab-8e22-5acc57ea2cd5', '2026-07-23 23:26:06.932139+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('52355a78-9ce2-49a2-8d78-d4b6aaad013b', 'CHARACTER', '4603fa7a-52a7-4c36-87f4-828cfe9c986e', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-07-23 23:26:06.932139+00');
@@ -3294,6 +3351,10 @@ INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) 
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('143e3f78-c234-4c29-b18c-b2303809739b', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/ErasedMarch.png', 0);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('a5d4c7fe-e585-424c-8ea0-2e0c04763eaf', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/JatoriaTechniques.png', 0);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f4b7edbe-2d94-44ee-8fe8-d4c214886a96', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/JatoriaTechniques.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('d60bfc3c-6911-4934-b910-56b774d66b8b', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/ValkerKane.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('780f52ca-bbf3-4c13-bd98-3d310a97aec6', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/ValkerKane.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('01fda78b-f422-48d5-8e94-3036b2a1b355', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/NewSingisdonia.jfif', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('55f90169-2b35-4b36-ae32-795aab9abd58', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/NewSingisdonia.jfif', 0);
 
 -- ============================================================
 -- ARCHETYPES
@@ -3345,16 +3406,25 @@ INSERT INTO public.signs (id, name, sign_order, season_time, archetype_id, sub_a
 -- MAP PINS
 -- ============================================================
 
-INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('56cfc2ab-0a80-40f4-8df1-d61fabf0e5ec', 'primordial-map', 'CHARACTER', 'e1d5f144-37f5-46fb-9f65-0d65f53e4b2c', 0.5055449107273828, 0.5127024408642844, '2026-07-22 07:36:42.470288+00');
-INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('b8336a8f-0e08-4e7e-bf09-f343cc8f7047', 'primordial-map', 'CHARACTER', 'c3fe20e2-722e-488e-bf4d-185fd024e900', 0.4993176228443732, 0.09204239294176175, '2026-07-22 07:36:56.757077+00');
-INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('b4367e47-56ca-4d7a-9fea-c713231b4f90', 'primordial-map', 'CHARACTER', '1a45079b-3a0e-4f21-9c71-4c024a03048c', 0.6756619736960533, 0.9170070142747667, '2026-07-26 23:09:36.398737+00');
-INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('84b22448-9f77-4d28-9303-bdf3530d19f8', 'primordial-map', 'CHARACTER', 'f5a61b14-e05f-4d69-880e-bc3056bbb039', 0.62533331872924, 0.1874508907391842, '2026-07-27 09:18:14.026604+00');
-INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('016353ac-fb85-4435-a383-0e2d0a53d52a', 'primordial-map', 'CHARACTER', '08faa861-e131-4a9c-ad64-a3ccb40e7df9', 0.6706034705158417, 0.7464361371671896, '2026-07-22 07:38:04.533406+00');
-INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('456a4c27-5b4d-4a67-8710-83785763d357', 'primordial-map', 'CHARACTER', '63beea19-161c-43cc-8a76-e6041ffeac7e', 0.3000076068515695, 0.3497118381256539, '2026-07-24 00:38:01.501441+00');
-INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('d4da1cd6-b6bf-4c0b-b667-bfdfc3284e7f', 'primordial-map', 'CHARACTER', '59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 0.3552550054552374, 0.20110367182769862, '2026-07-22 07:37:58.528094+00');
-INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('33cb5671-90c2-4fd9-ba1f-e0cfb9589400', 'primordial-map', 'CHARACTER', '4603fa7a-52a7-4c36-87f4-828cfe9c986e', 0.5631853041420107, 0.8663995773409, '2026-07-22 07:37:31.945939+00');
-INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('c02e0620-9c41-4d9f-91f2-2c7b0320fe7b', 'primordial-map', 'CHARACTER', '4b7d2e2c-82cb-4dfe-ab5e-67767a3bc653', 0.28465993235170367, 0.5596334538209154, '2026-07-22 07:37:08.761977+00');
-INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('026ae006-8c9b-41d3-acd9-1908e41367d0', 'primordial-map', 'CHARACTER', '7ae23e7f-ee42-4159-994c-81530d4b6753', 0.33572789601584063, 0.7448841567425882, '2026-07-27 09:19:22.129847+00');
-INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('75dfddba-915f-4b98-8a4c-075509daaee5', 'primordial-map', 'CHARACTER', '8b0ac830-df17-4143-a681-d88bf55a41d5', 0.4312248756587701, 0.8652527846199669, '2026-07-27 09:19:29.003306+00');
-INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('3165345b-2ec3-4d71-9401-b11aac389ecf', 'primordial-map', 'CHARACTER', 'a329e9d5-071c-4610-aca4-bdeeb86c9f58', 0.703593140694932, 0.3524375618294596, '2026-07-27 09:18:31.602025+00');
-INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at) VALUES ('0968fc65-5523-4bdf-989a-6490d73fb321', 'primordial-map', 'CHARACTER', '5e856f4d-05d8-4158-b71f-cb1ed557178e', 0.7151042461232072, 0.5787441876242108, '2026-07-22 07:37:19.110666+00');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('56cfc2ab-0a80-40f4-8df1-d61fabf0e5ec', 'primordial-map', 'CHARACTER', 'e1d5f144-37f5-46fb-9f65-0d65f53e4b2c', 0.5055449107273828, 0.5127024408642844, '2026-07-22 07:36:42.470288+00', NULL);
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('b8336a8f-0e08-4e7e-bf09-f343cc8f7047', 'primordial-map', 'CHARACTER', 'c3fe20e2-722e-488e-bf4d-185fd024e900', 0.4993176228443732, 0.09204239294176175, '2026-07-22 07:36:56.757077+00', NULL);
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('b4367e47-56ca-4d7a-9fea-c713231b4f90', 'primordial-map', 'CHARACTER', '1a45079b-3a0e-4f21-9c71-4c024a03048c', 0.6756619736960533, 0.9170070142747667, '2026-07-26 23:09:36.398737+00', NULL);
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('84b22448-9f77-4d28-9303-bdf3530d19f8', 'primordial-map', 'CHARACTER', 'f5a61b14-e05f-4d69-880e-bc3056bbb039', 0.62533331872924, 0.1874508907391842, '2026-07-27 09:18:14.026604+00', NULL);
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('016353ac-fb85-4435-a383-0e2d0a53d52a', 'primordial-map', 'CHARACTER', '08faa861-e131-4a9c-ad64-a3ccb40e7df9', 0.6706034705158417, 0.7464361371671896, '2026-07-22 07:38:04.533406+00', NULL);
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('456a4c27-5b4d-4a67-8710-83785763d357', 'primordial-map', 'CHARACTER', '63beea19-161c-43cc-8a76-e6041ffeac7e', 0.3000076068515695, 0.3497118381256539, '2026-07-24 00:38:01.501441+00', NULL);
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('d4da1cd6-b6bf-4c0b-b667-bfdfc3284e7f', 'primordial-map', 'CHARACTER', '59c17b35-81e0-4584-9f98-4a0d3c8a8cbb', 0.3552550054552374, 0.20110367182769862, '2026-07-22 07:37:58.528094+00', NULL);
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('33cb5671-90c2-4fd9-ba1f-e0cfb9589400', 'primordial-map', 'CHARACTER', '4603fa7a-52a7-4c36-87f4-828cfe9c986e', 0.5631853041420107, 0.8663995773409, '2026-07-22 07:37:31.945939+00', NULL);
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('c02e0620-9c41-4d9f-91f2-2c7b0320fe7b', 'primordial-map', 'CHARACTER', '4b7d2e2c-82cb-4dfe-ab5e-67767a3bc653', 0.28465993235170367, 0.5596334538209154, '2026-07-22 07:37:08.761977+00', NULL);
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('026ae006-8c9b-41d3-acd9-1908e41367d0', 'primordial-map', 'CHARACTER', '7ae23e7f-ee42-4159-994c-81530d4b6753', 0.33572789601584063, 0.7448841567425882, '2026-07-27 09:19:22.129847+00', NULL);
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('75dfddba-915f-4b98-8a4c-075509daaee5', 'primordial-map', 'CHARACTER', '8b0ac830-df17-4143-a681-d88bf55a41d5', 0.4312248756587701, 0.8652527846199669, '2026-07-27 09:19:29.003306+00', NULL);
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('3165345b-2ec3-4d71-9401-b11aac389ecf', 'primordial-map', 'CHARACTER', 'a329e9d5-071c-4610-aca4-bdeeb86c9f58', 0.703593140694932, 0.3524375618294596, '2026-07-27 09:18:31.602025+00', NULL);
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('0968fc65-5523-4bdf-989a-6490d73fb321', 'primordial-map', 'CHARACTER', '5e856f4d-05d8-4158-b71f-cb1ed557178e', 0.7151042461232072, 0.5787441876242108, '2026-07-22 07:37:19.110666+00', NULL);
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('c2b1c55c-f14b-4aa3-ae47-13ccf6c55d23', 'artalion-map', NULL, NULL, 0.28998181147093205, 0.2605733313073948, '2026-08-15 05:15:46.312181+00', 'Anglia');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('c1f96a21-ad0f-4471-8110-d82541236474', 'artalion-map', NULL, NULL, 0.6043843395365568, 0.29740823915739545, '2026-08-15 05:16:36.260252+00', 'Valkanheim');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('54dc70d7-2212-409f-bfc3-5bafc96608b3', 'artalion-map', NULL, NULL, 0.5126078790318512, 0.8171897165962932, '2026-08-15 05:17:37.67687+00', 'Sing Syr');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('a6acb154-9569-4ff6-a0a3-45aac339b6df', 'artalion-map', NULL, NULL, 0.2281917192499422, 0.36971379901110035, '2026-08-15 05:18:06.614563+00', 'Sinxonia');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('4f2d1b7b-d5f3-47a8-a17c-e0fc7558b8e5', 'artalion-map', NULL, NULL, 0.1654929492021731, 0.23738098192035728, '2026-08-15 05:18:21.944083+00', 'Verania');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('26ece25f-1441-433a-9d3a-c5e90750becc', 'artalion-map', NULL, NULL, 0.2636301544943334, 0.2087316091481347, '2026-08-15 05:18:29.124735+00', 'Iria');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('42305000-778d-4ca1-ac19-95b257d2be1c', 'artalion-map', NULL, NULL, 0.6298273186863761, 0.4624831965592501, '2026-08-15 05:19:09.902717+00', 'Olimpia');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('80b89d1c-206e-4643-8de0-aec29ff6b301', 'artalion-map', NULL, NULL, 0.7297818796320948, 0.5538883382611035, '2026-08-15 05:19:16.763234+00', 'Titania');
+INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('c91a748b-7863-4fe3-87cd-0a56d6adfc12', 'artalion-map', NULL, NULL, 0.4548220903010358, 0.4988108327888975, '2026-08-15 05:12:27.806501+00', 'Profundiumbra');
