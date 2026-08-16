@@ -29,7 +29,7 @@ Entity types and their category enums:
 
 | Entity | Category enum | Values |
 |--------|--------------|--------|
-| `Character` | `CharacterCategory` | HERO, VILLAIN, DEITY, CREATURE, NPC |
+| `Character` | `CharacterCategory` | HERO, VILLAIN, DEITY, CREATURE, COMPANION |
 | `Place` | `PlaceCategory` | CITY, REGION, DUNGEON, REALM, STRUCTURE |
 | `Faction` | `FactionCategory` | EMPIRE, GUILD, ORDER, TRIBE, DIVINE |
 | `Item` | `ItemCategory` | WEAPON, ARTIFACT, RELIC, TOOL, CONSUMABLE |
