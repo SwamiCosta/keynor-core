@@ -5,5 +5,5 @@ public enum CharacterCategory {
     VILLAIN,
     DEITY,
     CREATURE,
-    NPC
+    COMPANION
 }

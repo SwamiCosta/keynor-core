@@ -101,7 +101,7 @@ class CharacterServiceTest {
     @Test
     void create_shouldThrowDuplicateEntityNameException_whenNameAlreadyExists() {
         var command = new CreateCharacterUseCase.Command(
-                "Araveth", null, null, List.of(), List.of(CharacterCategory.NPC), null, null, Language.EN, null, null, null, false, null, null, false);
+                "Araveth", null, null, List.of(), List.of(CharacterCategory.COMPANION), null, null, Language.EN, null, null, null, false, null, null, false);
         when(characterRepository.existsByNameAndLanguage("Araveth", Language.EN)).thenReturn(true);
 
         assertThatThrownBy(() -> characterService.create(command))
@@ -163,7 +163,7 @@ class CharacterServiceTest {
         Instant now = Instant.now();
         Character character = new Character(
                 id, "Old Name", null, null, List.of(),
-                List.of(CharacterCategory.NPC), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
+                List.of(CharacterCategory.COMPANION), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(characterRepository.findById(id)).thenReturn(Optional.of(character));
         when(characterRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 

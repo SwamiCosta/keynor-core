@@ -106,7 +106,7 @@ class PublicCharacterControllerTest {
         Character character = new Character(
                 id, "Araveth", null, null,
                 List.of(),
-                List.of(CharacterCategory.NPC),
+                List.of(CharacterCategory.COMPANION),
                 EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findAllCharactersUseCase.findAll(any(), any()))
                 .thenReturn(new PageResult<>(List.of(character), 0, 20, 1));
@@ -150,7 +150,7 @@ class PublicCharacterControllerTest {
         Character canonCharacter = new Character(canonId, "Araveth", null, null, List.of(),
                 List.of(CharacterCategory.HERO), EntityStatus.CANON, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         Character draftCharacter = new Character(draftId, "Unfinished One", null, null, List.of(),
-                List.of(CharacterCategory.NPC), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
+                List.of(CharacterCategory.COMPANION), EntityStatus.DRAFT, null, now, now, Language.EN, UUID.randomUUID(), UUID.randomUUID(), false, false);
         when(findCharactersByIdsUseCase.findByIds(List.of(canonId, draftId)))
                 .thenReturn(List.of(canonCharacter, draftCharacter));
 

@@ -91,7 +91,7 @@ class CharacterJpaAdapterIntegrationTest {
 
     @Test
     void findAll_shouldExcludeCommonEntities_whenExcludeCommonIsTrue() {
-        characterRepository.save(buildCharacter("Ordinary Villager", EntityStatus.CANON, CharacterCategory.NPC, true));
+        characterRepository.save(buildCharacter("Ordinary Villager", EntityStatus.CANON, CharacterCategory.COMPANION, true));
         characterRepository.save(buildCharacter("Araveth", EntityStatus.CANON, CharacterCategory.HERO, false));
         EntityFilter excludeCommonFilter = new EntityFilter(Language.EN, List.of(EntityStatus.CANON), List.of(), false, true);
 
@@ -103,7 +103,7 @@ class CharacterJpaAdapterIntegrationTest {
 
     @Test
     void findAll_shouldIncludeCommonEntities_whenExcludeCommonIsFalse() {
-        characterRepository.save(buildCharacter("Ordinary Villager", EntityStatus.CANON, CharacterCategory.NPC, true));
+        characterRepository.save(buildCharacter("Ordinary Villager", EntityStatus.CANON, CharacterCategory.COMPANION, true));
         EntityFilter includeCommonFilter = new EntityFilter(Language.EN, List.of(EntityStatus.CANON), List.of(), false, false);
 
         PageResult<Character> result = characterRepository.findAll(includeCommonFilter, new PageRequest(0, 10));
@@ -114,7 +114,7 @@ class CharacterJpaAdapterIntegrationTest {
     @Test
     void findAll_shouldReturnPaginatedResults_whenPageSizeLimited() {
         for (int i = 1; i <= 5; i++) {
-            characterRepository.save(buildCharacter("Character " + i, EntityStatus.DRAFT, CharacterCategory.NPC));
+            characterRepository.save(buildCharacter("Character " + i, EntityStatus.DRAFT, CharacterCategory.COMPANION));
         }
         EntityFilter emptyFilter = new EntityFilter(Language.EN, List.of(), List.of(), false, false);
 
@@ -144,7 +144,7 @@ class CharacterJpaAdapterIntegrationTest {
 
     @Test
     void deleteById_shouldRemoveCharacter_whenCharacterExists() {
-        Character character = buildCharacter("ToBeDeleted", EntityStatus.DRAFT, CharacterCategory.NPC);
+        Character character = buildCharacter("ToBeDeleted", EntityStatus.DRAFT, CharacterCategory.COMPANION);
         characterRepository.save(character);
         UUID id = character.getId();
 
