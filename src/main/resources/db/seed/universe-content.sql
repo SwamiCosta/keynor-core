@@ -6,13 +6,19 @@
 --   places, place_categories, factions, faction_categories,
 --   faction_members, items, item_categories, events, event_categories,
 --   lore, lore_categories, entity_links, universe_entity_images,
---   archetypes, signs, map_pins
+--   archetypes, signs, map_pins, hidden_content_lock
 --
--- Excluded: users, oauth2_* (environment-specific, never in scope);
---   hidden_content_lock (V17) -- riddle + BCrypt password_hash per hidden
---   entity, 8 rows in the live DB, deliberately excluded per that
---   migration's own warning against leaking riddle answers into git
---   history (formally documented in universe-content-dump.md).
+-- Excluded: users, oauth2_* (environment-specific, never in scope).
+--
+-- hidden_content_lock (V17) is now IN SCOPE (2026-08-21, reversing its
+--   original exclusion) -- riddle text + BCrypt password_hash per hidden
+--   entity. Per explicit user decision, these riddle/password pairs are
+--   a gamification detail (an easter-egg puzzle), not real credentials
+--   protecting a real asset, and carry no security consequence if
+--   visible in the repository. password_hash still stores a BCrypt
+--   hash -- only the dump-scope decision changed, not the schema or
+--   the hashing. See universe-content-dump.md's "Resolved (2026-08-21)"
+--   note.
 --
 -- ⚠  Destructive: TRUNCATE removes all existing universe content before reinserting.
 -- ⚠  Apply only after Flyway migrations are fully up to date (V1–V19 at minimum).
@@ -22,8 +28,20 @@
 -- How to apply:
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
--- Last updated: 2026-08-17
--- Updated by:   Siegmund (regenerated fresh from the live database). Per
+-- Last updated: 2026-08-21
+-- Updated by:   Siegmund (added the HIDDEN_CONTENT_LOCK section -- 8 rows,
+--               one per hidden entity row, per the user's own riddle and
+--               password answers, with password_hash computed as a real
+--               BCrypt hash the same way as the bootstrap admin/SYSTEM
+--               client hashes (security-model.md). hidden_content_lock is
+--               now in scope for this file, per explicit user decision --
+--               see the header note above and universe-content-dump.md's
+--               "Resolved (2026-08-21)" note for the full rationale. Each
+--               conceptual hidden entity's EN and PT rows share the same
+--               riddle_text and password_hash, since only one riddle was
+--               supplied per entity, not one per language.
+--
+-- Previous entry, 2026-08-17, Siegmund (regenerated fresh from the live database). Per
 --               Aroneus's handoff, extending the previous 19-lore-
 --               species batch: INSERT characters Gæa (EN
 --               d54e37cd-3186-4522-a2fc-69fcd9a47387 / PT
@@ -73,6 +91,7 @@ TRUNCATE
     universe_entity_images,
     entity_links,
     map_pins,
+    hidden_content_lock,
     character_categories,
     place_categories,
     faction_categories,
@@ -4065,3 +4084,23 @@ INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, n
 INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('42305000-778d-4ca1-ac19-95b257d2be1c', 'artalion-map', NULL, NULL, 0.6298273186863761, 0.4624831965592501, '2026-08-15 05:19:09.902717+00', 'Olimpia');
 INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('80b89d1c-206e-4643-8de0-aec29ff6b301', 'artalion-map', NULL, NULL, 0.7297818796320948, 0.5538883382611035, '2026-08-15 05:19:16.763234+00', 'Titania');
 INSERT INTO public.map_pins (id, map_id, entity_type, entity_id, normalized_x, normalized_y, created_at, name) VALUES ('c91a748b-7863-4fe3-87cd-0a56d6adfc12', 'artalion-map', NULL, NULL, 0.4548220903010358, 0.4988108327888975, '2026-08-15 05:12:27.806501+00', 'Profundiumbra');
+
+-- ============================================================
+-- HIDDEN CONTENT LOCK
+-- ============================================================
+-- Riddle/password answers supplied directly by the user. Each conceptual
+-- hidden entity has one EN row and one PT row; both share the same
+-- riddle_text and password_hash, since only one riddle was given per
+-- entity, not one per language. password_hash is a real BCrypt hash
+-- (computed via BCryptPasswordEncoder, same mechanism as the bootstrap
+-- admin/SYSTEM-client hashes in security-model.md), verified to match
+-- its plaintext before being written here.
+
+INSERT INTO public.hidden_content_lock (entity_type, entity_id, riddle_text, password_hash, created_at, updated_at) VALUES ('CHARACTER', '1a45079b-3a0e-4f21-9c71-4c024a03048c', 'Something seems odd, one of the Amets is not what it seems to be. Can you guess who?', '$2a$10$NPe5rCBaVX.YUNUr0BlcSeU5SfU9BKXNqRjxQ1srIBua1C75A.KxW', '2026-08-21 00:00:00+00', '2026-08-21 00:00:00+00');
+INSERT INTO public.hidden_content_lock (entity_type, entity_id, riddle_text, password_hash, created_at, updated_at) VALUES ('CHARACTER', 'cb869fcd-8a2a-4948-b209-53a85601d875', 'Something seems odd, one of the Amets is not what it seems to be. Can you guess who?', '$2a$10$NPe5rCBaVX.YUNUr0BlcSeU5SfU9BKXNqRjxQ1srIBua1C75A.KxW', '2026-08-21 00:00:00+00', '2026-08-21 00:00:00+00');
+INSERT INTO public.hidden_content_lock (entity_type, entity_id, riddle_text, password_hash, created_at, updated_at) VALUES ('ITEM', '9f447692-3301-4b1a-8e1c-d6fc0fe16d1f', 'What sign does Ulusuros trully represent?', '$2a$10$r6ZYvXFV8Td34V5/WSZ2deBZMfsDg/ydGMBuoGnboNLkAZ/VgVd7q', '2026-08-21 00:00:00+00', '2026-08-21 00:00:00+00');
+INSERT INTO public.hidden_content_lock (entity_type, entity_id, riddle_text, password_hash, created_at, updated_at) VALUES ('ITEM', 'c7c9b0c5-d36e-45cf-99aa-4459fa311e32', 'What sign does Ulusuros trully represent?', '$2a$10$r6ZYvXFV8Td34V5/WSZ2deBZMfsDg/ydGMBuoGnboNLkAZ/VgVd7q', '2026-08-21 00:00:00+00', '2026-08-21 00:00:00+00');
+INSERT INTO public.hidden_content_lock (entity_type, entity_id, riddle_text, password_hash, created_at, updated_at) VALUES ('ITEM', 'd5ea4f36-b5d2-40b0-8bcb-667e2720a755', 'What sign does Punic represent?', '$2a$10$VqFn1bMrKZWH0KBfojv7.Ob.AUqPqMQ7X.3hhSQla8ogOGmzIr6ne', '2026-08-21 00:00:00+00', '2026-08-21 00:00:00+00');
+INSERT INTO public.hidden_content_lock (entity_type, entity_id, riddle_text, password_hash, created_at, updated_at) VALUES ('ITEM', '9d05dfe6-01ce-4ae8-8d3f-b1186887ff3a', 'What sign does Punic represent?', '$2a$10$VqFn1bMrKZWH0KBfojv7.Ob.AUqPqMQ7X.3hhSQla8ogOGmzIr6ne', '2026-08-21 00:00:00+00', '2026-08-21 00:00:00+00');
+INSERT INTO public.hidden_content_lock (entity_type, entity_id, riddle_text, password_hash, created_at, updated_at) VALUES ('LORE', '9fd9430d-88f4-457d-9b65-8e3f0b66e27e', 'Who now owns Zςanser veil?', '$2a$10$rNQlKxyVk/eM.0R01k25tOWNsllyudXaNN8roVtlatltPN7zPYSki', '2026-08-21 00:00:00+00', '2026-08-21 00:00:00+00');
+INSERT INTO public.hidden_content_lock (entity_type, entity_id, riddle_text, password_hash, created_at, updated_at) VALUES ('LORE', '47173b14-2dab-492b-b594-f735f5b5652c', 'Who now owns Zςanser veil?', '$2a$10$rNQlKxyVk/eM.0R01k25tOWNsllyudXaNN8roVtlatltPN7zPYSki', '2026-08-21 00:00:00+00', '2026-08-21 00:00:00+00');
