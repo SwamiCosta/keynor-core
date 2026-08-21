@@ -25,7 +25,7 @@ public class HiddenContentService implements CreateHiddenContentLockUseCase, Hid
      * user directly (workspace SKILLS.md Skill 14, Ask Before Inferring) --
      * not something an agent may invent.
      */
-    private static final String MASTER_PASSWORD = "PunicFnnEradis";
+    private static final String MASTER_PASSWORD = "PunicEradisFnn";
 
     private static final Duration TOKEN_TTL = Duration.ofHours(2);
 

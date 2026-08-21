@@ -23,16 +23,17 @@ items, item_categories,
 events, event_categories,
 lore, lore_categories,
 universe_entity_images, entity_links,
-archetypes, signs, map_pins
+archetypes, signs, map_pins, hidden_content_lock
 ```
 
 **Excluded tables** (never in scope):
 - `users` — environment-specific, contains hashed credentials
 - `oauth2_registered_client`, `oauth2_authorization`, `oauth2_authorization_consent` — environment-specific secrets
-- `hidden_content_lock` (V17) — riddle text + BCrypt password hash per hidden entity; excluded per that migration's own warning against leaking riddle answers into git history
 - Any future table that receives input from external users
 
 **Resolved** (2026-07-30): `map_pins` (V16, map-pins feature) is now in scope, brought in by Omnia's decision once it held real data (13 rows). It's structurally identical to `entity_links` — inputter-authored but universe-descriptive, not environment-specific — so it's treated the same way. The `MAP_PINS` section sits after `SIGNS` in the file, since `maps` and every entity type it can reference are already inserted earlier in file order.
+
+**Resolved** (2026-08-21): `hidden_content_lock` (V17) is now in scope, per explicit user decision — reversing V17's own original warning against leaking riddle answers into git history. The user's stated rationale: these riddle/password pairs are a gamification detail (an easter-egg puzzle mechanic), not real user credentials protecting any real asset, and carry no security consequence if committed and visible in the repository. **This is a formal, documented exception to the workspace's normal "never commit anything password-shaped" instinct — not an oversight.** `password_hash` still stores a BCrypt hash (schema unchanged, `V17__add_hidden_content.sql` untouched), computed the same way as the bootstrap admin/SYSTEM-client hashes (`security-model.md` — Step 1, jshell + `BCryptPasswordEncoder`); hashing still happens, it's just no longer treated as a reason to exclude the table from the dump. The `HIDDEN_CONTENT_LOCK` section sits after `MAP_PINS` in the file, since it has no ordering dependency on any other table beyond the six entity tables already inserted earlier.
 
 If a new table is added to the schema, the agent must evaluate whether it is universe content or user/environment data before adding it to the dump scope. When in doubt, exclude and flag to Imaws.
 
@@ -106,7 +107,7 @@ INSERT INTO eras (...) VALUES (...);
 
 Triggered when: the user asks Siegmund to update the dump after a data change in the local DB.
 
-1. Siegmund runs `pg_dump --data-only --column-inserts -t maps -t eras -t map_eras -t characters -t character_categories -t places -t place_categories -t factions -t faction_categories -t faction_members -t items -t item_categories -t events -t event_categories -t lore -t lore_categories -t universe_entity_images -t entity_links -t archetypes -t signs -t map_pins keynor_core` directly against the already-running local database. If the database is not reachable, Siegmund stops and reports — never starts one to proceed
+1. Siegmund runs `pg_dump --data-only --column-inserts -t maps -t eras -t map_eras -t characters -t character_categories -t places -t place_categories -t factions -t faction_categories -t faction_members -t items -t item_categories -t events -t event_categories -t lore -t lore_categories -t universe_entity_images -t entity_links -t archetypes -t signs -t map_pins -t hidden_content_lock keynor_core` directly against the already-running local database. If the database is not reachable, Siegmund stops and reports — never starts one to proceed
 2. Siegmund assembles the file: TRUNCATE block (table list carried over from the previous file), then one section per table in dependency order, each containing that table's `pg_dump` output pasted verbatim — see "File format" above for what NOT to hand-rework
 3. Siegmund updates the header's "Last updated" / "Updated by" lines to describe the change
 4. Siegmund verifies the new file against the previous version **by row content per table** (e.g. sort both old and new row sets by primary key before diffing) — not by literal line position. Physical row reordering with identical content (Postgres heap relocation after a past `UPDATE`) is expected and is not a defect
