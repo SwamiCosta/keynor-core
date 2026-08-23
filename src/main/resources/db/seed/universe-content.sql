@@ -28,8 +28,48 @@
 -- How to apply:
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
--- Last updated: 2026-08-21
--- Updated by:   Siegmund (added the HIDDEN_CONTENT_LOCK section -- 8 rows,
+-- Last updated: 2026-08-23
+-- Updated by:   Siegmund (regenerated fresh from the live database). Per
+--               Aroneus's handoff (Hatiri/Ashura/Dava/Maltham story arc):
+--               INSERT 2 new lore rows (The Seven Vayamarga of Mahalyra,
+--               EN 88fd08d7-ad08-435c-af5c-b7d043c6292d / PT
+--               bb625182-491e-4215-8987-f1ab6ff3be9d) and 8 new character
+--               rows -- Hatiri (DEITY, EN 2fab5cd5-dddd-478e-8998-
+--               96d197d29619 / PT 6e4eaee0-90a0-4d23-85cc-97f7544d137e),
+--               Ashura (VILLAIN), Dava (HERO), Maltham/Samyagdhara
+--               (HERO) -- verified present in the live DB by id before
+--               regenerating.
+--
+--               entity_links: 26 new rows verified via semantic diff
+--               (0 dropped). NOTE: the handoff's own summary line said
+--               "9 relationships x 2 languages = 18 rows" -- this undercounts.
+--               Recounting the handoff's own relationship table directly
+--               (2 rows/language for each of the 3 bidirectional pairs:
+--               Hatiri<->Vayamarga, Hatiri<->Dava, Ashura<->Dava; 1 row/
+--               language for each of the 7 one-way links: Hatiri->3 fixed
+--               DEITY lore entries, Ashura->Hatiri, Maltham->Vayamarga,
+--               Maltham->Ashura, Maltham->Dava) gives 13 rows/language x
+--               2 = 26, which matches the live DB exactly. Flagging per
+--               standard practice -- trusting the table + DB over the
+--               handoff's own arithmetic, not silently correcting it.
+--
+--               NOT applied -- flagged, not actioned: the handoff also
+--               reported a Trollfolk (EN d12e2ca8-f9ae-4bf4-96ea-
+--               6b4cf74d6562 / PT f89b28b3-6aae-418e-9018-7b7c16b65913)
+--               image correction (Golbin.png->Goblin.png, Rancor.png->
+--               Rancor.jfif). Verified directly against a fresh pg_dump:
+--               both rows are byte-identical to the previous dump --
+--               still Golbin.png/Rancor.png. The correction described in
+--               the handoff has not actually reached the live database.
+--               Left unchanged here to keep this file a faithful mirror
+--               of the live DB; needs Aroneus to re-apply it live before
+--               Siegmund can pick it up.
+--
+--               14 new images (default entity images auto-attached to
+--               the 10 new rows) and full 706-row hidden-visibility
+--               integrity sweep (zero violations) also verified.
+--
+-- Previous entry, 2026-08-21, Siegmund (added the HIDDEN_CONTENT_LOCK section -- 8 rows,
 --               one per hidden entity row, per the user's own riddle and
 --               password answers, with password_hash computed as a real
 --               BCrypt hash the same way as the bootstrap admin/SYSTEM
@@ -1206,6 +1246,121 @@ INSERT INTO public.characters (id, name, summary, body, status, created_at, upda
 Everything that can be imagined lives there, covered by a layer of what cannot — and that layer is infinitely larger than the portion below it. This is not metaphor. It is the actual structure of her domain.
 
 To worship her, a single mind is not sufficient. She is not an entity that receives and responds. She is a legion — infinite intellects, infinite personalities, infinite configurations of possibility, all of them present simultaneously and none of them the definitive one. There is no center to address. There is no version of her that is the true one and the rest shadows. She is all of it, at once, without reconciliation. Her magnitude has nothing to do with power in the conventional sense. It has to do with dimension — with the simple fact that she is operating at a scale of comprehension so far removed from what surrounds her that the problems of other Amets, the events of worlds, the crises and resolutions that matter enormously to everything below her, do not reach her as concerns. She is not indifferent to them. She simply sees beyond them — not one beyond, not a fixed horizon, but an infinity of beyonds, each giving way to another, without end, without her appearing to notice that she has not yet arrived.', 'CANON', '2026-07-27 07:09:36.548112+00', '2026-07-30 02:18:55.74915+00', '48ed4b49-b7b5-4d4b-9715-00dcaa819209', NULL, 'en', '7ae23e7f-ee42-4159-994c-81530d4b6753', false, '7ae23e7f-ee42-4159-994c-81530d4b6753', false);
+
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('1527f011-01c0-4cfd-80e0-472790f8e927', 'Dava', 'Ashura''s murdered brother, chosen as Hatiri''s avatar before his own pride and quiet ambition cost him his life — his spirit lingered after death to distribute Hatiri''s last relics among seven heroes and set Maltham on the path to defeating Ashura.', 'Ashura''s brother, Dava grew into a gentle, generous boy. He was quiet, watchful — and for that, the masters of the temple where he was raised thought well of him.
+
+Whatever the discipline, Dava watched, gave himself to it, and made it his own. And every time he did, praise came from his peers and his masters alike, and every time it came, a small flame inside him burned a little brighter. Dava had been born for this. He felt it in his bones — destiny. He was the best, and he knew it.
+
+And because he knew it, he never needed to say it aloud. All he had to do was go on being himself, and go on gathering what that self earned him. He never needed to boast. Never needed to demand to be seen. He only had to stay quiet, serene, still — and every eye would find him regardless.
+
+So he stayed quiet. He watched others try to become what he already was, and watched them lose themselves for lack of his patience. Some would outpace him for a few weeks in some discipline or other, only to grow proud of it soon after — raising their voices, demanding the masters'' notice, only to be humbled and set back on the ground. Not Dava. He stayed quiet, and step by step, he kept climbing. He never challenged a soul. And for that, he was loved by all of them.
+
+And yet Dava never once offered his hand. They were rivals, in the end — every one of them. He kept his calm and never met them head-on. But make no mistake: it was that very calm that undid them. It was the refusal to meet them at all that beat them. Dava knew this well. It was his finest weapon. The same flame that burned in every other one of them burned in him too — the flame of pride, the flame of greatness. He was only ever smarter about it. Quiet. Patient. Unseen.
+
+And among those left behind was his own brother — the one who came closest of all to challenging him, and who let impatience take him in the final moment. Ashura carried real potential. If only Dava had taught him a little more calm. He might have surpassed him. But Dava was not there to raise anyone else up. He was there to be chosen. He would be Hatiri''s avatar. He would be a god.
+
+That, of course, never came to pass. His brother murdered him in the night to take his place. At least he was gentle about it, and quick. In the end, Dava understood that his peace and his silence, alone, had not been enough. They had not carried him to his destiny. Something more had been missing. And it was in that understanding — that unanswered question — that he stayed behind. His presence held fast to the world of the living, and he chose to go on. He watched, in horror, the terrible things his brother went on to do, and could not set aside the thought that some part of the blame was his to carry too. If only they had spoken more. Taught each other more.
+
+But it was too late for that now. The brother he had known had died with him. What remained in his place was something else entirely — a monster that had to be stopped. And Dava was the one who had to stop him. He gathered what still remained of the temple''s relics — those that could carry Hatiri''s power into a mortal valkani — seven jewels, which he gave to seven heroes scattered across the land, that they might defend their cities. But it was not enough. He would have to search further still. For someone who could walk a road no one had walked before, and do what, until then, no one had thought possible.', 'CANON', '2026-08-23 06:53:42.173033+00', '2026-08-23 06:53:42.173033+00', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f', 'en', '1527f011-01c0-4cfd-80e0-472790f8e927', false, '1527f011-01c0-4cfd-80e0-472790f8e927', false);
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('b8aac3ef-b2fa-46f1-b06e-83afd6d41e78', 'Dava', 'O irmão assassinado de Ashura, escolhido como avatar de Hatiri antes que seu próprio orgulho e ambição silenciosa lhe custassem a vida — seu espírito permaneceu após a morte para distribuir as últimas relíquias de Hatiri entre sete heróis e colocar Maltham no caminho para derrotar Ashura.', 'Irmão de Ashura, Dava cresceu como um garoto gentil e generoso. Era quieto, atento — e por isso os mestres do templo onde cresceu bem o viam.
+
+Fosse qual fosse a disciplina, Dava observava, se entregava a ela, e a fazia sua. E toda vez que o fazia, vinham os elogios de seus pares e mestres, e toda vez que vinham, uma pequena chama dentro dele ardia um pouco mais forte. Dava nascera para aquilo. Ele sentia isso nos ossos — destino. Era o melhor, e sabia que era.
+
+E por saber, nunca precisou dizer em voz alta. Bastava continuar sendo quem era, e continuar colhendo o que esse mesmo ser lhe rendia. Nunca precisou se vangloriar. Nunca precisou exigir ser visto. Bastava manter-se calado, sereno, quieto — e todos os olhos o encontrariam de qualquer forma.
+
+Então ele se calava. Observava outros tentarem se tornar aquilo que ele já era, e via-os se perderem pela falta da paciência que ele tinha. Alguns o superavam por algumas semanas nesta ou naquela disciplina, só para logo depois se orgulharem disso — erguendo a voz, exigindo a atenção dos mestres, só para serem humilhados e trazidos de volta ao chão. Não Dava. Ele se calava, e passo a passo, seguia subindo. Nunca desafiou uma alma sequer. E por isso, era amado por todos eles.
+
+E ainda assim, Dava jamais estendeu sua mão a ninguém. Eram rivais, afinal — todos eles. Mantinha sua calma e nunca os enfrentava de frente. Mas não se engane: era justamente essa calma que os derrubava. Era justamente a recusa em enfrentá-los que os derrotava. Dava sabia disso muito bem. Era sua melhor arma. A mesma chama que ardia em cada um dos outros ardia nele também — a chama do orgulho, a chama da grandeza. Ele era, apenas, mais esperto quanto a isso. Calado. Paciente. Invisível.
+
+E entre os que ficaram para trás estava seu próprio irmão — aquele que mais chegou perto de desafiá-lo, e que se deixou levar pela impaciência no último instante. Ashura carregava potencial verdadeiro. Se ao menos Dava tivesse lhe ensinado um pouco mais de calma. Talvez o tivesse superado. Mas Dava não estava ali para erguer ninguém além de si. Estava ali para ser escolhido. Seria o avatar de Hatiri. Seria um deus.
+
+Isso, é claro, nunca veio a acontecer. Seu irmão o assassinou durante a noite para tomar seu lugar. Ao menos foi gentil com ele, e rápido. No fim, Dava compreendeu que sua paz e seu silêncio, sozinhos, não haviam bastado. Não o haviam levado ao seu destino. Faltava algo mais. E foi nesse entendimento — nessa pergunta sem resposta — que ele permaneceu. Sua presença se manteve firme ao mundo dos vivos, e ele decidiu seguir em frente. Observou, horrorizado, as coisas terríveis que seu irmão passou a fazer, e não conseguiu deixar de pensar que parte da culpa também lhe pertencia. Se ao menos tivessem conversado mais. Ensinado mais, um ao outro.
+
+Mas já era tarde para isso. O irmão que ele conhecera havia morrido com ele. O que restara em seu lugar era outra coisa inteiramente — um monstro que precisava ser detido. E Dava era quem precisava detê-lo. Reuniu o que ainda restava das relíquias do templo — aquelas capazes de levar o poder de Hatiri a um valkani mortal — sete joias, que distribuiu a sete heróis espalhados pelo país, para que defendessem suas cidades. Mas não era suficiente. Teria de buscar mais além. Por alguém capaz de trilhar um caminho que ninguém jamais trilhara, e fazer o que, até então, ninguém julgara possível.', 'CANON', '2026-08-23 06:53:51.055718+00', '2026-08-23 06:53:51.055718+00', '42ebd1d2-b526-427e-b912-c9d40fb78e8a', '42ebd1d2-b526-427e-b912-c9d40fb78e8a', 'pt', '1527f011-01c0-4cfd-80e0-472790f8e927', false, 'b8aac3ef-b2fa-46f1-b06e-83afd6d41e78', false);
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('2fab5cd5-dddd-478e-8998-96d197d29619', 'Hatiri', 'A peaceful goddess of discipline, spirit, and martial cultivation, worshipped as Mahalyra''s guiding presence on Qashram and Tian-Annoth, whose devotees pursue balance and non-violence through the Seven Vayamarga, Fen Alchemy, and Rinadhara.', 'Hatiri is shown as a woman, her head crowned in ornament, seated in the lotus posture, robed in colors that seem to shift with the eye. Her symbol is the Jade Dragon.
+
+She is a peaceful goddess, and her rule is the cultivation of spirit and the knowledge of self. Discipline is hers above all else, and through discipline she is bound to the martial arts — though her practice concerns itself less with the strike than with the form the strike is born from.
+
+Her cult first rose on the plane of Tian-Annoth, in the Era of Heroes, when monks in great number turned their minds toward the workings of the world and the place the valkani held within it. These same monks also worshipped Mahalyra, another name borne by the goddess Gæa, she who is nature itself — but where Mahalyra moves as a neutral, abstract force of the universe, Hatiri is a guide, a protector, a presence to be spoken with in the search for direction and power.
+
+Her devotees hold that training and meditation, carried far enough, will wake a divine force sleeping within them — a force some name the Jade Dragon. This inward power is, at times, understood as no metaphor at all: a dragon woven of pure energy, called forth at a disciple''s will. To reach it, a devotee must give themselves to balance, to detachment, to contemplation.
+
+Through three practices, the devotees of Hatiri come to master their different powers:
+
+The Seven Vayamarga — a spiritual and martial practice that refines the practitioner''s body and mind, opening the way to supernatural ability
+The Fen Alchemy — an arcane practice of conjuring energies toward different ends; these energies may cancel one another or work in concert — fire, wood, earth, water, and metal
+Rinadhara — a positive or negative charge gathered through a person''s own actions; one who reaches another''s Rinadhara may work a variety of effects upon them
+For all their power, Hatiri''s devotees never seek out conflict, nor strike its first blow. Nations that live by her teaching turn first to diplomacy, and go to war only when every other path has closed. Yet these same devotees may still turn their power against one gripped by a negative Rinadhara — not as an attack, but to purify them, and hasten them toward their next life.
+
+Her devotees carry strings of prayer beads to steady them in worship, or amulets inked with scripture to draw good fortune and open the way to their enchantments. Temples stand, but scattered — set apart from the cities, far from crowded roads. Her followers favor the stillness of open country over the noise of urban life, and no small number of them are wanderers, for whom a temple found along the road is easier met than one sought out.
+
+For the common devotee, the pilgrimage to a temple is itself an act of worship. The road there may be hard — and that hardship, too, is offered up to Hatiri.
+
+She is praised by monks, by the peoples of Qashram and Long-ji, and by every priest who preaches peace and harmony in her name. Her clergy may carry no blade that cuts or pierces. They must keep the peace, and keep harmony with it. They live in celibacy, and preach charity as a duty. Some go further still, taking vows of silence or fasting to deepen their devotion.', 'CANON', '2026-08-23 06:51:46.921478+00', '2026-08-23 06:54:08.391724+00', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', '2fab5cd5-dddd-478e-8998-96d197d29619', false, '2fab5cd5-dddd-478e-8998-96d197d29619', false);
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('6e4eaee0-90a0-4d23-85cc-97f7544d137e', 'Hatiri', 'Uma deusa pacífica da disciplina, do espírito e do cultivo marcial, venerada como a presença guiadora de Mahalyra em Qashram e Tian-Annoth, cujos devotos buscam equilíbrio e não-violência através dos Sete Vayamarga, da Alquimia Fen e do Rinadhara.', 'Hatiri é retratada como uma mulher de cabeça coroada em ornamentos, sentada em postura de lótus, trajando cores que parecem mudar aos olhos de quem a observa. Seu símbolo é o Dragão de Jade.
+
+É uma deusa pacífica, e seu domínio é o cultivo do espírito e o conhecimento de si. A disciplina lhe pertence acima de tudo, e é por ela que se vincula às artes marciais — ainda que sua prática se volte menos ao golpe do que à forma da qual o golpe nasce.
+
+Seu culto surgiu primeiro no plano de Tian-Annoth, na Era dos Heróis, quando muitos monges voltaram a mente para o funcionamento do mundo e para o lugar que os valkani ocupavam nele. Esses mesmos monges também cultuavam Mahalyra, outro nome que a deusa Gæa carrega, ela que é a própria natureza — mas enquanto Mahalyra se move como força neutra e abstrata do universo, Hatiri é guia, é protetora, uma presença com quem se fala em busca de direção e de poder.
+
+Seus devotos sustentam que treino e meditação, levados longe o bastante, despertam uma força divina adormecida dentro deles — força que alguns chamam de Dragão de Jade. Esse poder interior é, por vezes, entendido sem metáfora alguma: um dragão tecido de pura energia, invocado pela vontade de seu discípulo. Para alcançá-lo, o devoto deve entregar-se ao equilíbrio, ao desapego, à contemplação.
+
+Por meio de três práticas, os devotos de Hatiri chegam a dominar seus diferentes poderes:
+
+Os Sete Vayamarga — prática espiritual e marcial que aprimora o corpo e a mente do praticante, abrindo caminho para habilidades sobrenaturais
+A Alquimia Fen — prática arcana que conjura energias para diferentes fins; essas energias podem se cancelar entre si ou atuar em conjunto — fogo, madeira, terra, água e metal
+Rinadhara — carga positiva ou negativa acumulada pelas próprias ações de uma pessoa; quem alcança o Rinadhara de alguém pode operar sobre ela diversos efeitos
+Apesar de todo esse poder, os devotos de Hatiri jamais buscam o conflito, nem desferem seu primeiro golpe. Nações que vivem por seus ensinamentos recorrem primeiro à diplomacia, e só vão à guerra quando todo outro caminho se fecha. Ainda assim, esses mesmos devotos podem voltar seu poder contra quem carrega um Rinadhara negativo — não como ataque, mas para purificá-lo, e apressar sua passagem à próxima vida.
+
+Seus devotos carregam rosários de contas que os sustentam na prece, ou amuletos com inscrições em pergaminho para atrair boa sorte e abrir caminho a seus encantamentos. Templos existem, mas espalhados — afastados dos centros urbanos, longe das estradas mais cheias. Seus fiéis preferem a quietude do campo ao ruído da vida urbana, e não poucos deles são nômades, para quem um templo encontrado ao longo da estrada é mais fácil de alcançar do que um buscado de propósito.
+
+Para o devoto comum, a peregrinação até um templo é, em si, um ato de devoção. O caminho até lá pode ser árduo — e esse próprio esforço é, também, uma oferenda a Hatiri.
+
+Ela é louvada por monges, pelos povos de Qashram e Long-ji, e por todo sacerdote que pregue, em seu nome, a paz e a harmonia. Seu clero não pode portar lâmina que corte ou perfure. Devem manter a paz, e com ela manter a harmonia. Vivem em celibato, e pregam a caridade como dever. Alguns vão além, fazendo votos de silêncio ou jejuns para aprofundar sua devoção.', 'CANON', '2026-08-23 06:51:56.861596+00', '2026-08-23 06:54:25.172075+00', '42ebd1d2-b526-427e-b912-c9d40fb78e8a', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', '2fab5cd5-dddd-478e-8998-96d197d29619', false, '6e4eaee0-90a0-4d23-85cc-97f7544d137e', false);
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('7d96c3d9-a8bf-4007-a7e0-93fade2a8f1e', 'Ashura', 'O avatar caído que Hatiri rejeitou, que assassinou o próprio irmão Dava para roubar seu lugar no ritual de ascensão e se tornou o mais forte dos Tamorok — os guerreiros-demônio corrompidos nascidos de seu próprio poder roubado.', 'Diz-se que os primeiros devotos de Hatiri acumularam, ao longo dos anos, grande poder e maior conhecimento ainda — o bastante para se aproximarem, cada vez mais, da própria deusa. A quem cumprisse os ritos corretamente, aguardava a elevação: ser nomeado elevani, erguido à posição de avatar da deusa. Esse indivíduo guiaria então seu povo pelos anos seguintes, até que chegasse a hora de ser substituído por outro.
+
+Em uma dessas horas, dois irmãos foram cogitados para a escolha: Ashura e Dava. Quando Dava foi o nomeado, a fúria de Ashura não encontrou fundo. Ele conspirou contra o próprio sangue, matando Dava durante a noite — e pela manhã já usava o rosto do irmão, caminhando até o ritual disfarçado dele.
+
+O que se seguiu foi catástrofe plena. A deusa, ao alcançar aquele que se apresentava diante dela, sentiu de imediato o quanto pouco de Ashura lhe pertencia, e o rejeitou — mas não antes que ele já tivesse tomado dela os segredos da alta magia. A sede de poder o levou dali em diante: incendiou os templos de Hatiri até as cinzas e partiu mundo afora, caçando alguma forma de tomar o lugar que lhe fora negado. Os ensinamentos da deusa foram quase todos apagados em seu rastro. E onde antes uma deusa concedia suas dádivas aos dignos, esse semideus caído passou a conceder as suas a criaturas inferiores, atando-as a si como seguidoras. Dessa dádiva nasceram os Tamorok: guerreiros que carregam em si o poder da natureza, mas carregam com ele, em igual medida, a malícia — indignos da bênção que lhes foi dada.', 'CANON', '2026-08-23 06:52:56.177185+00', '2026-08-23 06:54:54.144657+00', '42ebd1d2-b526-427e-b912-c9d40fb78e8a', '42ebd1d2-b526-427e-b912-c9d40fb78e8a', 'pt', 'f2406f9b-7817-4fad-9dc0-d1cb4bce6cad', false, '7d96c3d9-a8bf-4007-a7e0-93fade2a8f1e', false);
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('f2406f9b-7817-4fad-9dc0-d1cb4bce6cad', 'Ashura', 'Hatiri''s fallen would-be avatar, who murdered his brother Dava to steal his place in the ascension ritual, was cast out by the goddess, and became the strongest of the Tamorok — the corrupted demon-warriors born of his own stolen power.', 'It is said that Hatiri''s first devotees gathered great power and greater knowledge across the years — enough, in time, to draw them closer and closer to the goddess herself. To the one who performed the rites correctly, elevation waited: to be named elevani, raised to stand as the goddess''s avatar. Such a one would then lead their people through the years that followed, until the hour came for another to take their place.
+
+In one such hour, two brothers stood to be chosen: Ashura and Dava. When Dava was named, Ashura''s fury had no floor beneath it. He conspired against his own blood, killing Dava in the night — and by morning wore his brother''s face, walking into the ritual as him.
+
+What followed was catastrophe entire. The goddess, reaching to join with the one before her, felt at once how little of Ashura belonged beside her, and cast him out — but not before he had already taken from her the secrets of high magic. Thirst for power carried him from there: he burned Hatiri''s temples to ash and set out across the world, hunting some way to seize the place he had been denied. Her teachings were all but erased in his wake. And where a goddess once gave her gifts to the worthy, this fallen half-god now gave his to lesser creatures, binding them to him as followers. From that gift the Tamorok were born — warriors carrying the power of nature within them, but carrying malice with it in equal measure, unworthy of the blessing they had been given.', 'CANON', '2026-08-23 06:52:47.376265+00', '2026-08-23 06:54:40.302715+00', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f', 'en', 'f2406f9b-7817-4fad-9dc0-d1cb4bce6cad', false, 'f2406f9b-7817-4fad-9dc0-d1cb4bce6cad', false);
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('2fec4fad-f585-4d48-bf3e-522588d5b051', 'Maltham / Samyagdhara', 'A prince turned wandering monk who spent decades failing to defeat Ashura, until total surrender transformed him into Samyagdhara — the enlightened being who finally struck the demon down and refused the divine office offered in reward.', 'Born a prince, Maltham felt only emptiness and restlessness within the palace where all around him bowed in reverence. Before his birth, his parents had sought out a sage, who foretold that the boy to come was destined for greatness in whatever path he chose to walk. A warrior, and he would become the strongest who ever lived. A statesman, and he would rule the whole of the world. A monk, and he would become the humblest, holiest soul it had ever known.
+
+Carried by those words, his parents raised him for the aristocracy, meaning to make him emperor of the world, and through him, wealth and comfort for themselves. They gave him fine tutors, a life of ease, a marriage of good name. None of it moved him.
+
+In his youth, one of his own servants provoked him — a man who was, in truth, the very sage his parents had once consulted, now hidden behind a servant''s face. He alone dared to challenge Maltham, to contradict him, to force him to look upon the world as it truly was. While Maltham sheltered behind his walls, the people beyond them starved and suffered, ravaged by the Tamorok while the nobility raised no hand to defend them.
+
+Driven by that reckoning, Maltham fled his own house and became a monk. He wandered from land to land, training under master after master, driven to perfect himself further still, and to defeat the source of all that suffering.
+
+Decades passed, and Maltham swept the continent whole in search of the truth. He learned from dozens of masters, and learned all there was to learn. He fasted. He begged. He walked through snow, and he walked through burning coals. He dove into the deepest, quietest corners of his own mind. He gave up desire. He gave up love. And in none of it did he ever feel complete. He struck down Tamorok beyond counting, and saved lives beyond counting — yet never once did he feel ready to free the world of that evil.
+
+His enemy was Ashura. The strongest of all the Tamorok. Again and again Maltham stood against him, and again and again he fell. Every time he came before his enemy, Maltham ran. No technique worked. No miracle answered. No strength, no prayer, made him equal to what stood before him. Ashura was simply beyond his reach — and Maltham, fearing for his own life, could not bring himself to finish what he had set out to do.
+
+After the whole of his journey, after every disappointment it had cost him, Maltham walked once more to face his enemy. But this time, standing before that power, he did not run. He surrendered instead. Knowing full well he could not win, he had faith regardless, and let go of the last of his pride. And in that surrender, Maltham found true understanding at last. There, he let himself die as Maltham — and rise again as Samyagdhara.
+
+In this new awareness, all his knowledge became one thing. Every experience, every soul he had crossed paths with along the way, folded into a single truth, and the world itself shook beneath him. Ashura fell. But that was not the end of it.
+
+The one who had foretold his coming, the one who had driven him from his parents'' house, the one who had pushed him always toward what he might become — stood before him once more. His name was Dava, brother to Ashura, and he now offered Samyagdhara his divine inheritance: to become Hatiri''s avatar, and lead the people of Tian-Annoth back onto the path of order. Samyagdhara refused him. He wanted no political office now, no divine one either. He wanted nothing at all, save one thing: to guide those who, like him, still searched for truth — and to show them that, however hard the road, it could still be found.', 'CANON', '2026-08-23 06:55:45.64182+00', '2026-08-23 06:55:45.64182+00', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f', 'en', '2fec4fad-f585-4d48-bf3e-522588d5b051', false, '2fec4fad-f585-4d48-bf3e-522588d5b051', false);
+INSERT INTO public.characters (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('c40b0779-b320-4321-baa6-4130fa4da079', 'Maltham / Samyagdhara', 'Um príncipe que se tornou monge errante e passou décadas fracassando em derrotar Ashura, até que a entrega total o transformou em Samyagdhara — o ser iluminado que finalmente abateu o demônio e recusou o cargo divino oferecido como recompensa.', 'Nascido príncipe, Maltham sentia apenas vazio e inquietação dentro do palácio onde todos ao seu redor se curvavam em reverência. Antes de seu nascimento, seus pais haviam buscado um sábio, que profetizou que o rapaz por vir estava destinado à grandeza em qualquer caminho que escolhesse trilhar. Guerreiro, e se tornaria o mais forte que já existira. Estadista, e governaria o mundo inteiro. Monge, e se tornaria a alma mais humilde e santa que o mundo já conhecera.
+
+Levados por essas palavras, seus pais o criaram para a aristocracia, com a intenção de fazê-lo imperador do mundo, e através dele, riqueza e conforto para si mesmos. Deram-lhe bons professores, uma vida de conforto, um casamento de bom nome. Nada daquilo o comovia.
+
+Em sua juventude, um de seus próprios criados o provocou — um homem que era, na verdade, o mesmo sábio a quem seus pais haviam consultado, agora escondido sob o rosto de um criado. Só ele ousava desafiar Maltham, contrariá-lo, forçá-lo a encarar o mundo como ele realmente era. Enquanto Maltham se abrigava atrás de seus muros, o povo do lado de fora passava fome e sofria, assolado pelos Tamorok enquanto a nobreza não erguia uma mão para defendê-los.
+
+Levado por esse acerto de contas, Maltham fugiu da própria casa e se tornou monge. Vagou de terra em terra, treinando com mestre após mestre, movido a se aperfeiçoar cada vez mais, e a derrotar a fonte de todo aquele sofrimento.
+
+Décadas se passaram, e Maltham varreu o continente inteiro em busca da verdade. Aprendeu com dúzias de mestres, e aprendeu tudo o que havia para aprender. Jejuou. Mendigou. Caminhou pela neve, e caminhou sobre brasas. Mergulhou nos cantos mais profundos e silenciosos da própria mente. Abriu mão do desejo. Abriu mão do amor. E em nada disso jamais se sentiu completo. Abateu Tamorok além da conta, e salvou vidas além da conta — mas nunca, em momento algum, se sentiu pronto para livrar o mundo daquele mal.
+
+Seu inimigo era Ashura. O mais forte de todos os Tamorok. Vez após vez Maltham se ergueu contra ele, e vez após vez caiu. Toda vez que se via diante de seu inimigo, Maltham fugia. Nenhuma técnica funcionava. Nenhum milagre respondia. Nenhuma força, nenhuma prece, o tornava à altura do que tinha diante de si. Ashura estava, simplesmente, além de seu alcance — e Maltham, temendo pela própria vida, não conseguia se trazer a terminar o que havia começado.
+
+Após toda sua jornada, após cada decepção que ela lhe custara, Maltham caminhou mais uma vez para enfrentar seu inimigo. Mas dessa vez, diante daquele poder, ele não fugiu. Entregou-se, ao invés disso. Sabendo perfeitamente que não podia vencer, teve fé assim mesmo, e deixou ir o que lhe restava de orgulho. E nessa entrega, Maltham enfim encontrou o verdadeiro entendimento. Ali, permitiu-se morrer como Maltham — e ressurgir como Samyagdhara.
+
+Nessa nova consciência, todo o seu conhecimento se tornou uma única coisa. Cada experiência, cada alma que cruzara em seu caminho, se dobrou em uma única verdade, e o próprio mundo tremeu sob seus pés. Ashura caiu. Mas aquele não era o fim.
+
+Aquele que profetizara sua chegada, aquele que o expulsara da casa de seus pais, aquele que sempre o empurrara em direção ao que poderia se tornar — estava, mais uma vez, diante dele. Seu nome era Dava, irmão de Ashura, e ele agora oferecia a Samyagdhara sua herança divina: tornar-se avatar de Hatiri, e conduzir o povo de Tian-Annoth de volta ao caminho da ordem. Samyagdhara o recusou. Não queria mais cargo político algum, nem divino. Não queria mais nada, exceto uma única coisa: guiar aqueles que, como ele, ainda buscavam a verdade — e mostrar-lhes que, por mais difícil que fosse o caminho, ainda era possível encontrá-la.', 'CANON', '2026-08-23 06:55:55.200409+00', '2026-08-23 06:55:55.200409+00', '42ebd1d2-b526-427e-b912-c9d40fb78e8a', '42ebd1d2-b526-427e-b912-c9d40fb78e8a', 'pt', '2fec4fad-f585-4d48-bf3e-522588d5b051', false, 'c40b0779-b320-4321-baa6-4130fa4da079', false);
 
 -- ============================================================
 -- CHARACTER CATEGORIES
@@ -2883,6 +3038,71 @@ INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at
 
 Seus pulmões se ajustam com facilidade a mudanças de altitude, e suas pernas e pés absorvem o impacto de uma queda sem sofrer dano. Até seus crânios e pescoços são feitos para amortecer impactos — o que transforma uma cabeçada em arma genuína, poderosa o bastante para conter um inimigo por si só.', 'CANON', '2026-08-16 09:17:33.895815+00', '2026-08-17 09:24:50.774935+00', 'ea606f67-f995-4bab-ac9a-9dabd85046ec', 'ea606f67-f995-4bab-ac9a-9dabd85046ec', 'pt', '8093128f-3498-495a-aa23-214eebca7d76', false, '1703407e-9e06-4b81-b3d3-002dd9d74326', false);
 
+INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('88fd08d7-ad08-435c-af5c-b7d043c6292d', 'The Seven Vayamarga of Mahalyra', 'The origin story of the Seven Vayamarga — a martial-spiritual practice born when the monk Maltham unified fourteen rival disciplines devoted to the goddess Hatiri into a single harmonized path, breaking the Tamorok''s grip on the continent of Qashram.', 'On the continent of Qashram, the goddess Gæa was worshipped under the name Mahalyra, the primordial energy. In the mid Era of Heroes, the scattered peoples of the continent turned their eyes toward truth — toward the nature of the world and its gods — and hundreds of rival faiths rose in the search. In that same age, demons known as the Tamorok began to descend upon the villages, and the monks of Qashram turned toward the divine, seeking a power strong enough to stand against them.
+
+The monks tested discipline after discipline, training that could carry body and mind beyond their given limits. It was the goddess Hatiri who guided them, promising that those who kept themselves pure — faithful to their own nature and to the gifts Mahalyra had laid upon them — would come at last into the true potential that was theirs by birthright.
+
+From that promise, a faith''s worth came to be measured by one thing alone: how well its monks could stand against the Tamorok. Of the hundreds of paths that rose in those years, fourteen proved themselves above all the rest:
+
+Shtira — the Practice of the Anchor, bound to stability, strength, and balance
+Tvaran — the Practice of the Leap, bound to speed, flexibility, and motion
+Sudhi — the Practice of the Vessel, bound to purity and sanctity
+Sanjiva — the Practice of the Tide, bound to vital energy
+Kavacha — the Practice of Temperance, bound to endurance and mastery over instinct
+Jvala — the Practice of the Feast, bound to communion with the elements
+Prasada — the Practice of Compassion, bound to care and reverence for one''s fellow being
+Kroda — the Practice of Wrath, bound to the wielding of emotion
+Mauna — the Practice of Silence, bound to spiritual transformation
+Nada — the Practice of Prayer, bound to communion with the divine world
+Divya — the Practice of Reflection, bound to intuition and to the thread of destiny
+Marmam — the Practice of the Gaze, bound to understanding
+Turyia — the Practice of Meditation, bound to concentration and the unmaking of the self
+Unmada — the Practice of the Miracle, bound to the power of the mind
+Heroes rose from every one of these paths, and villages here and there found brief shelter behind them — yet the tide of the Tamorok could not be turned. Not until a monk named Maltham did what no one before him had thought to do: he gathered all fourteen disciplines into a single practice, and in doing so revealed a truth the others had missed. The potential of the valkani had never lived in any single facet of their being. It lived in the harmony between all of them. Maltham named this union the Seven Vayamarga:
+
+Bhurok — the Foundation, the harmony of Shtira and Tvaran
+Jalanta — the Sacred, the harmony of Sudhi and Sanjiva
+Tejokara — the Digestion, the harmony of Kavacha and Jvala
+Hridaya-Vin — the Soul, the harmony of Prasada and Kroda
+Vakarun — the Voice, the harmony of Mauna and Nada
+Netrayan — the Perception, the harmony of Divya and Marmam
+Saha-Suryam — the Crown, the harmony of Turyia and Unmada
+Rising in order, the Vayamarga trace a single spectrum — the valkani''s bond running from the earth and the world of mortal things, at Bhurok, up to the sky and the world of the divine, at Saha-Suryam. The true monk does not dwell at either end, nor claim any one gift as absolute. Like Maltham himself, they move across the whole of it, holding every connection and every grace of their existence in balance.
+
+With the Vayamarga''s rise, Qashram at last threw off the shadow of the Tamorok, and its peoples were free to flourish. To this day, the practice binds together two things once thought separate — the discipline of the warrior''s body, and the faith that still bows before Hatiri.', 'CANON', '2026-08-23 06:50:46.758618+00', '2026-08-23 06:52:07.523755+00', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', '88fd08d7-ad08-435c-af5c-b7d043c6292d', false, '88fd08d7-ad08-435c-af5c-b7d043c6292d', false);
+INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('bb625182-491e-4215-8987-f1ab6ff3be9d', 'Os Sete Vayamarga de Mahalyra', 'A história de origem dos Sete Vayamarga — uma prática espiritual e marcial nascida quando o monge Maltham unificou catorze disciplinas rivais devotadas à deusa Hatiri numa única via harmonizada, rompendo o domínio dos Tamorok sobre o continente de Qashram.', 'No continente de Qashram, a deusa Gæa era venerada sob o nome de Mahalyra, a energia primordial. Em meados da Era dos Heróis, os povos espalhados pelo continente voltaram-se para a busca da verdade — sobre o mundo, sobre os deuses — e centenas de crenças rivais nasceram dessa procura. Na mesma época, demônios conhecidos como Tamorok passaram a se abater sobre as aldeias, e os monges de Qashram voltaram-se ao divino, em busca de um poder capaz de enfrentá-los.
+
+Os monges testaram disciplina após disciplina, treinamentos que prometiam levar corpo e mente além dos próprios limites. Foi a deusa Hatiri quem os guiou, prometendo que aqueles que se mantivessem puros — fiéis à própria natureza e às dádivas que Mahalyra lhes concedera — alcançariam, enfim, o verdadeiro potencial que lhes pertencia por direito.
+
+A partir dessa promessa, o valor de uma fé passou a ser medido por uma única coisa: a capacidade de seus monges de resistir aos Tamorok. Das centenas de caminhos que surgiram naqueles anos, catorze se destacaram acima de todos os outros:
+
+Shtira — a Prática da Âncora, vinculada à estabilidade, força e equilíbrio
+Tvaran — a Prática do Salto, vinculada à velocidade, flexibilidade e movimento
+Sudhi — a Prática do Receptáculo, vinculada à pureza e à santidade
+Sanjiva — a Prática da Maré, vinculada à energia vital
+Kavacha — a Prática da Temperança, vinculada à resistência e ao controle dos instintos
+Jvala — a Prática do Festim, vinculada à conexão com os elementos
+Prasada — a Prática da Compaixão, vinculada ao cuidado e ao respeito pelo próximo
+Kroda — a Prática da Fúria, vinculada ao uso das emoções
+Mauna — a Prática do Silêncio, vinculada à transformação espiritual
+Nada — a Prática da Prece, vinculada à comunicação com o mundo divino
+Divya — a Prática da Reflexão, vinculada à intuição e à conexão com o destino
+Marmam — a Prática do Olhar, vinculada à compreensão
+Turyia — a Prática da Meditação, vinculada à concentração e ao desfazer do ego
+Unmada — a Prática do Milagre, vinculada ao poder da mente
+Heróis se ergueram de cada um desses caminhos, e aldeias aqui e ali encontraram abrigo passageiro atrás deles — mas o avanço dos Tamorok não se deixava conter. Até que um monge chamado Maltham fez o que nenhum outro antes dele havia pensado em fazer: reuniu as catorze disciplinas em uma única prática, e nesse gesto revelou uma verdade que todos os outros haviam deixado escapar. O potencial dos valkani jamais residira em uma única faceta de seu ser. Ele vivia na harmonia entre todas elas. Maltham deu a essa união o nome de Sete Vayamarga:
+
+Bhurok — a Base, harmonia entre Shtira e Tvaran
+Jalanta — o Sacro, harmonia entre Sudhi e Sanjiva
+Tejokara — a Digestão, harmonia entre Kavacha e Jvala
+Hridaya-Vin — a Alma, harmonia entre Prasada e Kroda
+Vakarun — a Comunicação, harmonia entre Mauna e Nada
+Netrayan — a Percepção, harmonia entre Divya e Marmam
+Saha-Suryam — a Coroa, harmonia entre Turyia e Unmada
+Em ordem crescente, os Vayamarga traçam um único espectro — o vínculo do valkani correndo da terra e do mundo dos mortais, em Bhurok, até o céu e o mundo divino, em Saha-Suryam. O verdadeiro monge não se detém em nenhum dos extremos, nem reivindica uma única dádiva como absoluta. Como o próprio Maltham, ele percorre toda a extensão desse espectro, mantendo em equilíbrio cada vínculo e cada graça de sua existência.
+
+Com a ascensão dos Vayamarga, Qashram finalmente se libertou da sombra dos Tamorok, e seus povos puderam florescer. Até hoje, a prática une duas coisas que antes pareciam separadas — a disciplina do corpo guerreiro e a fé que ainda se curva diante de Hatiri.', 'CANON', '2026-08-23 06:50:58.255772+00', '2026-08-23 06:52:17.413877+00', '42ebd1d2-b526-427e-b912-c9d40fb78e8a', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', '88fd08d7-ad08-435c-af5c-b7d043c6292d', false, 'bb625182-491e-4215-8987-f1ab6ff3be9d', false);
+
 -- ============================================================
 -- LORE CATEGORIES
 -- ============================================================
@@ -3659,6 +3879,33 @@ INSERT INTO public.entity_links (id, source_type, source_id, target_type, target
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('c69e3333-e47c-4697-a23d-316fe23552a8', 'LORE', '8093128f-3498-495a-aa23-214eebca7d76', 'LORE', 'af6e00bb-1307-4cf9-a1ba-09fe772b0636', '2026-08-17 09:24:40.655422+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('94208067-f20e-4971-9236-952ab6f41fa5', 'LORE', '1703407e-9e06-4b81-b3d3-002dd9d74326', 'LORE', '57428e7c-bd1f-4fbc-aa9d-722288c9e53e', '2026-08-17 09:24:50.813113+00');
 
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('33db8028-3e4f-4bd6-bfc0-7175c2d462b6', 'LORE', '88fd08d7-ad08-435c-af5c-b7d043c6292d', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', '2026-08-23 06:52:07.570754+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('f4cb4771-0375-4f25-98e4-f440844cda76', 'LORE', 'bb625182-491e-4215-8987-f1ab6ff3be9d', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', '2026-08-23 06:52:17.434623+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('5aa0c851-83b9-4ad4-93d2-49edc341e032', 'CHARACTER', '1527f011-01c0-4cfd-80e0-472790f8e927', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', '2026-08-23 06:53:42.19337+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('b5512620-c601-4401-8171-953e133ece9a', 'CHARACTER', '1527f011-01c0-4cfd-80e0-472790f8e927', 'CHARACTER', 'f2406f9b-7817-4fad-9dc0-d1cb4bce6cad', '2026-08-23 06:53:42.19337+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('8b813093-95c5-4f1c-9d1d-6b2fcf1cde63', 'CHARACTER', 'b8aac3ef-b2fa-46f1-b06e-83afd6d41e78', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', '2026-08-23 06:53:51.07851+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('881456f5-2686-4852-9863-afcb3722a9d9', 'CHARACTER', 'b8aac3ef-b2fa-46f1-b06e-83afd6d41e78', 'CHARACTER', '7d96c3d9-a8bf-4007-a7e0-93fade2a8f1e', '2026-08-23 06:53:51.07851+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('20978e97-b759-470d-b729-f9ecb6095a8a', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', 'LORE', '88fd08d7-ad08-435c-af5c-b7d043c6292d', '2026-08-23 06:54:08.430864+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('4a8f0208-2b40-4491-9802-3d857060ed9f', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', 'LORE', '4f205e4a-01bb-4094-81c5-b49b7fe142c6', '2026-08-23 06:54:08.430864+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('5405e664-2216-4750-80c6-62e7a4f0446a', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', 'LORE', 'ebd1073f-0a52-4c17-86c3-bfc1cb491a22', '2026-08-23 06:54:08.430864+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('4c794fd8-51db-4054-bd65-adab5c8a862a', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', 'LORE', 'c4ba4207-7857-49ab-8e22-5acc57ea2cd5', '2026-08-23 06:54:08.430864+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('4d29eb86-1302-486c-a771-d3b42dec9715', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', 'CHARACTER', '1527f011-01c0-4cfd-80e0-472790f8e927', '2026-08-23 06:54:08.430864+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('3f072ad8-7fac-44a2-b7a9-d22467e939b4', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', 'LORE', 'bb625182-491e-4215-8987-f1ab6ff3be9d', '2026-08-23 06:54:25.208608+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('817a37f5-a4e4-49dc-87e5-15137bcab546', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', 'LORE', '8986dc8b-69b3-4f61-bfac-1036d3ffba60', '2026-08-23 06:54:25.208608+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('1c45f404-0e22-4888-84f9-94c44afbed70', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', 'LORE', 'acf5d45d-2163-4918-a4dd-eaac675ba44e', '2026-08-23 06:54:25.208608+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('2145066c-baf4-4f8f-beb6-1477ebe21081', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', 'LORE', '91165b17-3214-40b5-bbf3-0f4432905570', '2026-08-23 06:54:25.208608+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('1815823d-5ff1-47e5-961c-eac6046a50ab', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', 'CHARACTER', 'b8aac3ef-b2fa-46f1-b06e-83afd6d41e78', '2026-08-23 06:54:25.208608+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('888de2ed-d8f0-4a36-b6dd-086e37e9c546', 'CHARACTER', 'f2406f9b-7817-4fad-9dc0-d1cb4bce6cad', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', '2026-08-23 06:54:40.324023+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('ceaa85d6-2c94-4e61-b40d-d0dc2f6caaf4', 'CHARACTER', 'f2406f9b-7817-4fad-9dc0-d1cb4bce6cad', 'CHARACTER', '1527f011-01c0-4cfd-80e0-472790f8e927', '2026-08-23 06:54:40.324023+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('cf694368-3c0e-42be-a94c-a0ff3a5b8bd7', 'CHARACTER', '7d96c3d9-a8bf-4007-a7e0-93fade2a8f1e', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', '2026-08-23 06:54:54.163293+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('95b73041-3864-47cb-87f7-ad40ec7ae767', 'CHARACTER', '7d96c3d9-a8bf-4007-a7e0-93fade2a8f1e', 'CHARACTER', 'b8aac3ef-b2fa-46f1-b06e-83afd6d41e78', '2026-08-23 06:54:54.163293+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('28f8090d-2e90-46a7-bf3b-14296830131d', 'CHARACTER', '2fec4fad-f585-4d48-bf3e-522588d5b051', 'LORE', '88fd08d7-ad08-435c-af5c-b7d043c6292d', '2026-08-23 06:55:45.668551+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('fdd7aa47-d737-4382-b7dc-e09b5bc53a46', 'CHARACTER', '2fec4fad-f585-4d48-bf3e-522588d5b051', 'CHARACTER', 'f2406f9b-7817-4fad-9dc0-d1cb4bce6cad', '2026-08-23 06:55:45.668551+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('7cc3dd24-270f-471b-91c8-973cc8a2d800', 'CHARACTER', '2fec4fad-f585-4d48-bf3e-522588d5b051', 'CHARACTER', '1527f011-01c0-4cfd-80e0-472790f8e927', '2026-08-23 06:55:45.668551+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('ee78c36b-f5b0-441c-926d-a8d97d294dbd', 'CHARACTER', 'c40b0779-b320-4321-baa6-4130fa4da079', 'LORE', 'bb625182-491e-4215-8987-f1ab6ff3be9d', '2026-08-23 06:55:55.228699+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('b42d4fea-c379-48f8-9d62-c713ece9d3dc', 'CHARACTER', 'c40b0779-b320-4321-baa6-4130fa4da079', 'CHARACTER', '7d96c3d9-a8bf-4007-a7e0-93fade2a8f1e', '2026-08-23 06:55:55.228699+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('ee616fd7-377f-495c-bbc1-1d1459db6889', 'CHARACTER', 'c40b0779-b320-4321-baa6-4130fa4da079', 'CHARACTER', 'b8aac3ef-b2fa-46f1-b06e-83afd6d41e78', '2026-08-23 06:55:55.228699+00');
+
 -- ============================================================
 -- IMAGES
 -- ============================================================
@@ -4011,6 +4258,21 @@ INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) 
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f89b28b3-6aae-418e-9018-7b7c16b65913', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/DemiTroll.png', 8);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('af6e00bb-1307-4cf9-a1ba-09fe772b0636', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Feral.png', 0);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('57428e7c-bd1f-4fbc-aa9d-722288c9e53e', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Feral.png', 0);
+
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('88fd08d7-ad08-435c-af5c-b7d043c6292d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/SevenMayvarga.jfif', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('bb625182-491e-4215-8987-f1ab6ff3be9d', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/SevenMayvarga.jfif', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('2fab5cd5-dddd-478e-8998-96d197d29619', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Hatiri.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('6e4eaee0-90a0-4d23-85cc-97f7544d137e', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Hatiri.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f2406f9b-7817-4fad-9dc0-d1cb4bce6cad', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ashura-1.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f2406f9b-7817-4fad-9dc0-d1cb4bce6cad', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ashura-2.png', 1);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('7d96c3d9-a8bf-4007-a7e0-93fade2a8f1e', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ashura-1.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('7d96c3d9-a8bf-4007-a7e0-93fade2a8f1e', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ashura-2.png', 1);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('1527f011-01c0-4cfd-80e0-472790f8e927', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Dava.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('b8aac3ef-b2fa-46f1-b06e-83afd6d41e78', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Dava.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('2fec4fad-f585-4d48-bf3e-522588d5b051', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Maltham.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('2fec4fad-f585-4d48-bf3e-522588d5b051', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Samyagdhara.png', 1);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('c40b0779-b320-4321-baa6-4130fa4da079', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Maltham.png', 0);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('c40b0779-b320-4321-baa6-4130fa4da079', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Samyagdhara.png', 1);
 
 -- ============================================================
 -- ARCHETYPES
