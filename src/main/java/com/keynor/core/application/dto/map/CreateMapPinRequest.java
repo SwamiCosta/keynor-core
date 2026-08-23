@@ -10,6 +10,7 @@ public record CreateMapPinRequest(
         String entityType,
         UUID entityId,
         String name,
+        UUID eraId,
         @NotNull @DecimalMin("0.0") @DecimalMax("1.0") Double normalizedX,
         @NotNull @DecimalMin("0.0") @DecimalMax("1.0") Double normalizedY) {
 }

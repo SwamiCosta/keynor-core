@@ -2,6 +2,7 @@ package com.keynor.core.domain.service;
 
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
+import com.keynor.core.domain.model.map.GameMap;
 import com.keynor.core.domain.model.map.MapPin;
 import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.port.in.map.CreateMapPinUseCase;
@@ -33,8 +34,9 @@ public class MapPinService implements CreateMapPinUseCase, UpdateMapPinUseCase, 
 
     @Override
     public MapPin create(CreateMapPinUseCase.Command command) {
-        mapRepository.findById(command.mapId())
+        var map = mapRepository.findById(command.mapId())
                 .orElseThrow(() -> new EntityNotFoundException("GameMap", command.mapId()));
+        validateEraBelongsToMap(command.eraId(), map);
 
         if (command.entityType() != null) {
             universeEntityLookupRepository.findSummary(command.entityType(), command.entityId())
@@ -52,6 +54,7 @@ public class MapPinService implements CreateMapPinUseCase, UpdateMapPinUseCase, 
                 command.entityType(),
                 command.entityId(),
                 command.name(),
+                command.eraId(),
                 command.normalizedX(),
                 command.normalizedY(),
                 Instant.now());
@@ -65,6 +68,9 @@ public class MapPinService implements CreateMapPinUseCase, UpdateMapPinUseCase, 
         if (!pin.getMapId().equals(mapId)) {
             throw new EntityNotFoundException("MapPin", pinId);
         }
+        var map = mapRepository.findById(mapId)
+                .orElseThrow(() -> new EntityNotFoundException("GameMap", mapId));
+        validateEraBelongsToMap(command.eraId(), map);
         if ((command.entityType() == null) != (command.entityId() == null)) {
             throw new IllegalArgumentException("entityType and entityId must both be present or both be absent");
         }
@@ -86,7 +92,7 @@ public class MapPinService implements CreateMapPinUseCase, UpdateMapPinUseCase, 
         String name = hasNewName ? command.name() : pin.getName();
 
         MapPin repositioned = new MapPin(
-                pin.getId(), mapId, entityType, entityId, name,
+                pin.getId(), mapId, entityType, entityId, name, command.eraId(),
                 command.normalizedX(), command.normalizedY(), pin.getCreatedAt());
         return mapPinRepository.save(repositioned);
     }
@@ -106,5 +112,12 @@ public class MapPinService implements CreateMapPinUseCase, UpdateMapPinUseCase, 
         mapRepository.findById(mapId)
                 .orElseThrow(() -> new EntityNotFoundException("GameMap", mapId));
         return mapPinRepository.findByMapId(mapId);
+    }
+
+    private void validateEraBelongsToMap(UUID eraId, GameMap map) {
+        if (eraId != null && !map.getEraIds().contains(eraId.toString())) {
+            throw new IllegalArgumentException(
+                    "eraId " + eraId + " is not one of the eras this map is available in");
+        }
     }
 }

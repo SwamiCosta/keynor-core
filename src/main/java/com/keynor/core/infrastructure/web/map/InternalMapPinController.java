@@ -52,6 +52,7 @@ public class InternalMapPinController {
                 parseEntityType(request.entityType()),
                 request.entityId(),
                 request.name(),
+                request.eraId(),
                 request.normalizedX(),
                 request.normalizedY());
         MapPin created = createMapPinUseCase.create(command);
@@ -70,7 +71,8 @@ public class InternalMapPinController {
                 request.normalizedY(),
                 request.name(),
                 parseEntityType(request.entityType()),
-                request.entityId());
+                request.entityId(),
+                request.eraId());
         MapPin updated = updateMapPinUseCase.update(mapId, pinId, command);
         var summary = updated.getEntityType() == null
                 ? null

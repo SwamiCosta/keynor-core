@@ -31,6 +31,9 @@ public class MapPinEntity {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "era_id")
+    private UUID eraId;
+
     @Column(name = "normalized_x", nullable = false)
     private double normalizedX;
 
@@ -50,6 +53,8 @@ public class MapPinEntity {
     public void setEntityId(UUID entityId) { this.entityId = entityId; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    public UUID getEraId() { return eraId; }
+    public void setEraId(UUID eraId) { this.eraId = eraId; }
     public double getNormalizedX() { return normalizedX; }
     public void setNormalizedX(double normalizedX) { this.normalizedX = normalizedX; }
     public double getNormalizedY() { return normalizedY; }

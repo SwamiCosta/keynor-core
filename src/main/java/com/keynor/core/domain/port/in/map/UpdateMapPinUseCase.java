@@ -11,8 +11,10 @@ public interface UpdateMapPinUseCase {
 
     /**
      * {@code entityType}/{@code entityId} null together means "leave the
-     * current link untouched" -- see MapPinService.
+     * current link untouched" -- see MapPinService. {@code eraId} is a full
+     * replace, same as the coordinates: the caller always resends the
+     * pin's intended era scope (null for "all eras").
      */
-    record Command(double normalizedX, double normalizedY, String name, EntityType entityType, UUID entityId) {
+    record Command(double normalizedX, double normalizedY, String name, EntityType entityType, UUID entityId, UUID eraId) {
     }
 }

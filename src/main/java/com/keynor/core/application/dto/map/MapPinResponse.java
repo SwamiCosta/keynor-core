@@ -12,6 +12,7 @@ public record MapPinResponse(
         String mapId,
         String name,
         LinkedEntityResponse entity,
+        UUID eraId,
         double normalizedX,
         double normalizedY,
         Instant createdAt) {
@@ -33,6 +34,7 @@ public record MapPinResponse(
                 pin.getMapId(),
                 name,
                 entity,
+                pin.getEraId(),
                 pin.getNormalizedX(),
                 pin.getNormalizedY(),
                 pin.getCreatedAt());

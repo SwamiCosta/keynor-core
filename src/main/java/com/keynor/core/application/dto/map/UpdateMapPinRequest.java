@@ -13,12 +13,15 @@ import java.util.UUID;
  * deriving from the linked entity -- see MapPinService. {@code entityType}/
  * {@code entityId}: both absent leaves the pin's current link untouched;
  * both present attaches/re-targets the pin to that entity. One without the
- * other is rejected -- see MapPinService.
+ * other is rejected -- see MapPinService. {@code eraId}: full replace, same
+ * as the coordinates -- null means "all eras", a value scopes the pin to
+ * that one era.
  */
 public record UpdateMapPinRequest(
         @NotNull @DecimalMin("0.0") @DecimalMax("1.0") Double normalizedX,
         @NotNull @DecimalMin("0.0") @DecimalMax("1.0") Double normalizedY,
         String name,
         String entityType,
-        UUID entityId) {
+        UUID entityId,
+        UUID eraId) {
 }
