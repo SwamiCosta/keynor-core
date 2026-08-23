@@ -28,8 +28,27 @@
 -- How to apply:
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
--- Last updated: 2026-08-23
--- Updated by:   Siegmund (regenerated fresh from the live database). Per
+-- Last updated: 2026-08-23 (2)
+-- Updated by:   Siegmund. Per Aroneus's follow-up handoff: updated the body
+--               column on The Seven Vayamarga of Mahalyra (EN
+--               88fd08d7-ad08-435c-af5c-b7d043c6292d / PT
+--               bb625182-491e-4215-8987-f1ab6ff3be9d) -- a new paragraph on
+--               breath practice inserted right after the 7-item Vayamarga
+--               list and before the "rising in order" paragraph, both
+--               languages. Verified directly against a fresh pg_dump: no
+--               other field changed (summary, images, categories, timeline,
+--               links all identical).
+--
+--               Also picked up, unprompted: both of this Lore's outbound
+--               LORE->CHARACTER entity_links rows (->Hatiri, both
+--               languages) came back from the live DB with new ids and new
+--               created_at timestamps, even though source/target/direction
+--               are unchanged -- the backend appears to recreate a Lore's
+--               outbound links on a full-entity PUT. Updated those 2 rows
+--               to match (id/created_at only); not a content bug, just
+--               reflecting the live DB verbatim as always.
+--
+-- Previous entry, 2026-08-23 (1), Siegmund (regenerated fresh from the live database). Per
 --               Aroneus's handoff (Hatiri/Ashura/Dava/Maltham story arc):
 --               INSERT 2 new lore rows (The Seven Vayamarga of Mahalyra,
 --               EN 88fd08d7-ad08-435c-af5c-b7d043c6292d / PT
@@ -3067,9 +3086,11 @@ Hridaya-Vin — the Soul, the harmony of Prasada and Kroda
 Vakarun — the Voice, the harmony of Mauna and Nada
 Netrayan — the Perception, the harmony of Divya and Marmam
 Saha-Suryam — the Crown, the harmony of Turyia and Unmada
+Beneath every one of these techniques lies a single root: breath. To draw breath correctly, the monks of Qashram teach, is to bring the spiritual air into union with the material body — to make of one act, held between an inhale and its release, the meeting place of what is divine and what is flesh. Without this union no technique opens the path the Vayamarga promise, however long it has been practiced; with it, even the plainest exercise becomes a moment of communion.
+
 Rising in order, the Vayamarga trace a single spectrum — the valkani''s bond running from the earth and the world of mortal things, at Bhurok, up to the sky and the world of the divine, at Saha-Suryam. The true monk does not dwell at either end, nor claim any one gift as absolute. Like Maltham himself, they move across the whole of it, holding every connection and every grace of their existence in balance.
 
-With the Vayamarga''s rise, Qashram at last threw off the shadow of the Tamorok, and its peoples were free to flourish. To this day, the practice binds together two things once thought separate — the discipline of the warrior''s body, and the faith that still bows before Hatiri.', 'CANON', '2026-08-23 06:50:46.758618+00', '2026-08-23 06:52:07.523755+00', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', '88fd08d7-ad08-435c-af5c-b7d043c6292d', false, '88fd08d7-ad08-435c-af5c-b7d043c6292d', false);
+With the Vayamarga''s rise, Qashram at last threw off the shadow of the Tamorok, and its peoples were free to flourish. To this day, the practice binds together two things once thought separate — the discipline of the warrior''s body, and the faith that still bows before Hatiri.', 'CANON', '2026-08-23 06:50:46.758618+00', '2026-08-23 10:50:19.668246+00', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', '88fd08d7-ad08-435c-af5c-b7d043c6292d', false, '88fd08d7-ad08-435c-af5c-b7d043c6292d', false);
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('bb625182-491e-4215-8987-f1ab6ff3be9d', 'Os Sete Vayamarga de Mahalyra', 'A história de origem dos Sete Vayamarga — uma prática espiritual e marcial nascida quando o monge Maltham unificou catorze disciplinas rivais devotadas à deusa Hatiri numa única via harmonizada, rompendo o domínio dos Tamorok sobre o continente de Qashram.', 'No continente de Qashram, a deusa Gæa era venerada sob o nome de Mahalyra, a energia primordial. Em meados da Era dos Heróis, os povos espalhados pelo continente voltaram-se para a busca da verdade — sobre o mundo, sobre os deuses — e centenas de crenças rivais nasceram dessa procura. Na mesma época, demônios conhecidos como Tamorok passaram a se abater sobre as aldeias, e os monges de Qashram voltaram-se ao divino, em busca de um poder capaz de enfrentá-los.
 
 Os monges testaram disciplina após disciplina, treinamentos que prometiam levar corpo e mente além dos próprios limites. Foi a deusa Hatiri quem os guiou, prometendo que aqueles que se mantivessem puros — fiéis à própria natureza e às dádivas que Mahalyra lhes concedera — alcançariam, enfim, o verdadeiro potencial que lhes pertencia por direito.
@@ -3099,9 +3120,11 @@ Hridaya-Vin — a Alma, harmonia entre Prasada e Kroda
 Vakarun — a Comunicação, harmonia entre Mauna e Nada
 Netrayan — a Percepção, harmonia entre Divya e Marmam
 Saha-Suryam — a Coroa, harmonia entre Turyia e Unmada
+Sob cada uma dessas técnicas repousa uma única raiz: a respiração. Respirar corretamente, ensinam os monges de Qashram, é trazer o ar espiritual à união com o corpo material — fazer de um único ato, contido entre a inspiração e sua liberação, o ponto de encontro entre o que é divino e o que é carne. Sem essa união, nenhuma técnica abre o caminho que os Vayamarga prometem, por mais tempo que tenha sido praticada; com ela, até o exercício mais simples se torna um instante de comunhão.
+
 Em ordem crescente, os Vayamarga traçam um único espectro — o vínculo do valkani correndo da terra e do mundo dos mortais, em Bhurok, até o céu e o mundo divino, em Saha-Suryam. O verdadeiro monge não se detém em nenhum dos extremos, nem reivindica uma única dádiva como absoluta. Como o próprio Maltham, ele percorre toda a extensão desse espectro, mantendo em equilíbrio cada vínculo e cada graça de sua existência.
 
-Com a ascensão dos Vayamarga, Qashram finalmente se libertou da sombra dos Tamorok, e seus povos puderam florescer. Até hoje, a prática une duas coisas que antes pareciam separadas — a disciplina do corpo guerreiro e a fé que ainda se curva diante de Hatiri.', 'CANON', '2026-08-23 06:50:58.255772+00', '2026-08-23 06:52:17.413877+00', '42ebd1d2-b526-427e-b912-c9d40fb78e8a', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', '88fd08d7-ad08-435c-af5c-b7d043c6292d', false, 'bb625182-491e-4215-8987-f1ab6ff3be9d', false);
+Com a ascensão dos Vayamarga, Qashram finalmente se libertou da sombra dos Tamorok, e seus povos puderam florescer. Até hoje, a prática une duas coisas que antes pareciam separadas — a disciplina do corpo guerreiro e a fé que ainda se curva diante de Hatiri.', 'CANON', '2026-08-23 06:50:58.255772+00', '2026-08-23 10:50:35.520121+00', '42ebd1d2-b526-427e-b912-c9d40fb78e8a', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', '88fd08d7-ad08-435c-af5c-b7d043c6292d', false, 'bb625182-491e-4215-8987-f1ab6ff3be9d', false);
 
 -- ============================================================
 -- LORE CATEGORIES
@@ -3879,8 +3902,8 @@ INSERT INTO public.entity_links (id, source_type, source_id, target_type, target
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('c69e3333-e47c-4697-a23d-316fe23552a8', 'LORE', '8093128f-3498-495a-aa23-214eebca7d76', 'LORE', 'af6e00bb-1307-4cf9-a1ba-09fe772b0636', '2026-08-17 09:24:40.655422+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('94208067-f20e-4971-9236-952ab6f41fa5', 'LORE', '1703407e-9e06-4b81-b3d3-002dd9d74326', 'LORE', '57428e7c-bd1f-4fbc-aa9d-722288c9e53e', '2026-08-17 09:24:50.813113+00');
 
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('33db8028-3e4f-4bd6-bfc0-7175c2d462b6', 'LORE', '88fd08d7-ad08-435c-af5c-b7d043c6292d', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', '2026-08-23 06:52:07.570754+00');
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('f4cb4771-0375-4f25-98e4-f440844cda76', 'LORE', 'bb625182-491e-4215-8987-f1ab6ff3be9d', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', '2026-08-23 06:52:17.434623+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('8980adb6-f37f-48ea-a9b6-d332292fea11', 'LORE', '88fd08d7-ad08-435c-af5c-b7d043c6292d', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', '2026-08-23 10:50:19.73207+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('a91f77a5-91bf-43f4-89ca-c8f5c2c1dc55', 'LORE', 'bb625182-491e-4215-8987-f1ab6ff3be9d', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', '2026-08-23 10:50:35.537183+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('5aa0c851-83b9-4ad4-93d2-49edc341e032', 'CHARACTER', '1527f011-01c0-4cfd-80e0-472790f8e927', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', '2026-08-23 06:53:42.19337+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('b5512620-c601-4401-8171-953e133ece9a', 'CHARACTER', '1527f011-01c0-4cfd-80e0-472790f8e927', 'CHARACTER', 'f2406f9b-7817-4fad-9dc0-d1cb4bce6cad', '2026-08-23 06:53:42.19337+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('8b813093-95c5-4f1c-9d1d-6b2fcf1cde63', 'CHARACTER', 'b8aac3ef-b2fa-46f1-b06e-83afd6d41e78', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', '2026-08-23 06:53:51.07851+00');
