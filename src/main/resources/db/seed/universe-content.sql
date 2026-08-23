@@ -28,8 +28,32 @@
 -- How to apply:
 --   psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
 --
--- Last updated: 2026-08-23 (2)
--- Updated by:   Siegmund. Per Aroneus's follow-up handoff: updated the body
+-- Last updated: 2026-08-23 (3)
+-- Updated by:   Siegmund. Per Aroneus's follow-up handoff: fixed a Markdown
+--               rendering bug across 5 existing Lore entries (10 rows) --
+--               plain \n-separated list lines were collapsing into one
+--               run-on line in aniannoth-overview (react-markdown treats
+--               single newlines as the same paragraph). Converted the
+--               affected list segments to proper "- item" Markdown syntax,
+--               both languages, on: The Seven Vayamarga of Mahalyra (both
+--               lists -- this row's value also already carries the prior
+--               breath-paragraph addition, superseding that diff), Elementals,
+--               Sektorians, Gizais, Trollfolk. Verified against a fresh
+--               pg_dump that no other field changed on any of these 10 rows.
+--
+--               Also verified live and picked up in this same regeneration:
+--               the Trollfolk image correction flagged as NOT-yet-applied in
+--               the 2026-08-23 (1) entry below has since landed live
+--               (Golbin.png->Goblin.png, Rancor.png->Rancor.jfif, both
+--               languages) -- that flag is now resolved.
+--
+--               entity_links: 12 rows updated (id/created_at only) -- each
+--               of these 5 Lore entries' outbound links came back
+--               recreated on the live DB, same recreate-on-full-PUT pattern
+--               already noted for Vayamarga in the previous entry, now
+--               confirmed general to LORE-sourced links, not row-specific.
+--
+-- Previous entry, 2026-08-23 (2), Siegmund. Per Aroneus's follow-up handoff: updated the body
 --               column on The Seven Vayamarga of Mahalyra (EN
 --               88fd08d7-ad08-435c-af5c-b7d043c6292d / PT
 --               bb625182-491e-4215-8987-f1ab6ff3be9d) -- a new paragraph on
@@ -2726,36 +2750,36 @@ As far as anyone can tell, though, every Sektorian can interbreed with every oth
 
 Sektorians descend directly from the Zookin. They evolved arthropod traits — segmented limbs, segmented carapace — and beyond that shared foundation, any individual Sektorian may carry one or more of the following adaptations:
 
-Pteromorphy — wings akin to those of butterflies, flies, or beetles
-Ocularia — compound eyes, or additional eyes altogether
-Stomatomorphy — a modified mouth: external mandibles, or a piercing proboscis
-Mechanopodia — limbs reshaped into pincers, blades, or cilia suited to scaling vertical surfaces
-Polypodia — additional pairs of limbs
-Caudomorphy — a stinger-tail, long like a scorpion''s or short like a wasp''s
-Keratinization — a more resistant carapace
-Cephalocornia — a modified head: horns for combat, or antennae for sharper sense
-Chemiomorphy — glands capable of producing venom, toxic pores, resilient fibers, caustic substances, pheromones and/or sticky fluids
-Extremophilia — adaptation to hostile conditions: hydrophobia, resistance to radiation, tolerance of extreme temperatures and the like
-Biosignaling — bioluminescence or an apparatus for sound or vibratory emission
-Hyperneurality — superhuman speed, agility and reflexes', 'CANON', '2026-08-16 09:11:20.289334+00', '2026-08-16 09:11:20.289334+00', '1cef56ea-c063-423d-8116-02abd1b4ee17', '1cef56ea-c063-423d-8116-02abd1b4ee17', 'en', 'fe3d3e79-3d05-438d-933c-e39c4731ae9b', false, 'fe3d3e79-3d05-438d-933c-e39c4731ae9b', false);
+- Pteromorphy — wings akin to those of butterflies, flies, or beetles
+- Ocularia — compound eyes, or additional eyes altogether
+- Stomatomorphy — a modified mouth: external mandibles, or a piercing proboscis
+- Mechanopodia — limbs reshaped into pincers, blades, or cilia suited to scaling vertical surfaces
+- Polypodia — additional pairs of limbs
+- Caudomorphy — a stinger-tail, long like a scorpion''s or short like a wasp''s
+- Keratinization — a more resistant carapace
+- Cephalocornia — a modified head: horns for combat, or antennae for sharper sense
+- Chemiomorphy — glands capable of producing venom, toxic pores, resilient fibers, caustic substances, pheromones and/or sticky fluids
+- Extremophilia — adaptation to hostile conditions: hydrophobia, resistance to radiation, tolerance of extreme temperatures and the like
+- Biosignaling — bioluminescence or an apparatus for sound or vibratory emission
+- Hyperneurality — superhuman speed, agility and reflexes', 'CANON', '2026-08-16 09:11:20.289334+00', '2026-08-23 11:17:23.546566+00', '1cef56ea-c063-423d-8116-02abd1b4ee17', '1cef56ea-c063-423d-8116-02abd1b4ee17', 'en', 'fe3d3e79-3d05-438d-933c-e39c4731ae9b', false, 'fe3d3e79-3d05-438d-933c-e39c4731ae9b', false);
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('3e5e600f-8e43-435f-b056-41426e762650', 'Sektorians', 'Um termo guarda-chuva para diversos povos artrópodes da linhagem Zookin, capazes de se reproduzir entre si, cada um portando alguma combinação de asas, olhos extras, bocas ou membros modificados, ferrões, glândulas de veneno e outras adaptações.', 'Muito pouco se sabe sobre esse grupo de indivíduos que habita o mundo dos valkani desde as eras mais antigas. Nenhum aventureiro, nenhum magistrado, jamais os estudou o bastante para classificá-los de forma adequada — e por isso, "Sektoriano" segue como termo guarda-chuva, esticado para cobrir diversos povos, alguns dos quais quase nada compartilham em forma física.
 
 Até onde se sabe, porém, todo Sektoriano pode se reproduzir com qualquer outro, o que torna a tarefa de agrupá-los por traço físico ainda mais difícil.
 
 Os Sektorianos descendem diretamente dos Zookin. Evoluíram traços artrópodes — membros segmentados, carapaça segmentada — e, além dessa base comum, cada Sektoriano pode apresentar uma ou mais das seguintes adaptações:
 
-Pteromorfia — asas semelhantes às de borboletas, moscas ou besouros
-Ocularia — olhos compostos, ou a adição de mais olhos
-Estomatomorfia — modificação na boca: mandíbulas externas, ou probóscide perfurador
-Mecanopodia — membros remodelados em pinças, lâminas ou cílios próprios para escalar superfícies verticais
-Polipodia — adição de mais pares de membros
-Caudomorfia — cauda com ferrão, longa como a de um escorpião ou curta como a de uma vespa
-Queratinização — carapaça mais resistente
-Cefalocornia — cabeça modificada: chifres para combate, ou antenas para sensibilidade mais aguçada
-Quimiomorfia — glândulas capazes de produzir veneno, poros tóxicos, fibras resistentes, substâncias cáusticas, feromônios e fluídos pegajosos
-Extremofilia — adaptação a condições hostis: hidrofobia, resistência à radiação, tolerância a temperaturas extremas, entre outras
-Biosinalização — bioluminescência, ou aparelho de emissão sonora ou vibratória
-Hiper-Neuralidade — velocidade, agilidade e reflexos sobre-humanos', 'CANON', '2026-08-16 09:11:28.490663+00', '2026-08-16 09:11:28.490663+00', 'cd99be38-1806-4b69-a911-dc4b58759a57', 'cd99be38-1806-4b69-a911-dc4b58759a57', 'pt', 'fe3d3e79-3d05-438d-933c-e39c4731ae9b', false, '3e5e600f-8e43-435f-b056-41426e762650', false);
+- Pteromorfia — asas semelhantes às de borboletas, moscas ou besouros
+- Ocularia — olhos compostos, ou a adição de mais olhos
+- Estomatomorfia — modificação na boca: mandíbulas externas, ou probóscide perfurador
+- Mecanopodia — membros remodelados em pinças, lâminas ou cílios próprios para escalar superfícies verticais
+- Polipodia — adição de mais pares de membros
+- Caudomorfia — cauda com ferrão, longa como a de um escorpião ou curta como a de uma vespa
+- Queratinização — carapaça mais resistente
+- Cefalocornia — cabeça modificada: chifres para combate, ou antenas para sensibilidade mais aguçada
+- Quimiomorfia — glândulas capazes de produzir veneno, poros tóxicos, fibras resistentes, substâncias cáusticas, feromônios e fluídos pegajosos
+- Extremofilia — adaptação a condições hostis: hidrofobia, resistência à radiação, tolerância a temperaturas extremas, entre outras
+- Biosinalização — bioluminescência, ou aparelho de emissão sonora ou vibratória
+- Hiper-Neuralidade — velocidade, agilidade e reflexos sobre-humanos', 'CANON', '2026-08-16 09:11:28.490663+00', '2026-08-23 11:17:46.06376+00', 'cd99be38-1806-4b69-a911-dc4b58759a57', 'cd99be38-1806-4b69-a911-dc4b58759a57', 'pt', 'fe3d3e79-3d05-438d-933c-e39c4731ae9b', false, '3e5e600f-8e43-435f-b056-41426e762650', false);
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('8fcc697b-a7f6-456a-976f-bd831188aa98', 'Moldkin', 'Provavelmente os primeiros valkani a formar comunidade, decompositores de pântano descendentes dos Slimekin, que empunham controle mental psíquico ao lado de poder arcano — e ancestrais tanto de Trolls quanto de Orcs.', 'Os Moldkin foram, muito provavelmente, os primeiros valkani a se reunir em comunidade — embora vários estudiosos prefiram chamá-los de pseudo-valkani em vez de lhes conceder o termo por inteiro. Descendentes diretos dos Slimekin, preferem lugares úmidos e extraem sua energia dos compostos químicos ao seu redor, sejam eles gasosos, líquidos ou sólidos. Esse hábito lhes rendeu o nome de decompositores, já que aquilo que consomem é, na maioria das vezes, matéria morta — embora, para um Moldkin, não seja nem morte nem decomposição. É apenas material, à espera de ser processado e transformado.
 
 Os Moldkin fazem seus lares em pântanos. Seus corpos são cobertos por filamentos ciliares semelhantes a cordões ou cabelos grossos, e pequenas protuberâncias despontam por sua pele, lembrando pequenos cogumelos. Apreciam a umidade e podem passar dias inteiros instalados na lama.
@@ -2843,46 +2867,46 @@ INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at
 
 The wild shapes of the Gizals follow the same lines as their larger kin, scaled down:
 
-Khanda — small lemurs and marmosets
-Kharal — cats and lynxes
-Varkha — smaller dog breeds and foxes
-Tarkhan — no Tarkhan line of Gizals exists
-Zulka — usually weasels and ferrets, though a Gizal of this line may take any Zulka form at smaller stature; the Zulka themselves already run close to Gizal size
-Kharapa — opossums and koalas
-Mokoa — tapirs
-Maru''a — seals
-Barkeith — red pandas
-Ghor — pigs
-Bramur — no Bramur line of Gizals exists
-Kragh — rams
+- Khanda — small lemurs and marmosets
+- Kharal — cats and lynxes
+- Varkha — smaller dog breeds and foxes
+- Tarkhan — no Tarkhan line of Gizals exists
+- Zulka — usually weasels and ferrets, though a Gizal of this line may take any Zulka form at smaller stature; the Zulka themselves already run close to Gizal size
+- Kharapa — opossums and koalas
+- Mokoa — tapirs
+- Maru''a — seals
+- Barkeith — red pandas
+- Ghor — pigs
+- Bramur — no Bramur line of Gizals exists
+- Kragh — rams
 
 Beyond these, there is the Krikha — a Feral tribe that exists solely as Gizals.
 
 Fast and watchful beyond any other tribe, the Krikha have spread into every corner of the primal world, carried by their elusiveness and by how quickly they multiply. Their communities run large, and though herbivores, they can gather great numbers to defend themselves when danger comes. All the same, they generally choose to migrate rather than compete with other ferals for ground.
 
-In wild shape, the Krikha resemble rats or rabbits — a shape that grants them tremendous perception and speed.', 'CANON', '2026-08-16 09:18:03.540131+00', '2026-08-16 09:18:03.540131+00', 'a5218652-50e5-4a59-8730-befe8589d2cf', 'a5218652-50e5-4a59-8730-befe8589d2cf', 'en', 'e23ee311-7d5a-4012-ab47-a0be0c0e9c41', false, 'e23ee311-7d5a-4012-ab47-a0be0c0e9c41', false);
+In wild shape, the Krikha resemble rats or rabbits — a shape that grants them tremendous perception and speed.', 'CANON', '2026-08-16 09:18:03.540131+00', '2026-08-23 11:18:12.440837+00', 'a5218652-50e5-4a59-8730-befe8589d2cf', 'a5218652-50e5-4a59-8730-befe8589d2cf', 'en', 'e23ee311-7d5a-4012-ab47-a0be0c0e9c41', false, 'e23ee311-7d5a-4012-ab47-a0be0c0e9c41', false);
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('dc95f0bd-46e1-4744-b5cd-bbb73601b637', 'Gizais', 'A contraparte em miniatura dos Ferais, versões reduzidas da maioria das formas selvagens ferais, além dos Krikha — uma tribo que existe unicamente como Gizais, com forma de rato ou coelho, de reprodução rápida e amplamente espalhada pelo mundo primal.', 'Os Gizais são a contraparte em miniatura dos Ferais. Onde um feral médio mede cerca de um metro e setenta, um Gizal raramente ultrapassa um metro e meio. Alguns Gizais encontram lugar dentro dos bandos de Ferais e contribuem plenamente para suas comunidades; outros são excluídos por seu tamanho diminuto, e caçados no lugar disso.
 
 As formas selvagens dos Gizais seguem as mesmas linhagens de seus parentes maiores, em escala reduzida:
 
-Khanda — lêmures e micos pequenos
-Kharal — gatos e linces
-Varkha — cães de porte menor e raposas
-Tarkhan — não existem Gizais da linhagem Tarkhan
-Zulka — geralmente doninhas e furões, embora um Gizal dessa linhagem possa assumir qualquer forma Zulka em estatura menor; os próprios Zulka já se aproximam bastante do porte Gizal
-Kharapa — gambás e coalas
-Mokoa — tapires
-Maru''a — focas
-Barkeith — pandas-vermelhos
-Ghor — porcos
-Bramur — não existem Gizais da linhagem Bramur
-Kragh — carneiros
+- Khanda — lêmures e micos pequenos
+- Kharal — gatos e linces
+- Varkha — cães de porte menor e raposas
+- Tarkhan — não existem Gizais da linhagem Tarkhan
+- Zulka — geralmente doninhas e furões, embora um Gizal dessa linhagem possa assumir qualquer forma Zulka em estatura menor; os próprios Zulka já se aproximam bastante do porte Gizal
+- Kharapa — gambás e coalas
+- Mokoa — tapires
+- Maru''a — focas
+- Barkeith — pandas-vermelhos
+- Ghor — porcos
+- Bramur — não existem Gizais da linhagem Bramur
+- Kragh — carneiros
 
 Além dessas, existem os Krikha — uma tribo Feral que existe unicamente como Gizais.
 
 Velozes e atentos como nenhuma outra tribo, os Krikha se espalharam por todo canto do mundo primal, levados por sua elusividade e pela rapidez com que se multiplicam. Suas comunidades são numerosas, e, embora herbívoros, conseguem reunir grandes grupos para se proteger quando o perigo se aproxima. Ainda assim, geralmente preferem migrar a competir por território com outros ferais.
 
-Em forma selvagem, os Krikha se assemelham a ratos ou coelhos — forma que lhes confere percepção e velocidade extraordinárias.', 'CANON', '2026-08-16 09:18:11.811008+00', '2026-08-16 09:18:11.811008+00', 'ea606f67-f995-4bab-ac9a-9dabd85046ec', 'ea606f67-f995-4bab-ac9a-9dabd85046ec', 'pt', 'e23ee311-7d5a-4012-ab47-a0be0c0e9c41', false, 'dc95f0bd-46e1-4744-b5cd-bbb73601b637', false);
+Em forma selvagem, os Krikha se assemelham a ratos ou coelhos — forma que lhes confere percepção e velocidade extraordinárias.', 'CANON', '2026-08-16 09:18:11.811008+00', '2026-08-23 11:18:33.173142+00', 'ea606f67-f995-4bab-ac9a-9dabd85046ec', 'ea606f67-f995-4bab-ac9a-9dabd85046ec', 'pt', 'e23ee311-7d5a-4012-ab47-a0be0c0e9c41', false, 'dc95f0bd-46e1-4744-b5cd-bbb73601b637', false);
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('3c5c67de-1e22-40a4-9e24-a1376a59ea88', 'Ontari', 'Elephant-sized, elephant-shaping ''Elders'' descended from mutated Zookin, near-elevani in power, who wander the primal lands as peaceful, hands-off guardians of the balance between the feral tribes.', 'Ontari are not quite Ferals — they''re something beyond that. They are believed to descend from a mutated line of Zookin, one that let them grow to exceptional size and reach a level of power comparable to the elevani.
 
 Ontari are also called the Elders. They wander the primal lands in herds, leaving the smallest trace of interference they can. Herbivores by nature, they take no part in the conflicts among the tribes, but watch from a distance — as though standing witness to make certain harmony is never broken. It is believed that they march along the edges of the Territory of the Living Land, holding back outsider creatures that might invade the Ferals'' lands and unsettle the balance kept there.
@@ -2913,28 +2937,28 @@ INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at
 
 Every elemental is built from matter, of one kind or another, but its behavior and the places it appears in depend above all on how that matter presents itself. The types of Elemental are as follows:
 
-Fluid — Elementals formed from matter in a liquid state
-Tempestuous — Elementals formed from gases
-Rigid — Elementals formed from solid matter
-Volatile — Elementals formed from matter in a highly energized state, such as plasma
-Miasmatic — Elementals formed from radioactive emissions, or matter so extremely granular that it passes through other matter entirely
-Prismatic — Elementals of matter in a granular state, at times capable of generating electricity through friction
-Condensed — Elementals of super-solid, dense materials, able to move only through magnetism
-Luminiferous — Elementals composed of absolute matter, also called prima matter or divine dust. This matter shines, and carries a repulsive effect that "unmakes" other matter on contact
-Dark — Elementals composed of black matter, also called divine ash. This matter runs dark, and carries a gravitational pull that draws in and absorbs other matter on contact', 'CANON', '2026-08-17 09:04:01.426424+00', '2026-08-17 09:04:01.426424+00', '2f0b14b1-2db2-4b78-a15b-d91b9344c26b', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', '6611f448-557e-4b03-84c2-0a3a5fd852f2', false, '6611f448-557e-4b03-84c2-0a3a5fd852f2', false);
+- Fluid — Elementals formed from matter in a liquid state
+- Tempestuous — Elementals formed from gases
+- Rigid — Elementals formed from solid matter
+- Volatile — Elementals formed from matter in a highly energized state, such as plasma
+- Miasmatic — Elementals formed from radioactive emissions, or matter so extremely granular that it passes through other matter entirely
+- Prismatic — Elementals of matter in a granular state, at times capable of generating electricity through friction
+- Condensed — Elementals of super-solid, dense materials, able to move only through magnetism
+- Luminiferous — Elementals composed of absolute matter, also called prima matter or divine dust. This matter shines, and carries a repulsive effect that "unmakes" other matter on contact
+- Dark — Elementals composed of black matter, also called divine ash. This matter runs dark, and carries a gravitational pull that draws in and absorbs other matter on contact', 'CANON', '2026-08-17 09:04:01.426424+00', '2026-08-23 11:16:26.813257+00', '2f0b14b1-2db2-4b78-a15b-d91b9344c26b', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', '6611f448-557e-4b03-84c2-0a3a5fd852f2', false, '6611f448-557e-4b03-84c2-0a3a5fd852f2', false);
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('4790e41c-b026-40ef-9572-2fff7f025b10', 'Elementais', 'Seres vivos minerais de matéria bruta animada pela natureza, movidos a princípio pela vontade de Gæa, classificados em nove tipos — Fluído, Tempestuoso, Rígido, Volátil, Miasmático, Prismático, Condensado, Luminífero e Escuro — conforme o estado da matéria que os compõe.', 'Elementais são seres vivos minerais, feitos essencialmente de matéria bruta animada por forças naturais e guiada por instintos dos mais primitivos. Surgem por conta própria onde a influência da natureza corre forte, movidos a princípio pela vontade de Gæa, deusa da Natureza. O corpo de cada elemental é feito de um tipo específico de matéria, contido num espaço e numa forma dados, e cada um se torna muito mais poderoso quando permanece ligado a uma fonte dessa matéria, qualquer que seja a forma dessa fonte. Podem lançar a própria massa contra um inimigo, e mudam de forma com facilidade — alguns chegam a se dividir em seres menores de si mesmos, e voltar a se unir depois.
 
 Todo elemental é constituído de matéria, seja ela qual for, mas seu comportamento e os locais onde surge dependem, acima de tudo, de como essa matéria se apresenta. Os tipos de Elemental são os seguintes:
 
-Fluído — Elementais formados a partir de matéria em estado líquido
-Tempestuosos — Elementais formados a partir de gases
-Rígidos — Elementais formados a partir de matéria sólida
-Voláteis — Elementais formados a partir de matéria em estado altamente energizado, como plasma
-Miasmáticos — Elementais formados a partir de emissões radioativas, ou de matéria tão extremamente granular que atravessa outras matérias por completo
-Prismáticos — Elementais de matéria em estado granular, por vezes capazes de gerar eletricidade por atrito
-Condensados — Elementais de materiais super-sólidos e densos, capazes de se mover apenas por magnetismo
-Luminíferos — Elementais compostos de matéria absoluta, também chamada de prima matéria ou poeira divina. Essa matéria brilha e carrega um efeito repulsivo que "desfaz" outras matérias ao contato
-Escuros — Elementais compostos de matéria negra, também chamada de cinzas divinas. Essa matéria é escura e carrega um efeito gravitacional que atrai e absorve outras matérias ao contato', 'CANON', '2026-08-17 09:04:11.166514+00', '2026-08-17 09:04:11.166514+00', 'f9c63136-a825-4124-99cf-c385cdf745ee', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', '6611f448-557e-4b03-84c2-0a3a5fd852f2', false, '4790e41c-b026-40ef-9572-2fff7f025b10', false);
+- Fluído — Elementais formados a partir de matéria em estado líquido
+- Tempestuosos — Elementais formados a partir de gases
+- Rígidos — Elementais formados a partir de matéria sólida
+- Voláteis — Elementais formados a partir de matéria em estado altamente energizado, como plasma
+- Miasmáticos — Elementais formados a partir de emissões radioativas, ou de matéria tão extremamente granular que atravessa outras matérias por completo
+- Prismáticos — Elementais de matéria em estado granular, por vezes capazes de gerar eletricidade por atrito
+- Condensados — Elementais de materiais super-sólidos e densos, capazes de se mover apenas por magnetismo
+- Luminíferos — Elementais compostos de matéria absoluta, também chamada de prima matéria ou poeira divina. Essa matéria brilha e carrega um efeito repulsivo que "desfaz" outras matérias ao contato
+- Escuros — Elementais compostos de matéria negra, também chamada de cinzas divinas. Essa matéria é escura e carrega um efeito gravitacional que atrai e absorve outras matérias ao contato', 'CANON', '2026-08-17 09:04:11.166514+00', '2026-08-23 11:16:51.80687+00', 'f9c63136-a825-4124-99cf-c385cdf745ee', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', '6611f448-557e-4b03-84c2-0a3a5fd852f2', false, '4790e41c-b026-40ef-9572-2fff7f025b10', false);
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('40172f32-d280-4793-8d8b-4076ba582927', 'Moldkin', 'Likely the first valkani to form community, swamp-dwelling decomposers descended from the Slimekin, wielding psychic mind-control alongside arcane power — and ancestors to both Trolls and Orcs.', 'Moldkin were, in all likelihood, the first valkani to gather into community — though a number of scholars prefer to call them pseudo-valkani rather than grant them the word outright. Direct descendants of the Slimekin, they favor damp places and draw their energy from the chemical compounds around them, whether those compounds arrive as gas, liquid, or solid. This habit has earned them the name of decomposers, since what they consume is, more often than not, dead matter — though to a Moldkin, it is neither death nor decay. It is simply material, waiting to be processed and transformed.
 
 Moldkin make their homes in swamps. Their bodies are covered in filament-like cilia, thick as cords or coarse hair, and small protuberances rise across their skin, not unlike little mushrooms. They love the wet and will pass whole days settled in mud.
@@ -2997,9 +3021,10 @@ Rancor Trolls carry limited intellect, but will work for other races in exchange
 
 Goblins — It''s common knowledge that goblins evolved from the Demi-Trolls, but broke off afterward into a people of their own, rich in culture and pride. A goblin''s body handles neither heat nor light well: their skin runs fragile under dry climates, and their eyes favor darker settings. For that reason, it''s common for them to coat themselves in mud before leaving their burrows during daylight — though many goblins learned to live within valkani society, and left that tribal habit behind. Goblins carry greenish skin, wide ears and noses, and stand small (roughly five feet). They fall into three subcategories:
 
-HobGoblin: the calmer goblins, and the craftier for it. They tend to run quiet and focused, but watch everything closely. Their features run sharper, and they make excellent rogues or scientists.
-BubGoblin: the wildest goblins, and the least willing to live outside their tribe. They run somewhat stronger than their cousins, and sometimes carry deformities or asymmetry in their bodies.
-DabGoblin: the most common of the three, with milder features and the most sociable temperament, usually found in trade or in manual labor.
+- HobGoblin: the calmer goblins, and the craftier for it. They tend to run quiet and focused, but watch everything closely. Their features run sharper, and they make excellent rogues or scientists.
+- BubGoblin: the wildest goblins, and the least willing to live outside their tribe. They run somewhat stronger than their cousins, and sometimes carry deformities or asymmetry in their bodies.
+- DabGoblin: the most common of the three, with milder features and the most sociable temperament, usually found in trade or in manual labor.
+
 Chuglings — The smallest of the Trollfolk, Chuglings are believed to be a cross between the Demi-Troll and some manner of fae being. Standing near three feet tall and fitted with greenish wings, these creatures wander the woodlands and pose real danger to travelers caught unaware. For all their aggression, Chuglings will accept trade by barter, and prize spices and salt above almost anything else. They carry sharp teeth, deep-set eyes, and enormous ears. Their hands and feet end in sharp claws, though they usually go armed with clubs or primitive spears besides.
 
 Orc — Known for their great strength in combat, Orcs organize themselves into communities built around respect for strength. In that spirit, it''s common for groups of Orcs to serve or work for individuals of other species, so long as that strength is valued in return. Orc culture is also rooted deep in interbreeding, which drives them to seek out crossbreeding with any number of other peoples. To an Orc, race is never a limiting factor, in any sense. Even so, they recognize the value of living among those who share their culture and their tastes. Orc tribes are highly adaptable, and can be found in every kind of environment — though sand, in particular, holds no appeal for them. Orcs run tall (roughly six foot three) and strong. Unlike their primitive ancestors, they no longer carry oversized teeth. Their skin color varies: green for crossbreeding with other orcs, gray for crossbreeding with Trolls, blue for crossbreeding with ogres, pink for crossbreeding with common valkani, or red for crossbreeding with demons. Beyond skin color, Orcs may carry specific traits inherited from each ancestry — a wider or narrower jaw, larger or smaller eyes, and so on.
@@ -3008,7 +3033,7 @@ Ogres — The most powerful of all the Trollfolk, Ogres are immense individuals 
 
 Mutant Ogres — Over the years, Ogres needed to evolve part of their cerebellum, the better to control such massive bodies. That evolution left the door open for a mutation that, in time, became common: some Ogres began to be born with two heads. These Ogres could carry conflicting personalities within themselves, along with an even greater pull toward violence.
 
-On the other side of that same coin, a different mutation caused some Ogres to be born with exceptional cleverness. The Ogre-Magi, as they came to be called, are rare individuals who take readily to community life and tend to specialize in research. Their bodies naturally build less than a common Ogre''s, but they still carry a real facility for muscle growth. Paired with a natural talent for magic and science, the Ogre-Magi stand among the most powerful valkani races that have ever lived.', 'CANON', '2026-08-17 09:11:02.775262+00', '2026-08-17 09:11:02.775262+00', '79f695b4-dd5d-468c-8040-8dd8acecd700', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', 'd12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', false, 'd12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', false);
+On the other side of that same coin, a different mutation caused some Ogres to be born with exceptional cleverness. The Ogre-Magi, as they came to be called, are rare individuals who take readily to community life and tend to specialize in research. Their bodies naturally build less than a common Ogre''s, but they still carry a real facility for muscle growth. Paired with a natural talent for magic and science, the Ogre-Magi stand among the most powerful valkani races that have ever lived.', 'CANON', '2026-08-17 09:11:02.775262+00', '2026-08-23 11:18:52.268579+00', '79f695b4-dd5d-468c-8040-8dd8acecd700', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', 'd12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', false, 'd12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', false);
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('f89b28b3-6aae-418e-9018-7b7c16b65913', 'Trollfolk', 'Um termo guarda-chuva para as raças valkani nascidas da união entre Orcs Primitivos e Trolls Primitivos — Forest Trolls, Demi-Trolls, Rancor Trolls, Goblins, Chuglings, Orcs e Ogros (incluindo suas mutações de duas cabeças e Ogre-Magi).', 'Trollfolk é um termo usado para abranger diferentes raças de valkani, incluindo Orcs, Ogros, Goblins, entre outras. Os Trolls têm origem na união dos Orcs Primitivos, com sua grande capacidade física, e dos Trolls Primitivos, com seu intelecto peculiar. Dessa união, diferentes tipos de tribos tomaram forma, cada qual carregando características próprias.
 
 Forest Trolls — Próximos de seus ancestrais em estatura e forma, os Trolls das Florestas costumam viver em comunidades isoladas. Seu temperamento, ao primeiro contato, é amigável e caloroso, mas sua aparência atrai a rejeição de outros povos mesmo assim, e essa rejeição já provocou uma boa quantidade de conflitos ao longo dos anos. Trolls carregam narizes proeminentes, orelhas grandes e corpos curvados. Seus cabelos crescem negros e espessos, e alguns usam bigode e barba além disso. Preferem se decorar — piercings, e ornamentos trabalhados em osso ou madeira, fixados na pele.
@@ -3023,9 +3048,10 @@ Os Rancor Trolls carregam intelecto limitado, mas trabalham para outras raças e
 
 Goblins — É de conhecimento popular que os goblins evoluíram a partir dos Demi-Trolls, mas se desprenderam depois como um povo próprio, rico em cultura e orgulho. O corpo de um goblin não lida bem nem com calor, nem com luz: sua pele é frágil sob climas secos, e seus olhos preferem ambientes mais escuros. Por isso, é comum que se cubram de lama antes de sair de suas tocas durante o dia — embora muitos goblins tenham aprendido a viver dentro da sociedade dos valkani, e deixado esse hábito tribal para trás. Goblins carregam pele esverdeada, orelhas e narizes largos, e estatura pequena (cerca de um metro e cinquenta). Dividem-se em três subcategorias:
 
-HobGoblin: os goblins mais calmos, e por isso mesmo os mais ardilosos. Tendem a ser quietos e concentrados, mas observam tudo de perto. Seus traços são mais agudos, e formam excelentes ladinos ou cientistas.
-BubGoblin: os goblins mais selvagens, e os menos dispostos a viver fora de sua tribo. São um pouco mais fortes que seus primos, e por vezes carregam deformações ou assimetria nos corpos.
-DabGoblin: os mais comuns dos três, com traços mais amenos e o temperamento mais sociável, geralmente encontrados no comércio ou em trabalho braçal.
+- HobGoblin: os goblins mais calmos, e por isso mesmo os mais ardilosos. Tendem a ser quietos e concentrados, mas observam tudo de perto. Seus traços são mais agudos, e formam excelentes ladinos ou cientistas.
+- BubGoblin: os goblins mais selvagens, e os menos dispostos a viver fora de sua tribo. São um pouco mais fortes que seus primos, e por vezes carregam deformações ou assimetria nos corpos.
+- DabGoblin: os mais comuns dos três, com traços mais amenos e o temperamento mais sociável, geralmente encontrados no comércio ou em trabalho braçal.
+
 Chuglings — Os menores dos Trollfolk, os Chuglings são tidos como um cruzamento entre o Demi-Troll e algum tipo de ser feérico. Com cerca de um metro de altura e equipados com asas esverdeadas, essas criaturas vagam pelos bosques e representam perigo real para viajantes desavisados. Apesar de toda a agressividade, os Chuglings aceitam comércio por troca, e valorizam especiarias e sal acima de quase tudo. Carregam dentes afiados, olhos fundos e orelhas enormes. Suas mãos e pés terminam em garras afiadas, embora costumem também se armar de clavas ou lanças primitivas.
 
 Orc — Reconhecidos por sua grande força em combate, os Orcs se organizam em comunidades erguidas sobre o respeito à força. Nesse espírito, é comum que grupos de Orcs sirvam ou trabalhem para indivíduos de outras espécies, desde que essa força seja valorizada em troca. A cultura Orc também tem raízes profundas na miscigenação, o que os leva a buscar cruzamento com diversos outros povos. Para um Orc, raça nunca é fator limitante, em nenhum sentido. Ainda assim, reconhecem o valor de viver entre aqueles que compartilham sua cultura e seus gostos. Tribos Orcs são altamente adaptáveis, e podem ser encontradas em todo tipo de ambiente — embora areia, especificamente, não lhes agrade. Orcs são altos (cerca de um metro e noventa) e fortes. Diferente de seus ancestrais primitivos, não carregam mais dentes avantajados. A coloração de sua pele varia: verde para cruzamento com outros orcs, cinza para cruzamento com Trolls, azul para cruzamento com ogros, rosada para cruzamento com valkani comuns, ou vermelha para cruzamento com demônios. Além da coloração de pele, Orcs podem carregar traços específicos herdados de cada ascendência — queixo mais largo ou mais fino, olhos maiores ou menores, e assim por diante.
@@ -3034,7 +3060,7 @@ Ogros — Os mais poderosos entre todos os Trollfolk, os Ogros são indivíduos 
 
 Ogros Mutantes — Com o passar dos anos, os Ogros precisaram evoluir parte de seu cerebelo, para melhor controlar corpos tão massivos. Essa evolução abriu espaço para uma mutação que, com o tempo, se tornou comum: alguns Ogros passaram a nascer com duas cabeças. Esses Ogros podiam carregar personalidades conflitantes dentro de si, junto de uma propensão ainda maior à violência.
 
-No outro lado dessa mesma moeda, uma mutação diferente fez com que alguns Ogros nascessem com esperteza excepcional. Os Ogre-Magi, como passaram a ser chamados, são indivíduos raros que se adaptam facilmente à vida em comunidade e costumam se especializar em pesquisa. Seus corpos naturalmente se desenvolvem menos do que os de um Ogro comum, mas ainda assim carregam grande facilidade para ganhar massa muscular. Somado a um talento natural para magia e ciência, os Ogre-Magi estão entre as mais poderosas raças de valkani que já existiram.', 'CANON', '2026-08-17 09:11:12.41823+00', '2026-08-17 09:11:12.41823+00', 'f2cc734b-4d24-457e-8f21-4560900588eb', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', 'd12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', false, 'f89b28b3-6aae-418e-9018-7b7c16b65913', false);
+No outro lado dessa mesma moeda, uma mutação diferente fez com que alguns Ogros nascessem com esperteza excepcional. Os Ogre-Magi, como passaram a ser chamados, são indivíduos raros que se adaptam facilmente à vida em comunidade e costumam se especializar em pesquisa. Seus corpos naturalmente se desenvolvem menos do que os de um Ogro comum, mas ainda assim carregam grande facilidade para ganhar massa muscular. Somado a um talento natural para magia e ciência, os Ogre-Magi estão entre as mais poderosas raças de valkani que já existiram.', 'CANON', '2026-08-17 09:11:12.41823+00', '2026-08-23 11:19:10.044718+00', 'f2cc734b-4d24-457e-8f21-4560900588eb', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', 'd12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', false, 'f89b28b3-6aae-418e-9018-7b7c16b65913', false);
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('607c47dc-b51d-47ae-9ec0-33127b81fe0c', 'Varkha', 'The most unified feral tribe, canine shapeshifters who hunt in strictly hierarchical packs, tracking prey by scent and sound across great distances.', 'Varkha are the most unified of the tribes, excelling above all at strategy and tracking. Their groups hold to a strict hierarchy, and their hunting parties can strike fear into bands far larger than their own.
 
 Their wild shape draws on dogs, granting them an exceptional ear for sound and nose for scent, and a voice — carried in howls and yips — that reaches across great distances. Their eyes stay fixed on any sign of weakness, a wound, the slowness of age, and they build their hunt around what they find, closing in with a presence built to intimidate before it ever needs to strike.', 'CANON', '2026-08-16 09:12:51.213034+00', '2026-08-17 09:21:26.382323+00', 'a5218652-50e5-4a59-8730-befe8589d2cf', 'a5218652-50e5-4a59-8730-befe8589d2cf', 'en', '607c47dc-b51d-47ae-9ec0-33127b81fe0c', false, '607c47dc-b51d-47ae-9ec0-33127b81fe0c', false);
@@ -3063,68 +3089,72 @@ The monks tested discipline after discipline, training that could carry body and
 
 From that promise, a faith''s worth came to be measured by one thing alone: how well its monks could stand against the Tamorok. Of the hundreds of paths that rose in those years, fourteen proved themselves above all the rest:
 
-Shtira — the Practice of the Anchor, bound to stability, strength, and balance
-Tvaran — the Practice of the Leap, bound to speed, flexibility, and motion
-Sudhi — the Practice of the Vessel, bound to purity and sanctity
-Sanjiva — the Practice of the Tide, bound to vital energy
-Kavacha — the Practice of Temperance, bound to endurance and mastery over instinct
-Jvala — the Practice of the Feast, bound to communion with the elements
-Prasada — the Practice of Compassion, bound to care and reverence for one''s fellow being
-Kroda — the Practice of Wrath, bound to the wielding of emotion
-Mauna — the Practice of Silence, bound to spiritual transformation
-Nada — the Practice of Prayer, bound to communion with the divine world
-Divya — the Practice of Reflection, bound to intuition and to the thread of destiny
-Marmam — the Practice of the Gaze, bound to understanding
-Turyia — the Practice of Meditation, bound to concentration and the unmaking of the self
-Unmada — the Practice of the Miracle, bound to the power of the mind
+- Shtira — the Practice of the Anchor, bound to stability, strength, and balance
+- Tvaran — the Practice of the Leap, bound to speed, flexibility, and motion
+- Sudhi — the Practice of the Vessel, bound to purity and sanctity
+- Sanjiva — the Practice of the Tide, bound to vital energy
+- Kavacha — the Practice of Temperance, bound to endurance and mastery over instinct
+- Jvala — the Practice of the Feast, bound to communion with the elements
+- Prasada — the Practice of Compassion, bound to care and reverence for one''s fellow being
+- Kroda — the Practice of Wrath, bound to the wielding of emotion
+- Mauna — the Practice of Silence, bound to spiritual transformation
+- Nada — the Practice of Prayer, bound to communion with the divine world
+- Divya — the Practice of Reflection, bound to intuition and to the thread of destiny
+- Marmam — the Practice of the Gaze, bound to understanding
+- Turyia — the Practice of Meditation, bound to concentration and the unmaking of the self
+- Unmada — the Practice of the Miracle, bound to the power of the mind
+
 Heroes rose from every one of these paths, and villages here and there found brief shelter behind them — yet the tide of the Tamorok could not be turned. Not until a monk named Maltham did what no one before him had thought to do: he gathered all fourteen disciplines into a single practice, and in doing so revealed a truth the others had missed. The potential of the valkani had never lived in any single facet of their being. It lived in the harmony between all of them. Maltham named this union the Seven Vayamarga:
 
-Bhurok — the Foundation, the harmony of Shtira and Tvaran
-Jalanta — the Sacred, the harmony of Sudhi and Sanjiva
-Tejokara — the Digestion, the harmony of Kavacha and Jvala
-Hridaya-Vin — the Soul, the harmony of Prasada and Kroda
-Vakarun — the Voice, the harmony of Mauna and Nada
-Netrayan — the Perception, the harmony of Divya and Marmam
-Saha-Suryam — the Crown, the harmony of Turyia and Unmada
+- Bhurok — the Foundation, the harmony of Shtira and Tvaran
+- Jalanta — the Sacred, the harmony of Sudhi and Sanjiva
+- Tejokara — the Digestion, the harmony of Kavacha and Jvala
+- Hridaya-Vin — the Soul, the harmony of Prasada and Kroda
+- Vakarun — the Voice, the harmony of Mauna and Nada
+- Netrayan — the Perception, the harmony of Divya and Marmam
+- Saha-Suryam — the Crown, the harmony of Turyia and Unmada
+
 Beneath every one of these techniques lies a single root: breath. To draw breath correctly, the monks of Qashram teach, is to bring the spiritual air into union with the material body — to make of one act, held between an inhale and its release, the meeting place of what is divine and what is flesh. Without this union no technique opens the path the Vayamarga promise, however long it has been practiced; with it, even the plainest exercise becomes a moment of communion.
 
 Rising in order, the Vayamarga trace a single spectrum — the valkani''s bond running from the earth and the world of mortal things, at Bhurok, up to the sky and the world of the divine, at Saha-Suryam. The true monk does not dwell at either end, nor claim any one gift as absolute. Like Maltham himself, they move across the whole of it, holding every connection and every grace of their existence in balance.
 
-With the Vayamarga''s rise, Qashram at last threw off the shadow of the Tamorok, and its peoples were free to flourish. To this day, the practice binds together two things once thought separate — the discipline of the warrior''s body, and the faith that still bows before Hatiri.', 'CANON', '2026-08-23 06:50:46.758618+00', '2026-08-23 10:50:19.668246+00', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', '88fd08d7-ad08-435c-af5c-b7d043c6292d', false, '88fd08d7-ad08-435c-af5c-b7d043c6292d', false);
+With the Vayamarga''s rise, Qashram at last threw off the shadow of the Tamorok, and its peoples were free to flourish. To this day, the practice binds together two things once thought separate — the discipline of the warrior''s body, and the faith that still bows before Hatiri.', 'CANON', '2026-08-23 06:50:46.758618+00', '2026-08-23 11:13:18.284125+00', 'd89ab35d-6b25-431e-95c4-7d0ae419d84f', 'fd791fd4-6951-4fa8-957e-5979bff9427f', 'en', '88fd08d7-ad08-435c-af5c-b7d043c6292d', false, '88fd08d7-ad08-435c-af5c-b7d043c6292d', false);
 INSERT INTO public.lore (id, name, summary, body, status, created_at, updated_at, timeline_founded_era_id, timeline_destroyed_era_id, language, translation_group_id, hidden, version_group_id, common) VALUES ('bb625182-491e-4215-8987-f1ab6ff3be9d', 'Os Sete Vayamarga de Mahalyra', 'A história de origem dos Sete Vayamarga — uma prática espiritual e marcial nascida quando o monge Maltham unificou catorze disciplinas rivais devotadas à deusa Hatiri numa única via harmonizada, rompendo o domínio dos Tamorok sobre o continente de Qashram.', 'No continente de Qashram, a deusa Gæa era venerada sob o nome de Mahalyra, a energia primordial. Em meados da Era dos Heróis, os povos espalhados pelo continente voltaram-se para a busca da verdade — sobre o mundo, sobre os deuses — e centenas de crenças rivais nasceram dessa procura. Na mesma época, demônios conhecidos como Tamorok passaram a se abater sobre as aldeias, e os monges de Qashram voltaram-se ao divino, em busca de um poder capaz de enfrentá-los.
 
 Os monges testaram disciplina após disciplina, treinamentos que prometiam levar corpo e mente além dos próprios limites. Foi a deusa Hatiri quem os guiou, prometendo que aqueles que se mantivessem puros — fiéis à própria natureza e às dádivas que Mahalyra lhes concedera — alcançariam, enfim, o verdadeiro potencial que lhes pertencia por direito.
 
 A partir dessa promessa, o valor de uma fé passou a ser medido por uma única coisa: a capacidade de seus monges de resistir aos Tamorok. Das centenas de caminhos que surgiram naqueles anos, catorze se destacaram acima de todos os outros:
 
-Shtira — a Prática da Âncora, vinculada à estabilidade, força e equilíbrio
-Tvaran — a Prática do Salto, vinculada à velocidade, flexibilidade e movimento
-Sudhi — a Prática do Receptáculo, vinculada à pureza e à santidade
-Sanjiva — a Prática da Maré, vinculada à energia vital
-Kavacha — a Prática da Temperança, vinculada à resistência e ao controle dos instintos
-Jvala — a Prática do Festim, vinculada à conexão com os elementos
-Prasada — a Prática da Compaixão, vinculada ao cuidado e ao respeito pelo próximo
-Kroda — a Prática da Fúria, vinculada ao uso das emoções
-Mauna — a Prática do Silêncio, vinculada à transformação espiritual
-Nada — a Prática da Prece, vinculada à comunicação com o mundo divino
-Divya — a Prática da Reflexão, vinculada à intuição e à conexão com o destino
-Marmam — a Prática do Olhar, vinculada à compreensão
-Turyia — a Prática da Meditação, vinculada à concentração e ao desfazer do ego
-Unmada — a Prática do Milagre, vinculada ao poder da mente
+- Shtira — a Prática da Âncora, vinculada à estabilidade, força e equilíbrio
+- Tvaran — a Prática do Salto, vinculada à velocidade, flexibilidade e movimento
+- Sudhi — a Prática do Receptáculo, vinculada à pureza e à santidade
+- Sanjiva — a Prática da Maré, vinculada à energia vital
+- Kavacha — a Prática da Temperança, vinculada à resistência e ao controle dos instintos
+- Jvala — a Prática do Festim, vinculada à conexão com os elementos
+- Prasada — a Prática da Compaixão, vinculada ao cuidado e ao respeito pelo próximo
+- Kroda — a Prática da Fúria, vinculada ao uso das emoções
+- Mauna — a Prática do Silêncio, vinculada à transformação espiritual
+- Nada — a Prática da Prece, vinculada à comunicação com o mundo divino
+- Divya — a Prática da Reflexão, vinculada à intuição e à conexão com o destino
+- Marmam — a Prática do Olhar, vinculada à compreensão
+- Turyia — a Prática da Meditação, vinculada à concentração e ao desfazer do ego
+- Unmada — a Prática do Milagre, vinculada ao poder da mente
+
 Heróis se ergueram de cada um desses caminhos, e aldeias aqui e ali encontraram abrigo passageiro atrás deles — mas o avanço dos Tamorok não se deixava conter. Até que um monge chamado Maltham fez o que nenhum outro antes dele havia pensado em fazer: reuniu as catorze disciplinas em uma única prática, e nesse gesto revelou uma verdade que todos os outros haviam deixado escapar. O potencial dos valkani jamais residira em uma única faceta de seu ser. Ele vivia na harmonia entre todas elas. Maltham deu a essa união o nome de Sete Vayamarga:
 
-Bhurok — a Base, harmonia entre Shtira e Tvaran
-Jalanta — o Sacro, harmonia entre Sudhi e Sanjiva
-Tejokara — a Digestão, harmonia entre Kavacha e Jvala
-Hridaya-Vin — a Alma, harmonia entre Prasada e Kroda
-Vakarun — a Comunicação, harmonia entre Mauna e Nada
-Netrayan — a Percepção, harmonia entre Divya e Marmam
-Saha-Suryam — a Coroa, harmonia entre Turyia e Unmada
+- Bhurok — a Base, harmonia entre Shtira e Tvaran
+- Jalanta — o Sacro, harmonia entre Sudhi e Sanjiva
+- Tejokara — a Digestão, harmonia entre Kavacha e Jvala
+- Hridaya-Vin — a Alma, harmonia entre Prasada e Kroda
+- Vakarun — a Comunicação, harmonia entre Mauna e Nada
+- Netrayan — a Percepção, harmonia entre Divya e Marmam
+- Saha-Suryam — a Coroa, harmonia entre Turyia e Unmada
+
 Sob cada uma dessas técnicas repousa uma única raiz: a respiração. Respirar corretamente, ensinam os monges de Qashram, é trazer o ar espiritual à união com o corpo material — fazer de um único ato, contido entre a inspiração e sua liberação, o ponto de encontro entre o que é divino e o que é carne. Sem essa união, nenhuma técnica abre o caminho que os Vayamarga prometem, por mais tempo que tenha sido praticada; com ela, até o exercício mais simples se torna um instante de comunhão.
 
 Em ordem crescente, os Vayamarga traçam um único espectro — o vínculo do valkani correndo da terra e do mundo dos mortais, em Bhurok, até o céu e o mundo divino, em Saha-Suryam. O verdadeiro monge não se detém em nenhum dos extremos, nem reivindica uma única dádiva como absoluta. Como o próprio Maltham, ele percorre toda a extensão desse espectro, mantendo em equilíbrio cada vínculo e cada graça de sua existência.
 
-Com a ascensão dos Vayamarga, Qashram finalmente se libertou da sombra dos Tamorok, e seus povos puderam florescer. Até hoje, a prática une duas coisas que antes pareciam separadas — a disciplina do corpo guerreiro e a fé que ainda se curva diante de Hatiri.', 'CANON', '2026-08-23 06:50:58.255772+00', '2026-08-23 10:50:35.520121+00', '42ebd1d2-b526-427e-b912-c9d40fb78e8a', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', '88fd08d7-ad08-435c-af5c-b7d043c6292d', false, 'bb625182-491e-4215-8987-f1ab6ff3be9d', false);
+Com a ascensão dos Vayamarga, Qashram finalmente se libertou da sombra dos Tamorok, e seus povos puderam florescer. Até hoje, a prática une duas coisas que antes pareciam separadas — a disciplina do corpo guerreiro e a fé que ainda se curva diante de Hatiri.', 'CANON', '2026-08-23 06:50:58.255772+00', '2026-08-23 11:13:24.143398+00', '42ebd1d2-b526-427e-b912-c9d40fb78e8a', 'cdaf8525-4ad7-4952-b93e-5fef4066aa0c', 'pt', '88fd08d7-ad08-435c-af5c-b7d043c6292d', false, 'bb625182-491e-4215-8987-f1ab6ff3be9d', false);
 
 -- ============================================================
 -- LORE CATEGORIES
@@ -3589,8 +3619,8 @@ INSERT INTO public.entity_links (id, source_type, source_id, target_type, target
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('3b7629a1-120a-4a75-a6c4-a4fbda67ee96', 'CHARACTER', '8a84c997-ff7b-4ab4-8850-2e7505a90d7c', 'ITEM', 'd0f09cda-d2ee-44c4-b94e-355bf0a5a6c9', '2026-07-26 09:49:05.175031+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('44be802a-be94-443d-a7a7-89499e6464d8', 'ITEM', 'd5ea4f36-b5d2-40b0-8bcb-667e2720a755', 'CHARACTER', '1a45079b-3a0e-4f21-9c71-4c024a03048c', '2026-07-26 09:49:38.774851+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('85f189b6-a4d0-4880-8b43-6b845f11e71b', 'ITEM', '9d05dfe6-01ce-4ae8-8d3f-b1186887ff3a', 'CHARACTER', 'cb869fcd-8a2a-4948-b209-53a85601d875', '2026-07-26 09:49:39.09271+00');
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('56c2afb8-73da-4aa9-9718-ec5fcae157a1', 'LORE', 'fe3d3e79-3d05-438d-933c-e39c4731ae9b', 'LORE', 'c2efdde8-3959-40d8-a967-4fd8aa737e74', '2026-08-16 09:11:20.330843+00');
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('30f4dafa-91a2-4cdd-a437-c500a1454da1', 'LORE', '3e5e600f-8e43-435f-b056-41426e762650', 'LORE', 'f7c41d29-af2b-4c08-b655-e58586e9623d', '2026-08-16 09:11:28.529543+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('1e41192a-dbd4-42f1-9e8f-cef449d39ba9', 'LORE', 'fe3d3e79-3d05-438d-933c-e39c4731ae9b', 'LORE', 'c2efdde8-3959-40d8-a967-4fd8aa737e74', '2026-08-23 11:17:23.566272+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('33ee0706-f05f-4de0-a09c-eb15fa3aa41d', 'LORE', '3e5e600f-8e43-435f-b056-41426e762650', 'LORE', 'f7c41d29-af2b-4c08-b655-e58586e9623d', '2026-08-23 11:17:46.079759+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('6d03b925-2103-4ece-8a30-f56f2db5c4ce', 'CHARACTER', 'ba5c6ad5-0199-47d6-bb4a-3aa693f1ce83', 'LORE', '86550df5-4d20-4ba8-9bc8-f0b1dfdfe420', '2026-08-01 04:58:53.045093+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('efa00c4a-41a8-4067-b65f-15d3ae274da1', 'CHARACTER', 'ba5c6ad5-0199-47d6-bb4a-3aa693f1ce83', 'CHARACTER', '3aafd441-affa-44b6-a119-4c71f7e384c8', '2026-08-01 04:58:53.045093+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('b38d3a7c-4177-42d7-a9d6-13cf276bc8ed', 'CHARACTER', 'ba5c6ad5-0199-47d6-bb4a-3aa693f1ce83', 'CHARACTER', 'c3fe20e2-722e-488e-bf4d-185fd024e900', '2026-08-01 04:58:53.045093+00');
@@ -3809,16 +3839,16 @@ INSERT INTO public.entity_links (id, source_type, source_id, target_type, target
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('005bd658-4795-467b-b978-e5feb1252069', 'LORE', 'f4b7edbe-2d94-44ee-8fe8-d4c214886a96', 'CHARACTER', '3f6179eb-7ce1-4a32-9c7d-fd74d02e9c3f', '2026-08-12 23:09:24.965173+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('0696640f-dae0-4899-ab53-dbcebb6a2701', 'CHARACTER', '16f14c7e-983d-4216-999d-c3b88c0797ed', 'LORE', 'a5d4c7fe-e585-424c-8ea0-2e0c04763eaf', '2026-08-12 23:09:43.438675+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('ba98984f-2938-46dc-a1ad-38cde30768d3', 'CHARACTER', '3f6179eb-7ce1-4a32-9c7d-fd74d02e9c3f', 'LORE', 'f4b7edbe-2d94-44ee-8fe8-d4c214886a96', '2026-08-12 23:09:50.470779+00');
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('01a7af92-2e74-4fb3-b7ce-9f1668d39ab6', 'LORE', 'e23ee311-7d5a-4012-ab47-a0be0c0e9c41', 'LORE', 'c2efdde8-3959-40d8-a967-4fd8aa737e74', '2026-08-16 09:18:03.586222+00');
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('2beb2c03-9790-4f8f-be48-48f31bc83292', 'LORE', 'dc95f0bd-46e1-4744-b5cd-bbb73601b637', 'LORE', 'f7c41d29-af2b-4c08-b655-e58586e9623d', '2026-08-16 09:18:11.844179+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('ba82c52c-0191-43d2-9e3a-76f6a1127135', 'LORE', 'e23ee311-7d5a-4012-ab47-a0be0c0e9c41', 'LORE', 'c2efdde8-3959-40d8-a967-4fd8aa737e74', '2026-08-23 11:18:12.457366+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('c8848581-2f3e-4b0e-a634-592f8ab117cc', 'LORE', 'dc95f0bd-46e1-4744-b5cd-bbb73601b637', 'LORE', 'f7c41d29-af2b-4c08-b655-e58586e9623d', '2026-08-23 11:18:33.187493+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('b1ce8e0d-432f-460b-abee-be1f9781e8a2', 'LORE', '3c5c67de-1e22-40a4-9e24-a1376a59ea88', 'LORE', 'c2efdde8-3959-40d8-a967-4fd8aa737e74', '2026-08-16 09:18:37.626565+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('8067dd45-3a1f-4fe0-b97d-90918214ebf9', 'LORE', 'f0836f70-185f-4071-b424-9dd5bd8b0fdb', 'LORE', 'f7c41d29-af2b-4c08-b655-e58586e9623d', '2026-08-16 09:18:46.701624+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('891b9df5-4ac7-42a4-860e-c9aa7232e990', 'CHARACTER', 'd54e37cd-3186-4522-a2fc-69fcd9a47387', 'LORE', 'c4ba4207-7857-49ab-8e22-5acc57ea2cd5', '2026-08-17 09:03:13.279163+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('b5cbb481-0480-4fd2-a29c-91273cb5589e', 'CHARACTER', '7f557e34-6074-471d-b9c4-3333cf53be04', 'LORE', '8986dc8b-69b3-4f61-bfac-1036d3ffba60', '2026-08-17 09:03:24.148703+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('22c3322d-03de-44eb-9fbe-ef4101191567', 'CHARACTER', '7f557e34-6074-471d-b9c4-3333cf53be04', 'LORE', 'acf5d45d-2163-4918-a4dd-eaac675ba44e', '2026-08-17 09:03:24.148703+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('c09b42b6-5c7a-4e37-87ad-2f2c660a8840', 'CHARACTER', '7f557e34-6074-471d-b9c4-3333cf53be04', 'LORE', '91165b17-3214-40b5-bbf3-0f4432905570', '2026-08-17 09:03:24.148703+00');
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('5d12eb3b-4d42-47e9-817f-7bcc07b5814c', 'LORE', '6611f448-557e-4b03-84c2-0a3a5fd852f2', 'CHARACTER', 'd54e37cd-3186-4522-a2fc-69fcd9a47387', '2026-08-17 09:04:01.798651+00');
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('b9fe4e23-4ab7-47e7-a463-f40616437c14', 'LORE', '4790e41c-b026-40ef-9572-2fff7f025b10', 'CHARACTER', '7f557e34-6074-471d-b9c4-3333cf53be04', '2026-08-17 09:04:11.76376+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('05980382-d260-434f-a732-df593e5a57a5', 'LORE', '6611f448-557e-4b03-84c2-0a3a5fd852f2', 'CHARACTER', 'd54e37cd-3186-4522-a2fc-69fcd9a47387', '2026-08-23 11:16:26.833235+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('433aa52f-6f55-4f6b-b159-e48f6c2e8f7b', 'LORE', '4790e41c-b026-40ef-9572-2fff7f025b10', 'CHARACTER', '7f557e34-6074-471d-b9c4-3333cf53be04', '2026-08-23 11:16:51.822478+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('8443ba8a-0364-437c-80ac-42e6255d670a', 'CHARACTER', '0015bf62-74a4-4d87-8165-e6f6b9c9d156', 'CHARACTER', 'f5a61b14-e05f-4d69-880e-bc3056bbb039', '2026-08-17 09:04:54.682361+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('351a0982-701f-497e-8e84-f96d8fc9d6c6', 'CHARACTER', '0015bf62-74a4-4d87-8165-e6f6b9c9d156', 'CHARACTER', '4b7d2e2c-82cb-4dfe-ab5e-67767a3bc653', '2026-08-17 09:04:54.682361+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('dbe67c74-b8d6-4568-8bda-38b4e0bd2fc0', 'CHARACTER', '0015bf62-74a4-4d87-8165-e6f6b9c9d156', 'LORE', '521ccad8-cbe0-46ac-823b-b874bd83aba1', '2026-08-17 09:04:54.682361+00');
@@ -3847,10 +3877,10 @@ INSERT INTO public.entity_links (id, source_type, source_id, target_type, target
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('9a24dc02-5b6e-4cbd-9509-bc0dab82de60', 'LORE', '544bbc1c-63a3-4622-ba34-e2896a2e32f2', 'LORE', '060e5f9d-4613-44c9-bf45-28356b2322b7', '2026-08-17 09:09:33.688547+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('d50b5bcd-2913-4f93-9f15-fedc1373e9ba', 'LORE', 'b7470017-fe72-45f3-a66d-c1d5f8df4171', 'LORE', 'f7c41d29-af2b-4c08-b655-e58586e9623d', '2026-08-17 09:09:43.123807+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('e1b742b1-7cba-46a6-830f-0969659bd078', 'LORE', 'b7470017-fe72-45f3-a66d-c1d5f8df4171', 'LORE', '1171c928-a7d0-48e8-85ee-5c0554fe7130', '2026-08-17 09:09:43.123807+00');
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('03e80071-36a0-4d15-a3b9-8867f9df76d3', 'LORE', 'd12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'LORE', 'a5f49592-1c2f-4d32-a196-8e0bd0677a94', '2026-08-17 09:11:02.821043+00');
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('43d64e2a-91a8-4774-bd18-5218e2af39e7', 'LORE', 'd12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'LORE', '544bbc1c-63a3-4622-ba34-e2896a2e32f2', '2026-08-17 09:11:02.821043+00');
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('d7c474d7-bfcd-495e-b3d6-e63cc42da716', 'LORE', 'f89b28b3-6aae-418e-9018-7b7c16b65913', 'LORE', 'a1c8c630-ca54-4d32-a1e0-8c76d33bcbcf', '2026-08-17 09:11:12.480254+00');
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('19bc475c-0ac6-46db-934a-23a361aa41c0', 'LORE', 'f89b28b3-6aae-418e-9018-7b7c16b65913', 'LORE', 'b7470017-fe72-45f3-a66d-c1d5f8df4171', '2026-08-17 09:11:12.480254+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('0aed736a-ff43-45ee-8877-f412bcb2a9ee', 'LORE', 'd12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'LORE', 'a5f49592-1c2f-4d32-a196-8e0bd0677a94', '2026-08-23 11:18:52.293054+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('393ac155-ebba-46f1-8b10-8075bfb35384', 'LORE', 'd12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'LORE', '544bbc1c-63a3-4622-ba34-e2896a2e32f2', '2026-08-23 11:18:52.293054+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('46111b9c-e596-40c1-bf80-b8180f6cc975', 'LORE', 'f89b28b3-6aae-418e-9018-7b7c16b65913', 'LORE', 'a1c8c630-ca54-4d32-a1e0-8c76d33bcbcf', '2026-08-23 11:19:10.065594+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('01e1f229-a0af-49d7-9cf9-82bdbcb82a9a', 'LORE', 'f89b28b3-6aae-418e-9018-7b7c16b65913', 'LORE', 'b7470017-fe72-45f3-a66d-c1d5f8df4171', '2026-08-23 11:19:10.065594+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('59e695cd-e569-44e0-b30a-965fe0e06a35', 'LORE', 'af6e00bb-1307-4cf9-a1ba-09fe772b0636', 'LORE', 'eb6b2d6f-5562-4071-946b-c0e617ea9af3', '2026-08-17 09:20:20.35584+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('51c92b94-0415-4617-b537-380b207bd670', 'LORE', 'af6e00bb-1307-4cf9-a1ba-09fe772b0636', 'LORE', '84187f75-a97b-4e29-b673-ac162a8461b7', '2026-08-17 09:20:20.35584+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('3a1f56b2-a681-4e6b-9f54-fdc5e0de14f6', 'LORE', 'af6e00bb-1307-4cf9-a1ba-09fe772b0636', 'LORE', 'd52404fd-acfe-4405-b6d9-516b1eb9943b', '2026-08-17 09:20:20.35584+00');
@@ -3902,8 +3932,8 @@ INSERT INTO public.entity_links (id, source_type, source_id, target_type, target
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('c69e3333-e47c-4697-a23d-316fe23552a8', 'LORE', '8093128f-3498-495a-aa23-214eebca7d76', 'LORE', 'af6e00bb-1307-4cf9-a1ba-09fe772b0636', '2026-08-17 09:24:40.655422+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('94208067-f20e-4971-9236-952ab6f41fa5', 'LORE', '1703407e-9e06-4b81-b3d3-002dd9d74326', 'LORE', '57428e7c-bd1f-4fbc-aa9d-722288c9e53e', '2026-08-17 09:24:50.813113+00');
 
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('8980adb6-f37f-48ea-a9b6-d332292fea11', 'LORE', '88fd08d7-ad08-435c-af5c-b7d043c6292d', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', '2026-08-23 10:50:19.73207+00');
-INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('a91f77a5-91bf-43f4-89ca-c8f5c2c1dc55', 'LORE', 'bb625182-491e-4215-8987-f1ab6ff3be9d', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', '2026-08-23 10:50:35.537183+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('46bf754c-3143-42a7-91b7-108ede174d1e', 'LORE', '88fd08d7-ad08-435c-af5c-b7d043c6292d', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', '2026-08-23 11:13:18.318552+00');
+INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('af21dcb5-6822-4691-a4c5-f200f421409e', 'LORE', 'bb625182-491e-4215-8987-f1ab6ff3be9d', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', '2026-08-23 11:13:24.159182+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('5aa0c851-83b9-4ad4-93d2-49edc341e032', 'CHARACTER', '1527f011-01c0-4cfd-80e0-472790f8e927', 'CHARACTER', '2fab5cd5-dddd-478e-8998-96d197d29619', '2026-08-23 06:53:42.19337+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('b5512620-c601-4401-8171-953e133ece9a', 'CHARACTER', '1527f011-01c0-4cfd-80e0-472790f8e927', 'CHARACTER', 'f2406f9b-7817-4fad-9dc0-d1cb4bce6cad', '2026-08-23 06:53:42.19337+00');
 INSERT INTO public.entity_links (id, source_type, source_id, target_type, target_id, created_at) VALUES ('8b813093-95c5-4f1c-9d1d-6b2fcf1cde63', 'CHARACTER', 'b8aac3ef-b2fa-46f1-b06e-83afd6d41e78', 'CHARACTER', '6e4eaee0-90a0-4d23-85cc-97f7544d137e', '2026-08-23 06:53:51.07851+00');
@@ -4263,18 +4293,18 @@ INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) 
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('b7470017-fe72-45f3-a66d-c1d5f8df4171', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/PrimitiveOrc.png', 0);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('d12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/ForestTroll.png', 0);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('d12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Orc.jfif', 1);
-INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('d12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Rancor.png', 2);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('d12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Rancor.jfif', 2);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('d12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Chugling.png', 3);
-INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('d12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Golbin.png', 4);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('d12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Goblin.png', 4);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('d12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ogre.png', 5);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('d12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/TwoHeadedOgre.png', 6);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('d12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/OgreMagi.png', 7);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('d12e2ca8-f9ae-4bf4-96ea-6b4cf74d6562', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/DemiTroll.png', 8);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f89b28b3-6aae-418e-9018-7b7c16b65913', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/ForestTroll.png', 0);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f89b28b3-6aae-418e-9018-7b7c16b65913', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Orc.jfif', 1);
-INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f89b28b3-6aae-418e-9018-7b7c16b65913', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Rancor.png', 2);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f89b28b3-6aae-418e-9018-7b7c16b65913', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Rancor.jfif', 2);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f89b28b3-6aae-418e-9018-7b7c16b65913', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Chugling.png', 3);
-INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f89b28b3-6aae-418e-9018-7b7c16b65913', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Golbin.png', 4);
+INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f89b28b3-6aae-418e-9018-7b7c16b65913', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Goblin.png', 4);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f89b28b3-6aae-418e-9018-7b7c16b65913', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/Ogre.png', 5);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f89b28b3-6aae-418e-9018-7b7c16b65913', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/TwoHeadedOgre.png', 6);
 INSERT INTO public.universe_entity_images (entity_id, image_url, display_order) VALUES ('f89b28b3-6aae-418e-9018-7b7c16b65913', 'https://pub-f1c218252a1647b7a5079e610730dc44.r2.dev/characters/OgreMagi.png', 7);
