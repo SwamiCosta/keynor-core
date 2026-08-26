@@ -34,7 +34,6 @@
 - [ ] Geofrey of the Manticore — mentioned in The Twelve Techniques of Jatoria
 - [ ] Glair the Grey — mentioned in The Twelve Techniques of Jatoria
 - [ ] Roark, the Wandering Orc — mentioned in The Twelve Techniques of Jatoria
-- [ ] Galtam the Illuminated — mentioned in The Twelve Techniques of Jatoria
 - [ ] Johny Gunn — mentioned in The Twelve Techniques of Jatoria
 - [ ] Preston Vance — mentioned in The Twelve Techniques of Jatoria
 - [ ] Ocaelum (deity) — mentioned in The Twelve Techniques of Jatoria
