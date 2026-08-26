@@ -2,6 +2,7 @@ package com.keynor.core.infrastructure.web.map;
 
 import com.keynor.core.application.dto.map.MapPinResponse;
 import com.keynor.core.domain.model.map.MapPin;
+import com.keynor.core.domain.model.map.PinShape;
 import com.keynor.core.domain.model.shared.EntityLinkSummary;
 import com.keynor.core.domain.model.shared.EntityStatus;
 import com.keynor.core.domain.model.shared.EntityType;
@@ -40,7 +41,7 @@ class PublicMapPinControllerTest {
     }
 
     private MapPin aPin(UUID entityId) {
-        return new MapPin(UUID.randomUUID(), MAP_ID, EntityType.CHARACTER, entityId, null, 0.5, 0.5, Instant.now());
+        return new MapPin(UUID.randomUUID(), MAP_ID, EntityType.CHARACTER, entityId, null, PinShape.DEFAULT, 0.5, 0.5, Instant.now());
     }
 
     @Test
@@ -58,6 +59,22 @@ class PublicMapPinControllerTest {
         assertThat(body).hasSize(1);
         assertThat(body.get(0).entity().name()).isEqualTo("Araveth");
         assertThat(body.get(0).name()).isEqualTo("Araveth");
+        assertThat(body.get(0).shape()).isEqualTo(PinShape.DEFAULT);
+    }
+
+    @Test
+    void findByMap_shouldIncludeStarShape_whenPinHasStarShape() {
+        UUID entityId = UUID.randomUUID();
+        MapPin pin = new MapPin(UUID.randomUUID(), MAP_ID, EntityType.CHARACTER, entityId, null, PinShape.STAR, 0.5, 0.5, Instant.now());
+        EntityLinkSummary summary = new EntityLinkSummary(EntityType.CHARACTER, entityId, "Araveth", EntityStatus.CANON, false, false);
+        when(findMapPinsUseCase.findByMapId(MAP_ID)).thenReturn(List.of(pin));
+        when(findEntitySummaryUseCase.findSummary(EntityType.CHARACTER, entityId)).thenReturn(Optional.of(summary));
+
+        var response = controller.findByMap(MAP_ID);
+
+        List<MapPinResponse> body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.get(0).shape()).isEqualTo(PinShape.STAR);
     }
 
     @Test
@@ -76,7 +93,7 @@ class PublicMapPinControllerTest {
 
     @Test
     void findByMap_shouldIncludePinWithItsOwnName_whenPinHasNoLinkedEntity() {
-        MapPin pin = new MapPin(UUID.randomUUID(), MAP_ID, null, null, "Uncharted Ruins", 0.3, 0.7, Instant.now());
+        MapPin pin = new MapPin(UUID.randomUUID(), MAP_ID, null, null, "Uncharted Ruins", PinShape.DEFAULT, 0.3, 0.7, Instant.now());
         when(findMapPinsUseCase.findByMapId(MAP_ID)).thenReturn(List.of(pin));
 
         var response = controller.findByMap(MAP_ID);
@@ -91,7 +108,7 @@ class PublicMapPinControllerTest {
     @Test
     void findByMap_shouldSuppressName_whenTargetIsHiddenAndStillLocked() {
         UUID entityId = UUID.randomUUID();
-        MapPin pin = new MapPin(UUID.randomUUID(), MAP_ID, EntityType.CHARACTER, entityId, "A curious marker", 0.5, 0.5, Instant.now());
+        MapPin pin = new MapPin(UUID.randomUUID(), MAP_ID, EntityType.CHARACTER, entityId, "A curious marker", PinShape.DEFAULT, 0.5, 0.5, Instant.now());
         EntityLinkSummary hiddenSummary = new EntityLinkSummary(EntityType.CHARACTER, entityId, "Secret Vault", EntityStatus.CANON, true, false);
         when(findMapPinsUseCase.findByMapId(MAP_ID)).thenReturn(List.of(pin));
         when(findEntitySummaryUseCase.findSummary(EntityType.CHARACTER, entityId)).thenReturn(Optional.of(hiddenSummary));
