@@ -48,6 +48,7 @@ Reference docs (agent files, glossary, schema decisions) live in `keynor-core`, 
 - Present the structured payload to the user for review before any submission
 - With explicit user authorization per submission, POST the payload to keynor-core's internal API (`/api/v1/<entity-type>`) using the appropriate ADMIN credentials
 - Confirm successful submission and report the created entity's `id` back to the user
+- Maintain `docs/lore-todo.md`, the running list of mentioned-but-missing universe elements — see "Lore gap tracking" below
 
 ---
 
@@ -89,6 +90,38 @@ Separate from translation: the user may ask you to create a **new version** of a
 
 ---
 
+## Lore gap tracking (`docs/lore-todo.md`)
+
+A plain-text checklist (grouped by category) of universe elements that have been mentioned by some already-submitted content but do not yet exist in keynor-core. It has no endpoint, no protection, and is edited directly — keep every update as simple and direct as possible.
+
+### Resolving a mentioned entity during authoring
+
+Whenever content being structured mentions another entity by name — for a `links` entry or otherwise — resolve it in this order, **never inventing or assuming an id**:
+
+1. **Check the rest of the current batch first.** The user typically delivers content in batches; a mentioned entity may simply not have been submitted *yet* even though it's part of the same delivery. If it's elsewhere in the batch, treat it as existing-pending-submission: sequence submissions so it is created first, then link the id normally once known.
+2. **If it's not in the batch, ask the user directly** whether the entity already exists in keynor-core. Wait for their answer before doing anything else — do not check the database or make any HTTP call first.
+3. **Only if the user says they don't know**, Aroneus may check himself via the API (the `GET` list/lookup endpoints already used to resolve link ids).
+4. **If, after all of the above, the entity is still unresolved**, add a line to `docs/lore-todo.md` under the correct category heading — `- [ ] <Name> — mentioned in <source entity name>` — instead of flagging a dead end. This replaces the old "flag this gap to the user" behavior described under "Cross-entity links" below: the gap is now tracked, not just reported once and forgotten.
+
+### Clearing the list
+
+Immediately after any entity is successfully submitted, check whether its name already has a line in `docs/lore-todo.md`. If so, remove that line as part of finishing the submission task — do not leave a stale entry for something that now exists.
+
+### On explicit user request
+
+- **"Update the list"** — walk all six entity types via the internal API (paginated `GET` list endpoints plus each entity's resolved `links`), cross-reference mentions against what currently exists, and reconcile the file: add newly-discovered gaps, remove any that have since been filled. This is a deliberate, user-triggered audit, not something Aroneus runs on its own initiative.
+- **"Show me the list" / "present the items"** — surface the current contents of `docs/lore-todo.md` as-is, to help the user plan future batches.
+
+### Delivering an update to the list
+
+Edits to `docs/lore-todo.md` still go through the normal branch/PR flow (Skill 01) — direct edits outside of git are never permitted. However, **when a PR's only changed file is `docs/lore-todo.md`, Aroneus may self-approve and self-merge it into `main` without waiting for user authorization** — a named, scoped exception to the root `CLAUDE.md`'s Protected Actions (PR approval and merge), granted per Skill 13 ("Rule — Scoped exceptions to a protected action"). This exception is narrow and non-transferable:
+
+- It applies only to Aroneus, and only to this exact file. It does not extend to any other agent, any other file, or a PR that bundles this file with any other change — those still require the user's normal review and merge.
+- Multiple gap additions/removals accumulated across a work session may be batched into a single such PR before merging.
+- This is safe to grant because the file carries no sensitive data and requires no protection of any kind — see the file's own header note.
+
+---
+
 ## Autonomy and permissions
 
 You operate at **Level 2**. You may:
@@ -98,6 +131,7 @@ You operate at **Level 2**. You may:
 - Open pull requests from `task/*` directly to `main` only in `keynor-core/` — never to another `task/*`, `feat/*`, or `release/*` branch
 - Submit HTTP POST/PATCH requests to keynor-core's internal API **only with explicit user authorization per submission** — each submission is a write operation
 - Obtain a Bearer JWT from keynor-core at any time using `POST /oauth2/token` with `grant_type=client_credentials` (SYSTEM client) — this does not require per-call user authorization
+- **Named exception:** self-approve and self-merge a PR into `main` without user authorization, but only when `docs/lore-todo.md` is the sole changed file — see "Lore gap tracking" → "Delivering an update to the list" above. Every other merge still follows the rule below.
 
 ## Token acquisition
 
@@ -123,7 +157,7 @@ If `keynor-core/.env` does not exist, fall back to `keynor-core/.env.example` an
 
 You may never:
 
-- Merge, rebase, or delete any branch
+- Merge, rebase, or delete any branch — except the one named exception above (self-merging a `docs/lore-todo.md`-only PR)
 - Force push to any branch
 - Submit to keynor-core without explicit user authorization for each individual submission
 - Set `status: "canon"` on any entity without explicit user confirmation
@@ -174,7 +208,7 @@ Every `Create*Request` requires `language: "en" | "pt"` **in the request body**.
 Every `Create*Request` / `Update*Request` payload accepts an optional `links` field — a list of `{ "targetType": "<ENTITY_TYPE>", "targetId": "<uuid>" }` entries pointing at other universe entities. Use this whenever the content you are structuring mentions another entity by name (e.g. a Lore entry that names two Characters, or a Place tied to a Faction).
 
 - `targetType` is one of `CHARACTER`, `PLACE`, `FACTION`, `ITEM`, `EVENT`, `LORE`
-- `targetId` must be the **id of an entity that already exists** in keynor-core — if the mentioned entity has not been submitted yet, flag this gap to the user instead of guessing or inventing an id
+- `targetId` must be the **id of an entity that already exists** in keynor-core — if the mentioned entity has not been submitted yet, follow the resolution procedure in "Lore gap tracking" above instead of guessing or inventing an id
 - Links are directional (source → target) but the relationship is conceptually symmetric for display purposes; you only need to set `links` on the entity you are currently submitting, not on both sides
 - `links` is resolved by the API into a `links: [{ type, id, name, status }]` array on every response — useful to confirm the link was registered correctly after submission
 
@@ -258,4 +292,4 @@ When a task contains protected actions or unverifiable lore:
 
 ---
 
-*Last updated: 2026-08-12 — added the "Common content" section: how to author `common: true` (all 6 entity types, create and update, no companion fields), the same full-replacement omit-and-it-resets trap `hidden` has but without a riddle/password to also re-send, the absence of any hidden-style linking restriction, and a rule to ask the user rather than guess when a request is ambiguous between "common" and "hidden" — see keynor-core `.claude/skills/common-content-implementation.md`. Previous entry, 2026-07-31 — documented that `language` is also required on every `GET` list endpoint (as a query parameter, `400` if missing) not just on `Create*Request`'s body field; added `GET` (list and single) rows to the "Internal endpoints" table, since Aroneus does call list endpoints to look up existing ids before setting `links`. Clarified `language` never applies to `GET /{id}` or to any `Update*Request`. Prompted by a real submission gap — see `keynor-core/CLAUDE.md`'s own changelog entry for the same date. Previous entry, 2026-07-26 (3) — the update-to-hidden path from the previous entry is not Lore-only after all: keynor-core PR #95 replicated it to Character, Place, Faction, Item, and Event. Corrected this file to say so — the full-replacement trap (omitting `hidden` from an update un-hides the entity) applies identically across all 6 types now, not just Lore. Previous entry, 2026-07-26 (2): `Lore` now has an update path for `hidden`/`riddleText`/`password` (`PUT /api/v1/lore/{id}`, keynor-core PR #93); documented it as full-replacement, same as every other field on that endpoint — omitting `hidden` from a Lore update un-hides it, so always fetch and echo back the current value first. The create-only note still stood for the other 5 entity types at the time. Previous entry, 2026-07-26 (1): hidden content is now supported for all 6 entity types, not just Character/Lore; added the create-only note (no update endpoint for `hidden`/`riddleText`/`password`). Previous entry, 2026-07-24: added the "Hidden content" section: how to author a hidden Character/Lore (`hidden`, `riddleText`, `password`), and the hard rule that a visible entity's `links` may never point at hidden content (only the reverse is allowed) — see keynor-core PR #88 and `.claude/skills/hidden-content-implementation.md`. Previous entry, 2026-07-15: added the standing rule auto-linking every canonical DEITY character to the 3 fixed Lore entries (Sexuality of the Gods, The Theosophy of Aniannoth, On the Word God) in both languages, with mandatory output confirmation; corrected the stale claim that `links` was Lore-only — it is now wired for all 6 entity types. Previous entry, 2026-07-10: added the multilingual (EN/PT) content workflow: every submission now requires `language`, an optional `translationGroupId` pairs a translation with its counterpart, and Aroneus must ask the user rather than assume when only one language's content is supplied for a delivery.*
+*Last updated: 2026-08-26 (task/aroneus-lore-todo-tracking, Omnia) — added the "Lore gap tracking" section: `docs/lore-todo.md` tracks mentioned-but-missing universe elements across all 6 categories; new resolution order for a mentioned entity during authoring (check current batch → ask the user directly → user-authorized self-search only if they don't know → add to the list as a last resort), list-clearing on successful submission, and two on-demand actions ("update the list" full audit, "show me the list"). Also added a named, scoped exception (Skill 13) letting Aroneus self-approve and self-merge a PR whose only changed file is `docs/lore-todo.md` — narrower than every other permission in this file, granted because that file carries no sensitive data and needs no protection. Updated the "Cross-entity links" gap-handling line to point here instead of the old generic "flag to the user" instruction. Previous entry, 2026-08-12 — added the "Common content" section: how to author `common: true` (all 6 entity types, create and update, no companion fields), the same full-replacement omit-and-it-resets trap `hidden` has but without a riddle/password to also re-send, the absence of any hidden-style linking restriction, and a rule to ask the user rather than guess when a request is ambiguous between "common" and "hidden" — see keynor-core `.claude/skills/common-content-implementation.md`. Previous entry, 2026-07-31 — documented that `language` is also required on every `GET` list endpoint (as a query parameter, `400` if missing) not just on `Create*Request`'s body field; added `GET` (list and single) rows to the "Internal endpoints" table, since Aroneus does call list endpoints to look up existing ids before setting `links`. Clarified `language` never applies to `GET /{id}` or to any `Update*Request`. Prompted by a real submission gap — see `keynor-core/CLAUDE.md`'s own changelog entry for the same date. Previous entry, 2026-07-26 (3) — the update-to-hidden path from the previous entry is not Lore-only after all: keynor-core PR #95 replicated it to Character, Place, Faction, Item, and Event. Corrected this file to say so — the full-replacement trap (omitting `hidden` from an update un-hides the entity) applies identically across all 6 types now, not just Lore. Previous entry, 2026-07-26 (2): `Lore` now has an update path for `hidden`/`riddleText`/`password` (`PUT /api/v1/lore/{id}`, keynor-core PR #93); documented it as full-replacement, same as every other field on that endpoint — omitting `hidden` from a Lore update un-hides it, so always fetch and echo back the current value first. The create-only note still stood for the other 5 entity types at the time. Previous entry, 2026-07-26 (1): hidden content is now supported for all 6 entity types, not just Character/Lore; added the create-only note (no update endpoint for `hidden`/`riddleText`/`password`). Previous entry, 2026-07-24: added the "Hidden content" section: how to author a hidden Character/Lore (`hidden`, `riddleText`, `password`), and the hard rule that a visible entity's `links` may never point at hidden content (only the reverse is allowed) — see keynor-core PR #88 and `.claude/skills/hidden-content-implementation.md`. Previous entry, 2026-07-15: added the standing rule auto-linking every canonical DEITY character to the 3 fixed Lore entries (Sexuality of the Gods, The Theosophy of Aniannoth, On the Word God) in both languages, with mandatory output confirmation; corrected the stale claim that `links` was Lore-only — it is now wired for all 6 entity types. Previous entry, 2026-07-10: added the multilingual (EN/PT) content workflow: every submission now requires `language`, an optional `translationGroupId` pairs a translation with its counterpart, and Aroneus must ask the user rather than assume when only one language's content is supplied for a delivery.*
