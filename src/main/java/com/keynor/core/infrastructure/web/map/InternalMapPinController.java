@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 import static com.keynor.core.infrastructure.web.map.MapPinRequestSupport.parseEntityType;
+import static com.keynor.core.infrastructure.web.map.MapPinRequestSupport.parsePinShapeOrDefault;
+import static com.keynor.core.infrastructure.web.map.MapPinRequestSupport.parsePinShapeOrNull;
 
 @RestController
 @RequestMapping("/api/v1/maps/{mapId}/pins")
@@ -52,6 +54,7 @@ public class InternalMapPinController {
                 parseEntityType(request.entityType()),
                 request.entityId(),
                 request.name(),
+                parsePinShapeOrDefault(request.shape()),
                 request.normalizedX(),
                 request.normalizedY());
         MapPin created = createMapPinUseCase.create(command);
@@ -70,7 +73,8 @@ public class InternalMapPinController {
                 request.normalizedY(),
                 request.name(),
                 parseEntityType(request.entityType()),
-                request.entityId());
+                request.entityId(),
+                parsePinShapeOrNull(request.shape()));
         MapPin updated = updateMapPinUseCase.update(mapId, pinId, command);
         var summary = updated.getEntityType() == null
                 ? null

@@ -13,6 +13,7 @@ public class MapPinMapper {
                 entity.getEntityType(),
                 entity.getEntityId(),
                 entity.getName(),
+                entity.getShape(),
                 entity.getNormalizedX(),
                 entity.getNormalizedY(),
                 entity.getCreatedAt());
@@ -25,6 +26,7 @@ public class MapPinMapper {
         entity.setEntityType(pin.getEntityType());
         entity.setEntityId(pin.getEntityId());
         entity.setName(pin.getName());
+        entity.setShape(pin.getShape());
         entity.setNormalizedX(pin.getNormalizedX());
         entity.setNormalizedY(pin.getNormalizedY());
         entity.setCreatedAt(pin.getCreatedAt());

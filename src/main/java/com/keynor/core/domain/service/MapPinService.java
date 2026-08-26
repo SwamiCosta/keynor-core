@@ -3,6 +3,7 @@ package com.keynor.core.domain.service;
 import com.keynor.core.domain.exception.DuplicateEntityNameException;
 import com.keynor.core.domain.exception.EntityNotFoundException;
 import com.keynor.core.domain.model.map.MapPin;
+import com.keynor.core.domain.model.map.PinShape;
 import com.keynor.core.domain.model.shared.EntityType;
 import com.keynor.core.domain.port.in.map.CreateMapPinUseCase;
 import com.keynor.core.domain.port.in.map.DeleteMapPinUseCase;
@@ -52,6 +53,7 @@ public class MapPinService implements CreateMapPinUseCase, UpdateMapPinUseCase, 
                 command.entityType(),
                 command.entityId(),
                 command.name(),
+                command.shape(),
                 command.normalizedX(),
                 command.normalizedY(),
                 Instant.now());
@@ -84,9 +86,10 @@ public class MapPinService implements CreateMapPinUseCase, UpdateMapPinUseCase, 
 
         boolean hasNewName = command.name() != null && !command.name().isBlank();
         String name = hasNewName ? command.name() : pin.getName();
+        PinShape shape = command.shape() != null ? command.shape() : pin.getShape();
 
         MapPin repositioned = new MapPin(
-                pin.getId(), mapId, entityType, entityId, name,
+                pin.getId(), mapId, entityType, entityId, name, shape,
                 command.normalizedX(), command.normalizedY(), pin.getCreatedAt());
         return mapPinRepository.save(repositioned);
     }

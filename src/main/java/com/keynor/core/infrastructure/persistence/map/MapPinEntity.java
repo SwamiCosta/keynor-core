@@ -1,5 +1,6 @@
 package com.keynor.core.infrastructure.persistence.map;
 
+import com.keynor.core.domain.model.map.PinShape;
 import com.keynor.core.domain.model.shared.EntityType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,6 +32,10 @@ public class MapPinEntity {
     @Column(name = "name")
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "shape", nullable = false)
+    private PinShape shape;
+
     @Column(name = "normalized_x", nullable = false)
     private double normalizedX;
 
@@ -50,6 +55,8 @@ public class MapPinEntity {
     public void setEntityId(UUID entityId) { this.entityId = entityId; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    public PinShape getShape() { return shape; }
+    public void setShape(PinShape shape) { this.shape = shape; }
     public double getNormalizedX() { return normalizedX; }
     public void setNormalizedX(double normalizedX) { this.normalizedX = normalizedX; }
     public double getNormalizedY() { return normalizedY; }
