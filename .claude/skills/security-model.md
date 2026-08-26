@@ -147,7 +147,11 @@ Keep the plaintext secret in a local `.env.local` file (gitignored) — it canno
 
 ### Step 4 — Register a browser PKCE client (human login for a frontend SPA)
 
-Used by any browser-based frontend doing the `authorization_code`+PKCE human login flow (`aniannoth-overview`'s `AuthContext.tsx`, and `keynor-rpg-client` from 2026-08-05 onward). This was previously undocumented — `aniannoth-overview/.claude/CLAUDE.md` flagged its own `aniannoth-admin` client as "not usable until registered... by the user" with no worked example to follow. Unlike the SYSTEM client, this is a **public client** — no secret, since a value embedded in browser-shipped JS cannot be kept confidential; PKCE (`require-proof-key: true`) is what protects the code exchange instead.
+Used by any browser-based frontend doing the `authorization_code`+PKCE human login flow (`aniannoth-overview`'s `AuthContext.tsx`, and `keynor-rpg-client` from 2026-08-05 onward). Unlike the SYSTEM client, this is a **public client** — no secret, since a value embedded in browser-shipped JS cannot be kept confidential; PKCE (`require-proof-key: true`) is what protects the code exchange instead.
+
+**Every currently-registered PKCE client needs its own worked example here — not just one, with the others left as "do it the same way."** This section originally documented only `rpg-client`; `aniannoth-admin` was left as a cross-reference to `aniannoth-overview/.claude/CLAUDE.md`'s "not usable until registered... by the user" note with no SQL to copy, and that gap caused a real incident (2026-08-26) — a login flow broke in a way that took real debugging to trace back to "this client was simply never registered," when a worked example here would have made it a five-second copy-paste. Add a new block below whenever a new PKCE client is introduced, immediately, in the same change — don't defer it.
+
+#### `rpg-client` (keynor-rpg-client)
 
 ```sql
 INSERT INTO oauth2_registered_client (
@@ -174,6 +178,32 @@ VALUES (
 `redirect_uris` accepts a single URI here — for multiple environments (LAN hosting, a built/served bundle on a different port), either register additional rows with different `client_id`s, or update this row's `redirect_uris` to match wherever the frontend is actually reachable from. `client_id`s are app-scoped, not role-scoped: the same `rpg-client` row is used whether an `ADMIN` or a `DEFAULT` user logs in — the role comes from which `users` row authenticates during the form-login step, not from which OAuth2 client initiated the request.
 
 **LAN-hosting caveat:** if `keynor-rpg-client` is reached from another machine on the network (not `localhost`), both this row's `redirect_uris` and `ResourceServerConfig`'s CORS `allowedOrigins` must include the host machine's actual LAN-reachable origin, not just `localhost:5173`.
+
+#### `aniannoth-admin` (aniannoth-overview)
+
+```sql
+INSERT INTO oauth2_registered_client (
+    id, client_id, client_id_issued_at, client_secret, client_name,
+    client_authentication_methods, authorization_grant_types,
+    redirect_uris, post_logout_redirect_uris, scopes, client_settings, token_settings
+)
+VALUES (
+    gen_random_uuid()::text,
+    'aniannoth-admin',
+    NOW(),
+    NULL,
+    'aniannoth-overview',
+    'none',
+    'authorization_code',
+    'http://localhost:4173/auth/callback',
+    '',
+    'openid',
+    '{"@class":"java.util.Collections$UnmodifiableMap","settings.client.require-proof-key":true,"settings.client.require-authorization-consent":false}',
+    '{"@class":"java.util.Collections$UnmodifiableMap","settings.token.reuse-refresh-tokens":true,"settings.token.id-token-signature-algorithm":["org.springframework.security.oauth2.jose.jws.SignatureAlgorithm","RS256"],"settings.token.access-token-time-to-live":["java.time.Duration",3600.000000000],"settings.token.access-token-format":{"@class":"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat","value":"self-contained"},"settings.token.refresh-token-time-to-live":["java.time.Duration",86400.000000000],"settings.token.authorization-code-time-to-live":["java.time.Duration",300.000000000],"settings.token.device-code-time-to-live":["java.time.Duration",300.000000000]}'
+);
+```
+
+Same shape as `rpg-client` — only `client_id`, `client_name`, and `redirect_uris` differ (`4173`, aniannoth-overview's fixed dev/preview port, per that project's own `CLAUDE.md`). `VITE_ADMIN_CLIENT_ID` in `aniannoth-overview`'s environment must match this `client_id` exactly.
 
 ### Step 5 — Obtain a token (client_credentials)
 
@@ -214,7 +244,8 @@ The Authorization Server redirects to `/login`. Submit the human user's credenti
 | `invalid_client` | Wrong `client_id`, wrong secret, or hash mismatch | Verify with SELECT; regenerate hash if needed |
 | `invalid_grant` | Grant type not registered for this client | Check `authorization_grant_types` column |
 | Token invalid after app restart | RSA key is ephemeral in dev | Obtain a new token — existing tokens are invalidated on restart |
+| `400 Bad Request` on `GET /oauth2/authorize` | `client_id` in the query string doesn't match any row in `oauth2_registered_client` — never registered, or wiped by a DB reset | Register it via Step 4 (pick the matching worked example, or add a new one if it's a client not yet documented here) |
 
 ---
 
-*Maintained by Imaws. Formerly `oauth2-bootstrap.md` — renamed and expanded to cover the full security model, not just the bootstrap procedure.*
+*Maintained by Imaws. Formerly `oauth2-bootstrap.md` — renamed and expanded to cover the full security model, not just the bootstrap procedure. Updated 2026-08-26: added the `aniannoth-admin` worked example (Step 4) that was missing since this section was first written — only `rpg-client` had one, and the gap caused a real incident when `aniannoth-admin` turned out to have never been registered. Also added a "Common errors" row for `400` on `/oauth2/authorize` from an unregistered `client_id`.*
