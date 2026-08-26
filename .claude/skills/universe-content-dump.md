@@ -152,7 +152,10 @@ The user performs all of these steps manually:
 2. Start PostgreSQL via Docker Compose: `docker-compose up -d postgres`
 3. Start the application once (Flyway runs all migrations automatically)
 4. Stop the application
-5. Apply the bootstrap SQL (ADMIN user + SYSTEM client — see `oauth2-bootstrap.md`)
+5. Apply the bootstrap SQL — see `security-model.md`'s "Bootstrap and token acquisition" section, every one of these, not a subset:
+   - Step 2 — the ADMIN user
+   - Step 3 — the `system-client` SYSTEM client
+   - Step 4 — **every** currently-documented PKCE client, by name (`rpg-client`, `aniannoth-admin`, and any added since) — a login flow for whichever one gets skipped will look broken in a way that doesn't obviously point back to "this client was never registered" (see that section's own note on the 2026-08-26 incident this caused)
 6. Apply the universe content dump:
    ```bash
    psql -U keynor -d keynor_core -f src/main/resources/db/seed/universe-content.sql
